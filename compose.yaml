@@ -1,0 +1,7 @@
+﻿services:
+  giveaid:
+    image: giveaid
+    build:
+      context: .
+      dockerfile: GiveAID/Dockerfile
+
