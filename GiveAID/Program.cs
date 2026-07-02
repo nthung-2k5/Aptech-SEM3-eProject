@@ -10,6 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddHydro();
 
+builder.Services.AddScoped<IAboutUsSubpageService, AboutUsSubpageService>();
+builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", options => { options.LoginPath = "/Login"; });
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,6 +33,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
