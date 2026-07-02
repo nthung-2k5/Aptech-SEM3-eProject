@@ -1,7 +1,21 @@
 ﻿services:
-  giveaid:
-    image: giveaid
-    build:
-      context: .
-      dockerfile: GiveAID/Dockerfile
+#  giveaid:
+#    image: giveaid
+#    build:
+#      context: .
+#      dockerfile: GiveAID/Dockerfile
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: sqlserver-container
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=GiveAID@123
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql-data:/var/opt/mssql
 
+volumes:
+  mssql-data:
