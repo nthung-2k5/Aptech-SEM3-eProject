@@ -186,3 +186,21 @@ a {
         line-height: 1.5;
     }
 }
+
+nav {
+    @apply hidden md:flex items-center gap-1;
+
+    a.navbar-button {
+        @apply px-4 py-2 text-sm font-medium rounded transition-colors text-white/80 hover:text-white hover:bg-white/10 no-underline;
+    }
+}
+
+footer {
+    div.social-icon {
+        @apply size-9 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-white/60 hover:bg-[#C97C2E] hover:text-white cursor-pointer transition-colors;
+    }
+
+    a.page-link {
+        @apply block text-sm text-white/60 hover:text-white transition-colors no-underline;
+    }
+}
