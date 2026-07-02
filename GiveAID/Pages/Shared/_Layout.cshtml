@@ -1,54 +1,144 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
+@inject Services.Abstractions.IAboutUsSubpageService AboutUsSubpageService
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - GiveAID</title>
     <script type="importmap"></script>
+    
+    <!-- Hydro Components -->
     <meta name="hydro-config" />
     <script defer src="~/hydro/hydro.js" asp-append-version="true"></script>
     <script defer src="~/hydro/alpine.js" asp-append-version="true"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    
+    <!-- Tailwind-compiled CSS -->
+    <link rel="stylesheet" href="~/app.css" asp-append-version="true"/>
+    
     <link rel="stylesheet" href="~/GiveAID.styles.css" asp-append-version="true"/>
+    
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    
+    <!-- Phosphor Icons -->
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="https://cdn.jsdelivr.net/npm/@@phosphor-icons/web@2.1.1/src/regular/style.css"
+    />
+    <link
+        rel="stylesheet"
+        type="text/css"
+        href="https://cdn.jsdelivr.net/npm/@@phosphor-icons/web@2.1.1/src/fill/style.css"
+    />
 </head>
-<body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-        <div class="container">
-            <a class="navbar-brand" asp-area="" asp-page="/Index">GiveAID</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                    </li>
-                </ul>
-            </div>
+<body class="min-h-screen font-['Source_Sans_3',sans-serif] bg-[#F6F1E9]">
+
+<!-- Header -->
+<header class="sticky top-0 z-50 bg-[#1A5C6B] text-white shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        <div class="flex items-center justify-between h-16">
+            <!-- Logo -->
+            <a asp-page="/Index" class="flex items-center gap-2 group text-white hover:text-white no-underline">
+                <div class="size-8 bg-[#C97C2E] rounded-full flex items-center justify-center">
+                    <i class="ph-fill ph-heart text-white"></i>
+                </div>
+                <span class="font-['Playfair_Display',serif] text-xl font-bold tracking-tight">Give<span class="text-[#E8C07D]">-AID</span></span>
+            </a>
+
+            <!-- Nav -->
+            <nav id="navbar">
+                <a asp-page="/Index" class="navbar-button">Home</a>
+                <a asp-page="/Donate/Index" class="navbar-button">Donate</a>
+                <a asp-page="/Help" class="navbar-button">Help Centre</a>
+                <a asp-page="/Partners" class="navbar-button">Our Partners</a>
+                
+                <div class="relative group">
+                    <a asp-page="/About" class="navbar-button">
+                        About Us
+                    </a>
+                    <div class="absolute left-0 mt-2 w-56 bg-white text-black shadow-lg rounded-b-md hidden group-hover:block border border-[#E3DDD3]">
+                        @foreach(var subpage in await AboutUsSubpageService.ListSubpagesAsync())
+                        {
+                            <a href="/About/@subpage.Slug" class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] last:border-0 no-underline transition-colors">@subpage.Title</a>
+                        }
+                    </div>
+                </div>
+
+                @if(User.Identity?.IsAuthenticated == true)
+                {
+                    <span class="ml-2 px-3 py-2 text-white text-sm font-medium">Hi, Admin</span>
+                    <a asp-page="/Login?handler=Logout" class="px-3 py-2 text-white/80 hover:text-white text-sm transition-colors no-underline">Logout</a>
+                }
+                else
+                {
+                    <a asp-page="/Register" class="ml-2 px-4 py-2 bg-[#C97C2E] hover:bg-[#B06B20] text-white text-sm font-semibold rounded transition-colors no-underline">Register</a>
+                    <a asp-page="/Login" class="px-3 py-2 text-white/80 hover:text-white text-sm transition-colors no-underline">Login</a>
+                }
+            </nav>
         </div>
-    </nav>
+    </div>
 </header>
-<div class="container">
-    <main role="main" class="pb-3">
+
+<div class="min-h-screen flex flex-col">
+    <main role="main" class="flex-grow">
         @RenderBody()
     </main>
 </div>
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2026 - GiveAID - <a asp-area="" asp-page="/Privacy">Privacy</a>
+<!-- Footer -->
+<footer class="bg-[#1C1A17] text-white">
+    <div class="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-4 gap-10">
+        <div class="md:col-span-2">
+            <div class="flex items-center gap-2 mb-4">
+                <div class="size-8 bg-[#C97C2E] rounded-full flex items-center justify-center">
+                    <i class="ph-fill ph-heart text-white"></i>
+                </div>
+                <span class="font-['Playfair_Display',serif] text-xl font-bold">Give<span class="text-[#E8C07D]">-AID</span></span>
+            </div>
+            <p class="text-white/50 text-sm leading-relaxed mb-5 max-w-xs">A Non-Governmental Organisation established to coordinate welfare funding across 48 verified partners and 12 countries.</p>
+            <div class="flex gap-3">
+                <div class="social-icon">FB</div>
+                <div class="social-icon">TW</div>
+                <div class="social-icon">IG</div>
+                <div class="social-icon">LI</div>
+            </div>
+        </div>
+        <div>
+            <h4 class="text-sm font-bold uppercase tracking-widest text-white/40 mb-4">Quick Links</h4>
+            <div class="space-y-2.5">
+                <a asp-page="/" class="page-link">Home</a>
+                <a asp-page="/Donate" class="page-link">Donate</a>
+                <a asp-page="/Programs" class="page-link">Programmes</a>
+                <a asp-page="/Gallery" class="page-link">Gallery</a>
+                <a asp-page="/Partners" class="page-link">Our Partners</a>
+            </div>
+        </div>
+        <div>
+            <h4 class="text-sm font-bold uppercase tracking-widest text-white/40 mb-4">Contact</h4>
+            <div class="space-y-2 text-sm text-white/60">
+                <p>12, Philanthropy Lane</p>
+                <p>Bandra West, Mumbai 400050</p>
+                <p>+91 22 4567 8900</p>
+                <p>info@give-aid.org</p>
+            </div>
+        </div>
+    </div>
+    <div class="border-t border-white/5">
+        <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-white/30">
+            <p>© 2026 Give-AID. All rights reserved.</p>
+            <div class="flex gap-5">
+                <span class="hover:text-white/60 cursor-pointer transition-colors">Privacy Policy</span>
+                <span class="hover:text-white/60 cursor-pointer transition-colors">Terms of Use</span>
+                <span class="hover:text-white/60 cursor-pointer transition-colors">Certificate</span>
+            </div>
+        </div>
     </div>
 </footer>
 
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+<script>
+  lucide.createIcons();
+</script>
 
 @await RenderSectionAsync("Scripts", required: false)
 </body>
