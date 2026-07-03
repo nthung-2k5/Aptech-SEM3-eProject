@@ -7,7 +7,7 @@ a {
     text-decoration: none;
 }
 
-:root {
+/* :root {
     --font-size: 16px;
     --background: #F6F1E9;
     --foreground: #1C1A17;
@@ -124,16 +124,16 @@ a {
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
-}
+} */
 
 @layer base {
-    * {
+    /* * {
         @apply border-border outline-ring/50;
-    }
+    } */
 
-    body {
+    /* body {
         @apply bg-background text-foreground;
-    }
+    } */
 
     /**
   * Default typography styles for HTML elements (h1-h4, p, label, button, input).
@@ -202,5 +202,55 @@ footer {
 
     a.page-link {
         @apply block text-sm text-white/60 hover:text-white transition-colors no-underline;
+    }
+}
+
+.hero-section {
+    @apply bg-[#1A5C6B] text-white py-12;
+
+    > div {
+        @apply max-w-7xl mx-auto px-6;
+
+        > p {
+            @apply font-['Source_Sans_3',sans-serif] text-[#E8C07D] text-xs font-semibold uppercase tracking-widest mb-2;
+        }
+
+        > h1 {
+            @apply font-['Playfair_Display',serif] text-4xl font-bold;
+        }
+    }
+}
+
+#about-us {
+    aside {
+        @apply md:w-56 flex-shrink-0;
+
+        > div {
+            @apply bg-white border border-[#E3DDD3] rounded-xl sticky top-24 font-['Source_Sans_3',sans-serif];
+            
+            > section {
+                &:first-child {
+                    @apply rounded-t-xl;
+                }
+
+                &:last-child {
+                    @apply rounded-b-xl;
+                }
+
+                @apply relative border-b border-[#E3DDD3] last:border-0 data-[active=True]:bg-[#1A5C6B] data-[active=False]:hover:bg-[#F6F1E9] transition-colors flex items-center;
+
+                > a {
+                    @apply flex-1 block w-full text-left px-5 py-3.5 text-sm text-[#1C1A17] group-data-[active=True]:text-white group-data-[active=True]:font-semibold no-underline;
+                }
+
+                > div {
+                    @apply absolute right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity;
+                    
+                    button {
+                        @apply p-1.5 rounded transition-colors;
+                    }
+                }
+            }
+        }
     }
 }
