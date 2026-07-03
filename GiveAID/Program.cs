@@ -1,13 +1,16 @@
-using GiveAID.Data;
+using GiveAID;
 using GiveAID.Services.Abstractions;
 using GiveAID.Services;
 using Hydro.Configuration;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AddFolderRouteModelConvention("/Components", model => model.Selectors.Clear());
+});
+
 builder.Services.AddHydro();
 
 builder.Services.AddScoped<IAboutUsSubpageService, AboutUsSubpageService>();
