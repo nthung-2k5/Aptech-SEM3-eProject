@@ -11,6 +11,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddHydro();
 
 builder.Services.AddScoped<IAboutUsSubpageService, AboutUsSubpageService>();
+builder.Services.AddScoped<IProgrammeService, ProgrammeService>();
 builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", options => { options.LoginPath = "/Login"; });
 
 var app = builder.Build();
