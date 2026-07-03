@@ -1,26 +1,17 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
-using System.Threading.Tasks;
-using System;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace GiveAID.Pages;
+namespace GiveAID.Pages.Programmes;
 
-public class ProgrammeDetailsModel : PageModel
+public class ProgrammeDetailsModel(IProgrammeService programmeService) : PageModel
 {
-    private readonly IProgrammeService _programmeService;
-
-    public ProgrammeDetailsModel(IProgrammeService programmeService)
-    {
-        _programmeService = programmeService;
-    }
-
     public ProgrammeDetailsDto? Programme { get; set; }
 
     public async Task<IActionResult> OnGetAsync(Guid id)
     {
-        Programme = await _programmeService.GetProgrammeDetailsAsync(id);
+        Programme = await programmeService.GetProgrammeDetailsAsync(id);
         
         if (Programme == null)
         {
