@@ -5,7 +5,7 @@ namespace GiveAID.Services;
 
 public class AboutUsSubpageService : IAboutUsSubpageService
 {
-    private readonly List<AboutUsSubpageDto> pages =
+    private readonly List<AboutUsSubpageDetailsDto> pages =
     [
         new(
             "what-we-do",
@@ -61,18 +61,18 @@ public class AboutUsSubpageService : IAboutUsSubpageService
                 """)
     ];
 
-    public Task<AboutUsSubpageDto[]> ListSubpagesAsync(CancellationToken ct = default)
+    public Task<AboutUsSubpageSummaryDto[]> ListSubpagesAsync(CancellationToken ct = default)
     {
-        return Task.FromResult(pages.ToArray());
+        return Task.FromResult<AboutUsSubpageSummaryDto[]>(pages.ToArray());
     }
 
-    public AboutUsSubpageDto? GetBySlugAsync(string slug, CancellationToken ct = default)
+    public Task<AboutUsSubpageDetailsDto?> GetBySlugAsync(string slug, CancellationToken ct = default)
     {
         var page = pages.FirstOrDefault(p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
-        return page;
+        return Task.FromResult(page);
     }
 
-    public Task<bool> AddSubpageAsync(AboutUsSubpageDto page, CancellationToken ct = default)
+    public Task<bool> AddSubpageAsync(AboutUsSubpageDetailsDto page, CancellationToken ct = default)
     {
         bool exists = pages.Any(p => p.Slug.Equals(page.Slug, StringComparison.OrdinalIgnoreCase));
         
@@ -81,7 +81,7 @@ public class AboutUsSubpageService : IAboutUsSubpageService
         return Task.FromResult(!exists);
     }
 
-    public Task<bool> UpdateSubpageAsync(AboutUsSubpageDto page, CancellationToken ct = default)
+    public Task<bool> UpdateSubpageAsync(AboutUsSubpageDetailsDto page, CancellationToken ct = default)
     {
         bool exists = pages.Any(p => p.Slug.Equals(page.Slug, StringComparison.OrdinalIgnoreCase));
 

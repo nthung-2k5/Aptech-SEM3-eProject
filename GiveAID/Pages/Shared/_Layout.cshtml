@@ -53,13 +53,13 @@
                 <a asp-page="/Partners" class="navbar-button">Our Partners</a>
                 
                 <div class="relative group">
-                    <a asp-page="/About" class="navbar-button">
+                    <a asp-page="/AboutUs" class="navbar-button">
                         About Us
                     </a>
-                    <div class="absolute left-0 mt-2 w-56 bg-white text-black shadow-lg rounded-b-md hidden group-hover:block border border-[#E3DDD3]">
+                    <div class="absolute left-0 mt-1 w-56 bg-white text-black shadow-lg rounded-b-md hidden group-hover:block border border-[#E3DDD3]">
                         @foreach(var subpage in await AboutUsSubpageService.ListSubpagesAsync())
                         {
-                            <a href="/About/@subpage.Slug" class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] last:border-0 no-underline transition-colors">@subpage.Title</a>
+                            <a asp-page="/AboutUs" asp-route-slug="@subpage.Slug" class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] last:border-0 no-underline transition-colors">@subpage.Title</a>
                         }
                     </div>
                 </div>
