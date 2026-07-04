@@ -318,3 +318,15 @@ footer {
 span.validation-message {
     @apply text-xs text-error mt-2;
 }
+
+#admin nav > a {
+    @apply flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors no-underline;
+
+    &[data-active=True] {
+        @apply bg-[#1A5C6B] text-white;
+    }
+
+    &[data-active=False] {
+        @apply text-[#6B6459] hover:bg-[#F6F1E9];
+    }
+}
