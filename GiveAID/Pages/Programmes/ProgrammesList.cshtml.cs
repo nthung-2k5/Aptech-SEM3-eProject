@@ -1,8 +1,8 @@
-using Hydro;
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
+using Hydro;
 
-namespace GiveAID.Pages.Components;
+namespace GiveAID.Pages.Programmes;
 
 public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
 {
@@ -47,6 +47,6 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
             PageNumber = PageNumber,
             PageSize = 6
         };
-        Programmes = await programmeService.GetProgrammesAsync(query);
+        Programmes = await programmeService.GetAllProgrammesAsync(query);
     }
 }

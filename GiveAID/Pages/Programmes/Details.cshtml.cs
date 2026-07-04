@@ -7,11 +7,11 @@ namespace GiveAID.Pages.Programmes;
 
 public class ProgrammeDetailsModel(IProgrammeService programmeService) : PageModel
 {
-    public ProgrammeDetailsDto? Programme { get; set; }
+    public ProgrammeDto? Programme { get; set; }
 
     public async Task<IActionResult> OnGetAsync(Guid id)
     {
-        Programme = await programmeService.GetProgrammeDetailsAsync(id);
+        Programme = await programmeService.GetProgrammeByIdAsync(id);
 
         if (Programme == null) { return NotFound(); }
 
