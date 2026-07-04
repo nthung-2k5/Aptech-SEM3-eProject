@@ -11,14 +11,10 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
     public string Ngo { get; set; } = string.Empty;
     public int PageNumber { get; set; } = 1;
 
-    public IEnumerable<ProgrammeSummaryDto> Programmes { get; set; } = Array.Empty<ProgrammeSummaryDto>();
-    public int TotalCount { get; set; }
-    public int TotalPages => (int)Math.Ceiling(TotalCount / 6.0);
+    public ProgrammeSummaryDto[] Programmes { get; set; } = [];
+    public int TotalPages => (int)Math.Ceiling(Programmes.Length / 6.0);
 
-    public override async Task MountAsync()
-    {
-        await LoadProgrammesAsync();
-    }
+    public override async Task MountAsync() { await LoadProgrammesAsync(); }
 
     public async Task Search()
     {
@@ -51,8 +47,6 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
             PageNumber = PageNumber,
             PageSize = 6
         };
-        var result = await programmeService.GetProgrammesAsync(query);
-        Programmes = result.Programmes;
-        TotalCount = result.TotalCount;
+        Programmes = await programmeService.GetProgrammesAsync(query);
     }
 }
