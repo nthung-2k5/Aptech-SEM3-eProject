@@ -3,7 +3,7 @@ using GiveAID.Services.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace GiveAID.Pages;
+namespace GiveAID.Pages.AboutUs;
 
 public class AboutModel(IAboutUsSubpageService aboutUsService) : PageModel
 {
@@ -30,6 +30,6 @@ public class AboutModel(IAboutUsSubpageService aboutUsService) : PageModel
     {
         if (User.Identity?.IsAuthenticated == true) { await aboutUsService.DeleteSubpageAsync(slug, ct); }
 
-        return RedirectToPage("/AboutUs", new { slug = "" });
+        return RedirectToPage("/AboutUs/Index", new { slug = "" });
     }
 }

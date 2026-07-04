@@ -23,7 +23,7 @@
                     {
                         bool isActive = Model.CurrentPage?.Slug == p.Slug;
                         <section data-active="@isActive" class="group">
-                            <a asp-page="/AboutUs" asp-route-slug="@p.Slug">
+                            <a asp-page="/AboutUs/Index" asp-route-slug="@p.Slug">
                                 @p.Title
                             </a>
                             @if (isAdmin)

@@ -19,7 +19,7 @@ public class EditorModel(IAboutUsSubpageService aboutUsService) : PageModel
             IsEditMode = true;
             CurrentPage = await aboutUsService.GetBySlugAsync(slug, ct);
 
-            if (CurrentPage == null) { return RedirectToPage("/AboutUs"); }
+            if (CurrentPage == null) { return RedirectToPage("/AboutUs/Index"); }
         }
         else { IsEditMode = false; }
 
@@ -34,6 +34,6 @@ public class EditorModel(IAboutUsSubpageService aboutUsService) : PageModel
         if (!string.IsNullOrEmpty(originalSlug)) { await aboutUsService.UpdateSubpageAsync(page, ct); }
         else { await aboutUsService.AddSubpageAsync(page, ct); }
 
-        return RedirectToPage("/AboutUs", new { slug });
+        return RedirectToPage("/AboutUs/Index", new { slug });
     }
 }
