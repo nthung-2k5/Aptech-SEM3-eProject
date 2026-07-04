@@ -10,17 +10,19 @@
             <h1 class="font-['Playfair_Display',serif] text-3xl font-bold mb-6 text-[#1C1A17]">
                 @(Model.IsEditMode ? "Update Subpage" : "Create Subpage")
             </h1>
-            
+
             <form method="post">
-                <input type="hidden" name="originalSlug" value="@Model.CurrentPage?.Slug" />
+                <input type="hidden" name="originalSlug" value="@Model.CurrentPage?.Slug"/>
                 <div class="space-y-4">
                     <div>
                         <label class="block text-sm font-medium mb-1">Title</label>
-                        <input type="text" name="title" value="@Model.CurrentPage?.Title" class="input input-bordered w-full" required />
+                        <input type="text" name="title" value="@Model.CurrentPage?.Title"
+                               class="input input-bordered w-full" required/>
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">Slug (URL)</label>
-                        <input type="text" name="slug" value="@Model.CurrentPage?.Slug" class="input input-bordered w-full" required />
+                        <input type="text" name="slug" value="@Model.CurrentPage?.Slug"
+                               class="input input-bordered w-full" required/>
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">Content</label>
@@ -29,7 +31,8 @@
                 </div>
                 <div class="mt-6 flex justify-end gap-3">
                     <a asp-page="/AboutUs" asp-route-slug="@(Model.CurrentPage?.Slug ?? "")" class="btn btn-ghost">Cancel</a>
-                    <button type="submit" class="btn btn-primary bg-[#1A5C6B] text-white border-none hover:bg-[#154a56]">
+                    <button type="submit"
+                            class="btn btn-primary bg-[#1A5C6B] text-white border-none hover:bg-[#154a56]">
                         @(Model.IsEditMode ? "Save Changes" : "Create Subpage")
                     </button>
                 </div>

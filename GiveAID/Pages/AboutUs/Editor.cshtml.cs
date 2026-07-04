@@ -18,31 +18,22 @@ public class EditorModel(IAboutUsSubpageService aboutUsService) : PageModel
         {
             IsEditMode = true;
             CurrentPage = await aboutUsService.GetBySlugAsync(slug, ct);
-            if (CurrentPage == null)
-            {
-                return RedirectToPage("/AboutUs");
-            }
+
+            if (CurrentPage == null) { return RedirectToPage("/AboutUs"); }
         }
-        else
-        {
-            IsEditMode = false;
-        }
+        else { IsEditMode = false; }
+
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(string? originalSlug, string slug, string title, string content, CancellationToken ct)
+    public async Task<IActionResult> OnPostAsync(string? originalSlug, string slug, string title, string content,
+                                                 CancellationToken ct)
     {
         var page = new AboutUsSubpageDetailsDto(title, slug, content);
-        
-        if (!string.IsNullOrEmpty(originalSlug))
-        {
-            await aboutUsService.UpdateSubpageAsync(page, ct);
-        }
-        else
-        {
-            await aboutUsService.AddSubpageAsync(page, ct);
-        }
-        
+
+        if (!string.IsNullOrEmpty(originalSlug)) { await aboutUsService.UpdateSubpageAsync(page, ct); }
+        else { await aboutUsService.AddSubpageAsync(page, ct); }
+
         return RedirectToPage("/AboutUs", new { slug });
     }
 }

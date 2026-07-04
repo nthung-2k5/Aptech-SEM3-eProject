@@ -12,12 +12,9 @@ public class ProgrammeDetailsModel(IProgrammeService programmeService) : PageMod
     public async Task<IActionResult> OnGetAsync(Guid id)
     {
         Programme = await programmeService.GetProgrammeDetailsAsync(id);
-        
-        if (Programme == null)
-        {
-            return NotFound();
-        }
-        
+
+        if (Programme == null) { return NotFound(); }
+
         return Page();
     }
 }

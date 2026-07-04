@@ -4,7 +4,5 @@ namespace GiveAID.Pages.Programmes;
 
 public class ProgrammesModel : PageModel
 {
-    public void OnGet()
-    {
-    }
+    public void OnGet() { }
 }

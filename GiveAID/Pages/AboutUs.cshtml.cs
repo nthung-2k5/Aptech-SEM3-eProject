@@ -13,29 +13,23 @@ public class AboutModel(IAboutUsSubpageService aboutUsService) : PageModel
     public async Task<IActionResult> OnGetAsync(string? slug, CancellationToken ct)
     {
         Subpages = await aboutUsService.ListSubpagesAsync(ct);
-        if (Subpages.Length == 0) return Page();
 
-        if (string.IsNullOrEmpty(slug))
-        {
-            CurrentPage = await aboutUsService.GetBySlugAsync(Subpages[0].Slug, ct);
-        }
+        if (Subpages.Length == 0) { return Page(); }
+
+        if (string.IsNullOrEmpty(slug)) { CurrentPage = await aboutUsService.GetBySlugAsync(Subpages[0].Slug, ct); }
         else
         {
-            CurrentPage = await aboutUsService.GetBySlugAsync(slug, ct) ?? await aboutUsService.GetBySlugAsync(Subpages[0].Slug, ct);
+            CurrentPage = await aboutUsService.GetBySlugAsync(slug, ct) ??
+                          await aboutUsService.GetBySlugAsync(Subpages[0].Slug, ct);
         }
 
         return Page();
     }
 
-
-
     public async Task<IActionResult> OnPostDeleteAsync(string slug, CancellationToken ct)
     {
-        if (User.Identity?.IsAuthenticated == true)
-        {
-            await aboutUsService.DeleteSubpageAsync(slug, ct);
-        }
-        
+        if (User.Identity?.IsAuthenticated == true) { await aboutUsService.DeleteSubpageAsync(slug, ct); }
+
         return RedirectToPage("/AboutUs", new { slug = "" });
     }
 }
