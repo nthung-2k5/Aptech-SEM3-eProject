@@ -1,16 +1,15 @@
-namespace GiveAID.Services;
+using GiveAID.Models;
+using GiveAID.Services.Abstractions;
+using GiveAID.Dtos;
 
-using Abstractions;
-using Dtos;
-using System.Threading.Tasks;
-using System;
-using System.Linq;
+namespace GiveAID.Services;
 
 public class ProgrammeService : IProgrammeService
 {
-    public Task<ProgrammeSummaryDto[]> GetProgrammesAsync(ProgrammeQueryParameters query, CancellationToken ct = default)
+    public Task<ProgrammeSummaryDto[]> GetAllProgrammesAsync(ProgrammeQueryParameters query,
+                                                          CancellationToken ct = default)
     {
-        var q = Models.MockData.Programmes.AsQueryable();
+        var q = MockData.Programmes.AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(query.SearchTerm))
         {
@@ -28,25 +27,14 @@ public class ProgrammeService : IProgrammeService
             q = q.Where(p => p.Cause.Equals(query.Cause, StringComparison.OrdinalIgnoreCase));
         }
 
-        var paginated = q.Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize).Select(p =>
-                new ProgrammeSummaryDto(
-                    p.Id,
-                    p.Name,
-                    p.Cause,
-                    p.Ngo,
-                    p.ImageUrl,
-                    p.StartDate,
-                    p.EndDate,
-                    p.DonationCount,
-                    p.TargetAmount,
-                    p.RaisedAmount)).ToArray();
+        var paginated = q.Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize).ToArray();
 
-        return Task.FromResult(paginated);
+        return Task.FromResult<ProgrammeSummaryDto[]>(paginated);
     }
 
-    public Task<ProgrammeDetailsDto?> GetProgrammeDetailsAsync(Guid id, CancellationToken ct = default)
+    public Task<ProgrammeDto?> GetProgrammeByIdAsync(Guid id, CancellationToken ct = default)
     {
-        var prog = Models.MockData.Programmes.FirstOrDefault(p => p.Id == id);
+        var prog = MockData.Programmes.FirstOrDefault(p => p.Id == id);
         return Task.FromResult(prog);
     }
 }

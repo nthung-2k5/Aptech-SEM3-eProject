@@ -11,6 +11,6 @@ public partial class DonationTarget : OneOfBase<DonateForNgoTarget, DonateForPro
 
 public record DonationSaveDto(Guid UserId, DonationTarget Target, decimal Amount);
 
-public record UserDonationDto(DonationTarget Target, decimal Amount);
+public record UserDonationDto(DonationTarget Target, decimal Amount, DateTimeOffset DonationDate);
 
 public record DonationDto(Guid Id, Guid DonorId, string DonorName, DonationTarget Target, decimal Amount, DateTimeOffset DonationDate);

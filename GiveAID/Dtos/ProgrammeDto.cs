@@ -13,7 +13,7 @@ public record ProgrammeSummaryDto(
     decimal RaisedAmount
 );
 
-public record ProgrammeDetailsDto(
+public record ProgrammeDto(
     Guid Id,
     string Name,
     string Cause,
@@ -26,4 +26,15 @@ public record ProgrammeDetailsDto(
     decimal RaisedAmount,
     string Description,
     string OrganizerInfo
+): ProgrammeSummaryDto(
+    Id,
+    Name,
+    Cause,
+    Ngo,
+    ImageUrl,
+    StartDate,
+    EndDate,
+    DonationCount,
+    TargetAmount,
+    RaisedAmount
 );
