@@ -6,19 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - GiveAID</title>
     <script type="importmap"></script>
-    
+
     <!-- Hydro Components -->
-    <meta name="hydro-config" />
+    <meta name="hydro-config"/>
     <script defer src="~/hydro/hydro.js" asp-append-version="true"></script>
     <script defer src="~/hydro/alpine.js" asp-append-version="true"></script>
-    
+
     <!-- Tailwind-compiled CSS -->
     <link rel="stylesheet" href="~/app.css" asp-append-version="true"/>
-    
+
     <link rel="stylesheet" href="~/GiveAID.styles.css" asp-append-version="true"/>
-    
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
-    
+
     <!-- Phosphor Icons -->
     <link
         rel="stylesheet"
@@ -31,7 +29,7 @@
         href="https://cdn.jsdelivr.net/npm/@@phosphor-icons/web@2.1.1/src/fill/style.css"
     />
 </head>
-<body class="min-h-screen font-['Source_Sans_3',sans-serif] bg-[#F6F1E9]">
+<body class="min-h-screen bg-[#F6F1E9]">
 
 <!-- Header -->
 <header class="sticky top-0 z-50 bg-[#1A5C6B] text-white shadow-lg">
@@ -42,37 +40,44 @@
                 <div class="size-8 bg-[#C97C2E] rounded-full flex items-center justify-center">
                     <i class="ph-fill ph-heart text-white"></i>
                 </div>
-                <span class="font-['Playfair_Display',serif] text-xl font-bold tracking-tight">Give<span class="text-[#E8C07D]">-AID</span></span>
+                <h3 class="font-bold tracking-tight">Give<span class="text-[#E8C07D]">-AID</span></h3>
             </a>
 
             <!-- Nav -->
             <nav id="navbar">
                 <a asp-page="/Index" class="navbar-button">Home</a>
                 <a asp-page="/Programmes/Index" class="navbar-button">Programmes</a>
-                <a asp-page="/Help" class="navbar-button">Help Centre</a>
                 <a asp-page="/Partners" class="navbar-button">Our Partners</a>
-                
+
                 <div class="relative group">
                     <a asp-page="/AboutUs" class="navbar-button">
                         About Us
                     </a>
-                    <div class="absolute left-0 mt-1 w-56 bg-white text-black shadow-lg rounded-b-md hidden group-hover:block border border-[#E3DDD3]">
-                        @foreach(var subpage in await AboutUsSubpageService.ListSubpagesAsync())
+                    <div
+                        class="absolute left-0 mt-1 w-56 bg-white text-black shadow-lg rounded-b-md hidden group-hover:block border border-[#E3DDD3]">
+                        @foreach (var subpage in await AboutUsSubpageService.ListSubpagesAsync())
                         {
-                            <a asp-page="/AboutUs" asp-route-slug="@subpage.Slug" class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] last:border-0 no-underline transition-colors">@subpage.Title</a>
+                            <a asp-page="/AboutUs" asp-route-slug="@subpage.Slug"
+                               class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] last:border-0 no-underline transition-colors">@subpage.Title</a>
                         }
                     </div>
                 </div>
 
-                @if(User.Identity?.IsAuthenticated == true)
+                <a asp-page="/Gallery" class="navbar-button">Gallery</a>
+
+                <a asp-page="/Help" class="navbar-button">Contact Us</a>
+
+                @if (User.Identity?.IsAuthenticated == true)
                 {
                     <span class="ml-2 px-3 py-2 text-white text-sm font-medium">Hi, Admin</span>
-                    <a asp-page="/Login?handler=Logout" class="px-3 py-2 text-white/80 hover:text-white text-sm transition-colors no-underline">Logout</a>
+                    <a asp-page="/Login?handler=Logout"
+                       class="px-3 py-2 text-white/80 hover:text-white text-sm transition-colors no-underline">Logout</a>
                 }
                 else
                 {
-                    <a asp-page="/Register" class="ml-2 px-4 py-2 bg-[#C97C2E] hover:bg-[#B06B20] text-white text-sm font-semibold rounded transition-colors no-underline">Register</a>
-                    <a asp-page="/Login" class="px-3 py-2 text-white/80 hover:text-white text-sm transition-colors no-underline">Login</a>
+                    <a asp-page="/Register" class="btn btn-secondary">Register</a>
+                    <a asp-page="/Login"
+                       class="px-3 py-2 text-white/80 hover:text-white text-sm transition-colors no-underline">Login</a>
                 }
             </nav>
         </div>
@@ -86,57 +91,54 @@
 </div>
 
 <!-- Footer -->
-<footer class="bg-[#1C1A17] text-white">
-    <div class="max-w-7xl mx-auto px-6 py-14 grid md:grid-cols-4 gap-10">
-        <div class="md:col-span-2">
-            <div class="flex items-center gap-2 mb-4">
-                <div class="size-8 bg-[#C97C2E] rounded-full flex items-center justify-center">
-                    <i class="ph-fill ph-heart text-white"></i>
-                </div>
-                <span class="font-['Playfair_Display',serif] text-xl font-bold">Give<span class="text-[#E8C07D]">-AID</span></span>
+<footer class="footer sm:footer-horizontal bg-[#1C1A17] text-white px-6 py-14">
+    <aside>
+        <div class="flex items-center gap-2 mb-4">
+            <div class="size-8 bg-[#C97C2E] rounded-full flex items-center justify-center">
+                <i class="ph-fill ph-heart text-white"></i>
             </div>
-            <p class="text-white/50 text-sm leading-relaxed mb-5 max-w-xs">A Non-Governmental Organisation established to coordinate welfare funding across 48 verified partners and 12 countries.</p>
-            <div class="flex gap-3">
-                <div class="social-icon">FB</div>
-                <div class="social-icon">TW</div>
-                <div class="social-icon">IG</div>
-                <div class="social-icon">LI</div>
-            </div>
+            <h3 class="font-bold">Give<span class="text-[#E8C07D]">-AID</span></h3>
         </div>
-        <div>
-            <h4 class="text-sm font-bold uppercase tracking-widest text-white/40 mb-4">Quick Links</h4>
-            <div class="space-y-2.5">
-                <a asp-page="/" class="page-link">Home</a>
-                <a asp-page="/Donate" class="page-link">Donate</a>
-                <a asp-page="/Programmes" class="page-link">Programmes</a>
-                <a asp-page="/Gallery" class="page-link">Gallery</a>
-                <a asp-page="/Partners" class="page-link">Our Partners</a>
-            </div>
+        <p class="text-white/50 text-sm leading-relaxed mb-5 max-w-xs">A Non-Governmental Organisation established to
+            coordinate welfare funding across 48 verified partners and 12 countries.</p>
+        <div class="flex gap-3">
+            <div class="social-icon">FB</div>
+            <div class="social-icon">TW</div>
+            <div class="social-icon">IG</div>
+            <div class="social-icon">LI</div>
         </div>
-        <div>
-            <h4 class="text-sm font-bold uppercase tracking-widest text-white/40 mb-4">Contact</h4>
-            <div class="space-y-2 text-sm text-white/60">
-                <p>12, Philanthropy Lane</p>
-                <p>Bandra West, Mumbai 400050</p>
-                <p>+91 22 4567 8900</p>
-                <p>info@give-aid.org</p>
-            </div>
+    </aside>
+    <nav>
+        <h6 class="footer-title">Quick Links</h6>
+        <a asp-page="/" class="link link-hover">Home</a>
+        <a asp-page="/Programmes" class="link link-hover">Programmes</a>
+        <a asp-page="/Gallery" class="link link-hover">Gallery</a>
+        <a asp-page="/Partners" class="link link-hover">Our Partners</a>
+    </nav>
+    <nav>
+        <h6 class="footer-title">Contact</h6>
+        <div class="space-y-2 text-sm text-white/60">
+            <p>12, Philanthropy Lane</p>
+            <p>Bandra West, Mumbai 400050</p>
+            <p>+91 22 4567 8900</p>
+            <p>info@give-aid.org</p>
         </div>
-    </div>
-    <div class="border-t border-white/5">
-        <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-white/30">
-            <p>© 2026 Give-AID. All rights reserved.</p>
-            <div class="flex gap-5">
-                <span class="hover:text-white/60 cursor-pointer transition-colors">Privacy Policy</span>
-                <span class="hover:text-white/60 cursor-pointer transition-colors">Terms of Use</span>
-                <span class="hover:text-white/60 cursor-pointer transition-colors">Certificate</span>
-            </div>
-        </div>
-    </div>
+    </nav>
+</footer>
+<footer
+    class="footer sm:footer-horizontal bg-[#1C1A17] text-white px-6 py-5 border-t border-white/5 items-center justify-between gap-3 text-xs text-white/30">
+    <aside>
+        <p>© 2026 Give-AID. All rights reserved.</p>
+    </aside>
+    <aside class="flex gap-5">
+        <span class="hover:text-white/60 cursor-pointer transition-colors">Privacy Policy</span>
+        <span class="hover:text-white/60 cursor-pointer transition-colors">Terms of Use</span>
+        <span class="hover:text-white/60 cursor-pointer transition-colors">Certificate</span>
+    </aside>
 </footer>
 
 <script src="~/js/site.js" asp-append-version="true"></script>
 
-@await RenderSectionAsync("Scripts", required: false)
+@await RenderSectionAsync("Scripts", false)
 </body>
 </html>
