@@ -1,0 +1,49 @@
+@model LoginForm
+
+<div class="bg-white py-8 px-6 shadow-xl rounded-xl border border-[#E3DDD3] sm:px-10">
+    @if (Model.HasError)
+    {
+        <div class="bg-red-50 text-red-500 border border-red-100 p-3 rounded-lg text-sm mb-4">
+            Invalid email or password. Try again.
+        </div>
+    }
+    <form on:submit="@(() => Model.Submit())">
+        <div class="space-y-6">
+            <div>
+                <label asp-for="Email" class="block text-sm font-medium text-[#1C1A17] mb-2">Email address</label>
+                <label class="input w-full">
+                    <i class="ph ph-envelope"></i>
+                    <input asp-for="Email" bind type="email" autocomplete="email" placeholder="jane@example.com">
+                </label>
+                <span class="validation-message" asp-validation-for="Email"></span>
+            </div>
+
+            <div>
+                <label asp-for="Password" class="block text-sm font-medium text-[#1C1A17] mb-2">Password</label>
+                <label class="input w-full">
+                    <i class="ph ph-lock"></i>
+                    <input asp-for="Password" bind type="password" autocomplete="current-password"
+                           placeholder="••••••••">
+                </label>
+                <span class="validation-message" asp-validation-for="Password"></span>
+                @* <span class="text-red-500 text-xs mt-1 block" hydro-error="Password"></span> *@
+            </div>
+
+            <div class="flex items-center justify-between">
+                <label class="label">
+                    <input type="checkbox" asp-for="RememberMe" class="checkbox">
+                    Remember me
+                </label>
+
+                <div class="text-sm">
+                    <a href="#" class="font-semibold text-[#1A5C6B] hover:text-[#154D5A] no-underline">Forgot your
+                        password?</a>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block">
+                Sign in
+            </button>
+        </div>
+    </form>
+</div>
