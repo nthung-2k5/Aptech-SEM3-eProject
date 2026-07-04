@@ -1,4 +1,3 @@
-using GiveAID;
 using GiveAID.Services.Abstractions;
 using GiveAID.Services;
 using Hydro.Configuration;
@@ -15,6 +14,11 @@ builder.Services.AddHydro();
 
 builder.Services.AddScoped<IAboutUsSubpageService, AboutUsSubpageService>();
 builder.Services.AddScoped<IProgrammeService, ProgrammeService>();
+builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<INgoService, NgoService>();
+builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+builder.Services.AddScoped<IGalleryImageService, GalleryImageService>();
+builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", options => { options.LoginPath = "/Login"; });
 
 var app = builder.Build();
