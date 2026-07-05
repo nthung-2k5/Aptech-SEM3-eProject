@@ -1,0 +1,110 @@
+@model RegisterForm
+
+@if (Model.IsSuccess)
+{
+    <div class="text-center py-16">
+        <div class="size-20 bg-[#1A5C6B]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="ph ph-check text-3xl text-[#1A5C6B]"></i>
+        </div>
+        <h2 class="font-['Playfair_Display',serif] text-3xl font-bold text-[#1C1A17] mb-3">Welcome!</h2>
+        <p class="text-[#6B6459] mb-8">
+            Your account has been created. You can now donate, invite friends, and track your impact.
+        </p>
+        <a asp-page="/Index"
+           class="inline-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white font-semibold rounded-lg px-8 py-3.5 no-underline transition-colors">
+            Go to Home
+        </a>
+    </div>
+}
+else
+{
+    <form on:submit="@(() => Model.Submit())"
+          class="bg-white rounded-2xl border border-[#E3DDD3] shadow-sm p-8 space-y-6">
+        <div>
+            <h3 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1A5C6B] mb-4">Personal Information</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="col-span-2">
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Name</label>
+                    <input type="text" asp-for="Name" bind placeholder="Jane Doe" class="input w-full"/>
+                    <span class="validation-message" asp-validation-for="Name"></span>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Email Address</label>
+                    <input type="email" asp-for="Email" bind placeholder="jane@example.com" class="input w-full"/>
+                    <span class="validation-message" asp-validation-for="Email"></span>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Phone Number</label>
+                    <input type="tel" asp-for="Phone" bind placeholder="9876543210" class="input w-full"/>
+                    <span class="validation-message" asp-validation-for="Phone"></span>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Date of Birth</label>
+                    <input type="date" asp-for="DOB" bind class="input w-full"/>
+                    <span class="validation-message" asp-validation-for="DOB"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-[#E3DDD3] pt-6">
+            <h3 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1A5C6B] mb-4">Professional
+                Information</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Occupation</label>
+                    <select asp-for="Occupation" bind class="select w-full">
+                        <option value="">Select occupation</option>
+                        <option>Student</option>
+                        <option>Self-employed</option>
+                        <option>Salaried</option>
+                        <option>Business Owner</option>
+                        <option>Retired</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5">Address</label>
+                    <input type="text" asp-for="Address" bind placeholder="Mumbai"
+                           class="input w-full"/>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-[#E3DDD3] pt-6">
+            <h3 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1A5C6B] mb-4">Set Password</h3>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Password</label>
+                    <input type="password" asp-for="Password" bind placeholder="Min 6 characters"
+                           class="input w-full"/>
+                    <span class="validation-message" asp-validation-for="Password"></span>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Confirm Password</label>
+                    <input type="password" asp-for="ConfirmPassword" bind placeholder="Re-enter password"
+                           class="input w-full"/>
+                    <span class="validation-message" asp-validation-for="ConfirmPassword"></span>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="flex items-start gap-3 mt-2">
+                <label class="label required">
+                    <input type="checkbox" asp-for="Agree" bind class="checkbox" />
+                    I agree to the <span class="text-[#1A5C6B] underline cursor-pointer">Terms & Conditions</span> and
+                    <span class="text-[#1A5C6B] underline cursor-pointer">Privacy Policy</span>
+                </label>
+            </div>
+            <span class="validation-message" asp-validation-for="Agree"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg btn-block">
+            Create My Account
+        </button>
+        <p class="text-center text-sm text-[#6B6459] mt-4">
+            Already have an account?
+            <a asp-page="/Login/Index" class="text-[#1A5C6B] font-semibold no-underline hover:underline">Log in here</a>
+        </p>
+    </form>
+}

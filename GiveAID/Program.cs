@@ -1,5 +1,5 @@
-using GiveAID.Services.Abstractions;
 using GiveAID.Services;
+using GiveAID.Services.Abstractions;
 using Hydro.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
