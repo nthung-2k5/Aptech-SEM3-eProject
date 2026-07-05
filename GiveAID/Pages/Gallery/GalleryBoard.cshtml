@@ -1,7 +1,17 @@
 @model GalleryBoard
 
 <div>
-    <div class="flex flex-wrap items-center justify-end gap-4 mb-8">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div class="flex flex-wrap gap-2">
+            @foreach (string filter in new[] { "All", "Health", "Education", "Women", "Environment" })
+            {
+                <button type="button" on:click="@(() => Model.SetFilter(filter))"
+                        class="px-4 py-2 rounded-full text-sm font-medium transition-colors @(Model.Filter == filter ? "bg-[#1A5C6B] text-white" : "bg-white border border-[#E3DDD3] text-[#6B6459] hover:border-[#1A5C6B]")">
+                    @filter
+                </button>
+            }
+        </div>
+        
         <!-- Admin controls -->
         <button type="button" on:click="@(() => Model.OpenCreateModal())" class="flex items-center gap-2 px-4 py-2 bg-[#1A5C6B] text-white text-sm font-semibold rounded-lg hover:bg-[#154D5A]">
             <i class="ph ph-plus"></i> Add Image
@@ -9,9 +19,12 @@
     </div>
     
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-        @foreach (var img in Model.Images.Where(i => Model.Filter == "All" || i.AssociatedProgrammeName == Model.Filter))
+        @foreach (var img in Model.Images)
         {
-            <div class="group relative overflow-hidden rounded-xl bg-[#E3DDD3] aspect-[4/3] border border-[#E3DDD3]">
+            bool hasProgramme = img.AssociatedProgramme.HasValue;
+            var routeId = img.AssociatedProgramme?.Id;
+            
+            <a asp-page="@(hasProgramme ? "/Programmes/Details" : null)" asp-route-id="@routeId" class="group relative overflow-hidden rounded-xl bg-[#E3DDD3] aspect-[4/3] border border-[#E3DDD3]">
                 <img src="@img.ImageUri"
                      alt="@img.Caption"
                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
@@ -28,10 +41,13 @@
                 </div>
                 
                 <div class="absolute bottom-0 left-0 right-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                    <span class="text-xs text-[#E8C07D] font-semibold uppercase tracking-wide">@img.AssociatedProgrammeName</span>
+                    @if(img.AssociatedProgramme.HasValue)
+                    {
+                        <span class="text-xs text-[#E8C07D] font-semibold uppercase tracking-wide">@img.AssociatedProgramme.Value.Name</span>
+                    }
                     <p class="text-sm text-white font-medium">@img.Caption</p>
                 </div>
-            </div>
+            </a>
         }
     </div>
 
@@ -46,13 +62,13 @@
                         <div>
                             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Caption</label>
                             <input type="text" asp-for="Form.Caption" required
-                                   class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B] bg-white text-black" />
+                                   class="input w-full" />
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Associated Programme</label>
                             <select asp-for="Form.AssociatedProgrammeId"
-                                    class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B] bg-white text-black">
-                                <option value="">-- Select Programme --</option>
+                                    class="select w-full">
+                                <option value="" disabled selected>-- Select Programme --</option>
                                 @foreach (var prog in Model.Programmes)
                                 {
                                     <option value="@prog.Id">@prog.Name (@prog.Ngo)</option>

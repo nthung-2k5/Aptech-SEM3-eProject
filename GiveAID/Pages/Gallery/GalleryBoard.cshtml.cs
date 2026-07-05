@@ -1,9 +1,6 @@
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
 using Hydro;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using System.IO;
 
 namespace GiveAID.Pages.Gallery;
 
@@ -34,7 +31,7 @@ public class GalleryBoard(IGalleryImageService galleryService, IProgrammeService
     private async Task LoadData()
     {
         Images = await galleryService.GetAllImagesAsync();
-        Programmes = await programmeService.GetAllProgrammesAsync(new ProgrammeQueryParameters());
+        Programmes = await programmeService.GetAllProgrammesAsync(null);
     }
 
     public void SetFilter(string filter)
@@ -56,13 +53,12 @@ public class GalleryBoard(IGalleryImageService galleryService, IProgrammeService
         var image = await galleryService.GetImageByIdAsync(id);
         if (image != null)
         {
-            var matchingProgramme = Programmes.FirstOrDefault(p => p.Name == image.AssociatedProgrammeName);
             Form = new FormModel 
             { 
                 Caption = image.Caption, 
-                AssociatedProgrammeId = matchingProgramme?.Id 
+                AssociatedProgrammeId = image.AssociatedProgramme?.Id 
             };
-            PreviewImageUrl = image.ImageUri?.ToString();
+            PreviewImageUrl = image.ImageUri.ToString();
             IsModalOpen = true;
         }
     }
@@ -87,12 +83,12 @@ public class GalleryBoard(IGalleryImageService galleryService, IProgrammeService
 
         if (Form.ImageFile is { Length: > 0 })
         {
-            var uploadsFolder = Path.Combine(env.WebRootPath, "images", "gallery");
+            string uploadsFolder = Path.Combine(env.WebRootPath, "images", "gallery");
             Directory.CreateDirectory(uploadsFolder);
-            var uniqueFileName = Guid.NewGuid() + "_" + Form.ImageFile.FileName;
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+            string uniqueFileName = Guid.NewGuid() + "_" + Form.ImageFile.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
+            await using (var stream = new FileStream(filePath, FileMode.Create))
             {
                 await Form.ImageFile.CopyToAsync(stream);
             }

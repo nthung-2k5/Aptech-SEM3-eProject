@@ -1,76 +1,42 @@
+using GiveAID.Dtos;
+
 namespace GiveAID.Models;
 
-public static class MockData
+public class MockData
 {
-    public static readonly string[] Amounts = ["Rs. 500", "Rs. 1,000", "Rs. 2,500", "Rs. 5,000", "Rs. 10,000", "Other Amount"];
-    
-    public static readonly string[] Causes = ["Children", "Education", "Health", "Disabled", "Women", "Environment", "General Fund"];
-    
-    public static readonly List<Partner> Partners = new()
-    {
-        new Partner { Initials = "GT", Name = "GlobalTech Corp", Sector = "Technology" },
-        new Partner { Initials = "MB", Name = "Meridian Bank", Sector = "Finance" },
-        new Partner { Initials = "SL", Name = "SunLife Pharma", Sector = "Healthcare" },
-        new Partner { Initials = "BI", Name = "BuildWell Infra", Sector = "Construction" },
-        new Partner { Initials = "RL", Name = "Retail Link", Sector = "Retail" },
-        new Partner { Initials = "EF", Name = "EduFirst", Sector = "Education" }
-    };
+    public static MemberDto[] Members { get; set; } = [
+        new(Guid.NewGuid(), "John Doe", "john.doe@example.com", "password123", new DateOnly(1990, 1, 1), "123 Main St", "1234567890", "Software Engineer"),
+        new(Guid.NewGuid(), "Jane Smith", "jane.smith@example.com", "password456", new DateOnly(1985, 5, 15), "456 Elm St", "0987654321", "Doctor"),
+        new(Guid.NewGuid(), "Alice Johnson", "alice.j@example.com", "password789", new DateOnly(1992, 8, 20), "789 Oak St", "1112223333", "Teacher")
+    ];
 
-    public static readonly List<Ngo> InitialNgos = new()
-    {
-        new Ngo { Name = "HelpFirst India", Focus = "Child Education", Location = "New Delhi", Since = "2008" },
-        new Ngo { Name = "VisionAble Trust", Focus = "Disability Support", Location = "Mumbai", Since = "2011" },
-        new Ngo { Name = "GreenEarth Foundation", Focus = "Environment", Location = "Bangalore", Since = "2015" },
-        new Ngo { Name = "WomenEmpower Network", Focus = "Skill Training", Location = "Pune", Since = "2010" }
-    };
+    public static NgoDto[] Ngos { get; set; } = [
+        new(Guid.NewGuid(), "Global Helpers", "An NGO dedicated to global health.", "100 Health Way", "1-800-HELP", "https://globalhelpers.org"),
+        new(Guid.NewGuid(), "Education First", "Providing education to children worldwide.", "200 School Dr", "1-800-EDU", "https://educationfirst.org"),
+        new(Guid.NewGuid(), "Green Earth", "Environmental protection and conservation.", "300 Nature Ln", "1-800-GREEN", "https://greenearth.org")
+    ];
 
-    public static readonly List<Program> Programs = new()
-    {
-        new Program { Tag = "Education", Title = "Education for All", Desc = "Scholarships, study kits, and mentoring for 12,000+ underprivileged children across 6 states.", Count = "12,400 beneficiaries", Icon = "graduation-cap" },
-        new Program { Tag = "Health Care", Title = "Community Health Drive", Desc = "Free medical camps, vaccinations, and mental health support for rural and semi-urban communities.", Count = "8,900 patients served", Icon = "heart" },
-        new Program { Tag = "Special Needs", Title = "Privileged Children", Desc = "Specialized therapy, inclusive schooling, and assistive devices for specially-challenged children.", Count = "2,100 children", Icon = "baby" },
-        new Program { Tag = "Environment", Title = "Green Earth Initiative", Desc = "Large-scale tree plantation drives and water conservation workshops in arid regions.", Count = "50,000+ trees planted", Icon = "tree-pine" },
-        new Program { Tag = "Women", Title = "Women in Tech", Desc = "Digital literacy and vocational training for women from marginalized communities.", Count = "4,500 trained", Icon = "user-check" }
-    };
+    public static ProgrammeDto[] Programmes { get; set; } = [
+        new(Guid.NewGuid(), "Clean Water Initiative", "Clean Water", "Global Helpers", "https://images.unsplash.com/photo-1516905542749-d3e91122d250?q=80&w=2070&auto=format&fit=crop", DateTime.Now.AddDays(-30), DateTime.Now.AddDays(30), 150, 10000m, 5000m, "Providing clean water to communities in need.", "Global Helpers Team"),
+        new(Guid.NewGuid(), "Build a School", "Education", "Education First", "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=2132&auto=format&fit=crop", DateTime.Now.AddDays(-60), DateTime.Now.AddDays(60), 300, 50000m, 25000m, "Building schools in rural areas.", "Education First Team"),
+        new(Guid.NewGuid(), "Plant a Million Trees", "Environment", "Green Earth", "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2113&auto=format&fit=crop", DateTime.Now.AddDays(-10), DateTime.Now.AddDays(100), 50, 20000m, 1000m, "Reforestation project to combat climate change.", "Green Earth Team")
+    ];
 
-    public static readonly List<GalleryImage> GalleryImages = new()
-    {
-        new GalleryImage { Id = "1488521787991-ed7bbaae773c", Tag = "Health", Caption = "Annual Health Camp — June 2024" },
-        new GalleryImage { Id = "1532629345422-7515f3d16bb6", Tag = "Education", Caption = "Children Education Drive — March 2024" },
-        new GalleryImage { Id = "1542810634-71277d2d82b5", Tag = "Women", Caption = "Women Skill Training — Feb 2024" },
-        new GalleryImage { Id = "1601933470096-0e34634ffcde", Tag = "Environment", Caption = "Tree Plantation — Earth Day 2024" },
-        new GalleryImage { Id = "1576267423048-15c0040fec78", Tag = "Disabled", Caption = "Assistive Device Distribution — Jan 2024" },
-        new GalleryImage { Id = "1469571433402-8be3f4ff0022", Tag = "Youth", Caption = "Youth Leadership Workshop — Dec 2023" }
-    };
-}
+    public static UserQueryDto[] Queries { get; set; } = [
+        new(Guid.NewGuid(), Members[0].Id, Members[0].FullName, "Donation Issue", "I am having trouble making a donation.", "Please try clearing your browser cache.", DateTimeOffset.Now.AddDays(-2)),
+        new(Guid.NewGuid(), Members[1].Id, Members[1].FullName, "Volunteer Inquiry", "How can I volunteer for the upcoming event?", "We will send you a volunteer form shortly.", DateTimeOffset.Now.AddDays(-1)),
+        new(Guid.NewGuid(), Members[2].Id, Members[2].FullName, "Tax Receipt", "When will I receive my tax receipt?", null, DateTimeOffset.Now)
+    ];
 
-public class Partner
-{
-    public string Initials { get; set; } = "";
-    public string Name { get; set; } = "";
-    public string Sector { get; set; } = "";
-}
+    public static DonationDto[] Donations { get; set; } = [
+        new(Guid.NewGuid(), Members[0].Id, Members[0].FullName, new DonateForProgrammeTarget(Programmes[0].Id), 100m, DateTimeOffset.Now.AddDays(-5)),
+        new(Guid.NewGuid(), Members[1].Id, Members[1].FullName, new DonateForNgoTarget(Ngos[1].Id, Guid.NewGuid()), 50m, DateTimeOffset.Now.AddDays(-3)),
+        new(Guid.NewGuid(), Members[2].Id, Members[2].FullName, new DonateForProgrammeTarget(Programmes[2].Id), 25m, DateTimeOffset.Now.AddDays(-1))
+    ];
 
-public class Ngo
-{
-    public string Name { get; set; } = "";
-    public string Focus { get; set; } = "";
-    public string Location { get; set; } = "";
-    public string Since { get; set; } = "";
-}
-
-public class Program
-{
-    public string Tag { get; set; } = "";
-    public string Title { get; set; } = "";
-    public string Desc { get; set; } = "";
-    public string Count { get; set; } = "";
-    public string Icon { get; set; } = "";
-}
-
-public class GalleryImage
-{
-    public string Id { get; set; } = "";
-    public string Tag { get; set; } = "";
-    public string Caption { get; set; } = "";
+    public static GalleryImageDto[] GalleryImages { get; set; } = [
+        new GalleryImageDto(Guid.NewGuid(), new Uri("https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop"), "Children smiling", (Programmes[1].Id, Programmes[1].Name)),
+        new GalleryImageDto(Guid.NewGuid(), new Uri("https://images.unsplash.com/photo-1536856136534-bb679c52a9aa?q=80&w=2070&auto=format&fit=crop"), "New well installed", (Programmes[0].Id, Programmes[0].Name)),
+        new GalleryImageDto(Guid.NewGuid(), new Uri("https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2113&auto=format&fit=crop"), "Tree planting event", (Programmes[2].Id, Programmes[2].Name))
+    ];
 }
