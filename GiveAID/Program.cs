@@ -36,7 +36,11 @@ if (!app.Environment.IsDevelopment())
 //     options.UseSqlServer(connectionString));
 
 // builder.Services.AddScoped<IUserService, UserService>();
-
+// builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAboutService, AboutService>();
+// builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAboutService, AboutService>();
+builder.Services.AddScoped<IMemberService, MemberService>();
 app.UseHttpsRedirection();
 
 app.UseRouting();
