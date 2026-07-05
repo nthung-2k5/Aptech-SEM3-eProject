@@ -1,6 +1,7 @@
+@using GiveAID.Services.Abstractions
 <!DOCTYPE html>
 <html lang="en">
-@inject Services.Abstractions.IAboutUsSubpageService AboutUsSubpageService
+@inject IAboutUsSubpageService AboutUsSubpageService
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -16,6 +17,10 @@
     <link rel="stylesheet" href="~/app.css" asp-append-version="true"/>
 
     <link rel="stylesheet" href="~/GiveAID.styles.css" asp-append-version="true"/>
+    
+    <!-- Sweetalert 2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.all.min.js" integrity="sha256-Tobw4i5HcbW4qsJMYTxmGAameLGvooTQPPatA9PiGgo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.min.css" integrity="sha256-oRc+Vv1HS+BN2++oG9dcxGVifvL12yYXkufSX7eHF0M=" crossorigin="anonymous">
 
     <!-- Phosphor Icons -->
     <link
@@ -63,7 +68,7 @@
                     </div>
                 </div>
 
-                <a asp-page="/Gallery" class="navbar-button">Gallery</a>
+                <a asp-page="/Gallery/Index" class="navbar-button">Gallery</a>
 
                 <a asp-page="/Help" class="navbar-button">Contact Us</a>
 
@@ -112,7 +117,7 @@
         <h6 class="footer-title">Quick Links</h6>
         <a asp-page="/" class="link link-hover">Home</a>
         <a asp-page="/Programmes" class="link link-hover">Programmes</a>
-        <a asp-page="/Gallery" class="link link-hover">Gallery</a>
+        <a asp-page="/Gallery/Index" class="link link-hover">Gallery</a>
         <a asp-page="/Partners" class="link link-hover">Our Partners</a>
     </nav>
     <nav>
