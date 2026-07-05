@@ -1,6 +1,5 @@
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 

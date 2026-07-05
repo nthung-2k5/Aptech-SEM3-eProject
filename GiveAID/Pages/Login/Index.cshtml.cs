@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -20,13 +21,13 @@ public class LoginModel : PageModel
     {
         if (email == "admin@give-aid.org")
         {
-            var claims = new List<System.Security.Claims.Claim>
+            var claims = new List<Claim>
             {
-                new(System.Security.Claims.ClaimTypes.Email, email),
-                new(System.Security.Claims.ClaimTypes.Role, "Admin")
+                new(ClaimTypes.Email, email),
+                new(ClaimTypes.Role, "Admin")
             };
-            var identity = new System.Security.Claims.ClaimsIdentity(claims, "Cookies");
-            var principal = new System.Security.Claims.ClaimsPrincipal(identity);
+            var identity = new ClaimsIdentity(claims, "Cookies");
+            var principal = new ClaimsPrincipal(identity);
 
             await HttpContext.SignInAsync("Cookies", principal);
         }
