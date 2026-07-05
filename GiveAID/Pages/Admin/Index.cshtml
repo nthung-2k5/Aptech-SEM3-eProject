@@ -1,0 +1,82 @@
+@page "/Admin"
+@model IndexModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="space-y-6">
+    <div class="grid md:grid-cols-4 gap-5">
+        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
+            <div
+                class="text-[#1A5C6B] font-['Playfair_Display',serif] text-3xl font-bold mb-1">@Model.TotalDonations</div>
+            <div class="text-sm font-semibold text-[#1C1A17]">Total Donations</div>
+            <div class="text-xs text-[#6B6459]">all time</div>
+        </div>
+        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
+            <div
+                class="text-[#C97C2E] font-['Playfair_Display',serif] text-3xl font-bold mb-1">@Model.TotalMembers</div>
+            <div class="text-sm font-semibold text-[#1C1A17]">Registered Members</div>
+            <div class="text-xs text-[#6B6459]">active users</div>
+        </div>
+        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
+            <div
+                class="text-[#4A8B7F] font-['Playfair_Display',serif] text-3xl font-bold mb-1">@Model.TotalNgos</div>
+            <div class="text-sm font-semibold text-[#1C1A17]">Partner NGOs</div>
+            <div class="text-xs text-[#6B6459]">verified</div>
+        </div>
+        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
+            <div
+                class="text-[#D4183D] font-['Playfair_Display',serif] text-3xl font-bold mb-1">@Model.OpenQueriesCount</div>
+            <div class="text-sm font-semibold text-[#1C1A17]">Open Queries</div>
+            <div class="text-xs text-[#6B6459]">pending reply</div>
+        </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-5">
+        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-['Playfair_Display',serif] font-bold text-[#1C1A17]">Recent Donations</h3>
+                <a asp-page="/Admin/Donation/Index"
+                   class="text-sm text-[#1A5C6B] font-semibold hover:underline">View All</a>
+            </div>
+            <div class="space-y-3">
+                @foreach (var d in Model.LatestDonations)
+                {
+                    <div
+                        class="flex items-center justify-between text-sm pb-3 border-b border-[#E3DDD3] last:border-0 last:pb-0">
+                        @* <div> *@
+                        @*     <span class="font-medium text-[#1C1A17]">@d.DonorName</span> *@
+                        @*     <span class="text-[#6B6459] ml-2">@d.CauseName</span> *@
+                        @* </div> *@
+                        <span class="font-medium text-[#1C1A17]">@d.DonorName</span>
+                        <span class="text-[#1A5C6B] font-semibold">Rs. @d.Amount</span>
+                    </div>
+                }
+                @if (!Model.LatestDonations.Any()) { <p class="text-[#6B6459] text-sm">No donations found.</p> }
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-['Playfair_Display',serif] font-bold text-[#1C1A17]">Pending Queries</h3>
+                <a asp-page="/Admin/UserQuery/Index"
+                   class="text-sm text-[#1A5C6B] font-semibold hover:underline">View All</a>
+            </div>
+            <div class="space-y-3">
+                @foreach (var q in Model.LatestUnansweredQueries)
+                {
+                    <div class="text-sm pb-3 border-b border-[#E3DDD3] last:border-0 last:pb-0">
+                        <span class="font-medium text-[#1C1A17]">@q.UserName: </span>
+                        <span class="text-[#6B6459]">@q.MessageText</span>
+                        <div class="text-xs text-[#C97C2E] mt-1">@q.CreatedAt.ToString("MMM dd, yyyy")</div>
+                    </div>
+                }
+                @if (!Model.LatestUnansweredQueries.Any())
+                {
+                    <p class="text-[#6B6459] text-sm">No open
+                        queries.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

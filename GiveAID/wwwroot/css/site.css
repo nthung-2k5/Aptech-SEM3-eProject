@@ -1,13 +1,59 @@
-@import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,600&family=Source+Sans+3:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
 
-@custom-variant dark (&:is(.dark *));
+@import "tailwindcss";
+
+@source not "./tailwindcss";
+@source not "../js/daisyui{,*}.mjs";
+
+@plugin "../js/daisyui.mjs" {
+   themes: light --default;
+}
+
+@plugin "../js/daisyui-theme.mjs" {
+  name: "light";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0 0);
+  --color-base-300: oklch(95% 0 0);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --color-primary: #1a5c6b;
+  --color-primary-content: oklch(100% 0 0);
+  --color-secondary: #c97c2e;
+  --color-secondary-content: oklch(100% 0 0);
+  --color-accent: oklch(77% 0.152 181.912);
+  --color-accent-content: oklch(38% 0.063 188.416);
+  --color-neutral: oklch(14% 0.005 285.823);
+  --color-neutral-content: oklch(92% 0.004 286.32);
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-success: #00d390;
+  --color-success-content: oklch(37% 0.077 168.94);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(71% 0.194 13.428);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-selector: 0.5rem;
+  --radius-field: 0.25rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
 
 a {
     text-decoration: none;
 }
 
 :root {
+    --font-serif: 'Playfair Display', serif;
+    --font-sans: 'Source Sans 3', sans-serif;
+}
+
+/* :root {
     --font-size: 16px;
     --background: #F6F1E9;
     --foreground: #1C1A17;
@@ -124,16 +170,16 @@ a {
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
-}
+} */
 
 @layer base {
-    * {
+    /* * {
         @apply border-border outline-ring/50;
-    }
+    } */
 
-    body {
+    /* body {
         @apply bg-background text-foreground;
-    }
+    } */
 
     /**
   * Default typography styles for HTML elements (h1-h4, p, label, button, input).
@@ -145,24 +191,30 @@ a {
     }
 
     h1 {
-        font-size: var(--text-2xl);
-        font-weight: var(--font-weight-medium);
+        font-size: var(--text-3xl);
+        font-weight: var(--font-weight-bold);
         line-height: 1.5;
     }
 
     h2 {
-        font-size: var(--text-xl);
-        font-weight: var(--font-weight-medium);
+        font-size: var(--text-2xl);
+        font-weight: var(--font-weight-bold);
         line-height: 1.5;
     }
 
     h3 {
+        font-size: var(--text-xl);
+        font-weight: var(--font-weight-bold);
+        line-height: 1.5;
+    }
+
+    h4 {
         font-size: var(--text-lg);
         font-weight: var(--font-weight-medium);
         line-height: 1.5;
     }
 
-    h4 {
+    h5, h6 {
         font-size: var(--text-base);
         font-weight: var(--font-weight-medium);
         line-height: 1.5;
@@ -185,4 +237,101 @@ a {
         font-weight: var(--font-weight-normal);
         line-height: 1.5;
     }
+
+    h1, h2, h3, h4 {
+        @apply font-serif;
+    }
+}
+
+header nav {
+    @apply hidden md:flex items-center gap-1;
+
+    a.navbar-button {
+        @apply px-4 py-2 text-sm font-medium rounded transition-colors text-white/80 hover:text-white hover:bg-white/10 no-underline;
+    }
+}
+
+footer {
+    div.social-icon {
+        @apply size-9 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-white/60 hover:bg-[#C97C2E] hover:text-white cursor-pointer transition-colors;
+    }
+
+    a.page-link {
+        @apply block text-sm text-white/60 hover:text-white transition-colors no-underline;
+    }
+
+    a.link.link-hover {
+        @apply text-white/60 hover:text-white transition-colors;
+    }
+}
+
+.hero-section {
+    @apply bg-[#1A5C6B] text-white py-12;
+
+    > div {
+        @apply max-w-7xl mx-auto px-6;
+
+        > p {
+            @apply font-['Source_Sans_3',sans-serif] text-[#E8C07D] text-xs font-semibold uppercase tracking-widest mb-2;
+        }
+
+        > h1 {
+            @apply font-['Playfair_Display',serif] text-4xl font-bold;
+        }
+    }
+}
+
+#about-us {
+    aside {
+        @apply md:w-56 flex-shrink-0;
+
+        > div {
+            @apply bg-white border border-[#E3DDD3] rounded-xl sticky top-24 font-['Source_Sans_3',sans-serif];
+            
+            > section {
+                &:first-child {
+                    @apply rounded-t-xl;
+                }
+
+                &:last-child {
+                    @apply rounded-b-xl;
+                }
+
+                @apply relative border-b border-[#E3DDD3] last:border-0 data-[active=True]:bg-[#1A5C6B] data-[active=False]:hover:bg-[#F6F1E9] transition-colors flex items-center;
+
+                > a {
+                    @apply flex-1 block w-full text-left px-5 py-3.5 text-sm text-[#1C1A17] group-data-[active=True]:text-white group-data-[active=True]:font-semibold no-underline;
+                }
+
+                > div {
+                    @apply absolute right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity;
+                    
+                    button {
+                        @apply p-1.5 rounded transition-colors;
+                    }
+                }
+            }
+        }
+    }
+}
+
+span.validation-message {
+    @apply text-xs text-error mt-2;
+}
+
+#admin nav > a {
+    @apply flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors no-underline;
+
+    &[data-active=True] {
+        @apply bg-[#1A5C6B] text-white;
+    }
+
+    &[data-active=False] {
+        @apply text-[#6B6459] hover:bg-[#F6F1E9];
+    }
+}
+
+label.required::after {
+    content: "*";
+    @apply text-error ml-1;
 }

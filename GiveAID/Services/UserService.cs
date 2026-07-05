@@ -5,12 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Services;
 
-public class UserService(AppDbContext dbContext): IUserService
+public class UserService(AppDbContext dbContext) : IUserService
 {
-    public async Task<List<User>> GetAllUsersAsync(CancellationToken ct)
-    {
-        return await dbContext.Users.ToListAsync(ct);
-    }
+    public async Task<List<User>> GetAllUsersAsync(CancellationToken ct) => await dbContext.Users.ToListAsync(ct);
 
     public async Task<User?> GetUserByIdAsync(Guid userId, CancellationToken ct = default)
     {
@@ -39,13 +36,14 @@ public class UserService(AppDbContext dbContext): IUserService
     public async Task<bool> DeleteUserAsync(Guid userId, CancellationToken ct = default)
     {
         var user = await dbContext.Users.FirstOrDefaultAsync(u => u.UserId == userId, ct);
+
         if (user != null)
         {
             dbContext.Users.Remove(user);
             await dbContext.SaveChangesAsync(ct);
             return true;
         }
-        
+
         return false;
     }
 }

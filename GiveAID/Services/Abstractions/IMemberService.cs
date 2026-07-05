@@ -1,4 +1,4 @@
-﻿using GiveAID.Models;
+using GiveAID.Models;
 
 namespace GiveAID.Services.Abstractions;
 

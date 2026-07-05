@@ -1,0 +1,52 @@
+using GiveAID.Dtos;
+using GiveAID.Services.Abstractions;
+using Hydro;
+
+namespace GiveAID.Pages.Programmes;
+
+public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
+{
+    public string SearchTerm { get; set; } = string.Empty;
+    public string Cause { get; set; } = string.Empty;
+    public string Ngo { get; set; } = string.Empty;
+    public int PageNumber { get; set; } = 1;
+
+    public ProgrammeSummaryDto[] Programmes { get; set; } = [];
+    public int TotalPages => (int)Math.Ceiling(Programmes.Length / 6.0);
+
+    public override async Task MountAsync() { await LoadProgrammesAsync(); }
+
+    public async Task Search()
+    {
+        PageNumber = 1;
+        await LoadProgrammesAsync();
+    }
+
+    public async Task ChangePage(int page)
+    {
+        PageNumber = page;
+        await LoadProgrammesAsync();
+    }
+
+    public async Task ClearFilters()
+    {
+        SearchTerm = string.Empty;
+        Cause = string.Empty;
+        Ngo = string.Empty;
+        PageNumber = 1;
+        await LoadProgrammesAsync();
+    }
+
+    private async Task LoadProgrammesAsync()
+    {
+        var query = new ProgrammeQueryParameters
+        {
+            SearchTerm = SearchTerm,
+            Cause = Cause,
+            Ngo = Ngo,
+            PageNumber = PageNumber,
+            PageSize = 6
+        };
+        Programmes = await programmeService.GetAllProgrammesAsync(query);
+    }
+}

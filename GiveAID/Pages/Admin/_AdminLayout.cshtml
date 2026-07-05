@@ -1,0 +1,58 @@
+﻿@{
+    Layout = "Shared/_Layout";
+}
+
+@functions
+{
+    bool IsActive(string page) => ViewContext.RouteData.Values["Page"]?.ToString()?.StartsWith(page) == true;
+}
+
+<div id="admin" class="min-h-screen bg-[#F6F1E9]">
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <section class="flex items-center justify-between mb-8">
+            <div>
+                <div class="flex items-center gap-2 text-[#C97C2E] text-xs font-bold uppercase tracking-widest mb-1">
+                    <i class="ph ph-shield"></i> Admin Dashboard
+                </div>
+                <h1 class="text-[#1C1A17]">Give-AID Control Panel</h1>
+            </div>
+            <a href="/" class="text-sm text-[#6B6459] hover:text-[#1A5C6B] flex items-center gap-1 no-underline">
+                <i class="ph ph-caret-left"></i> Back to Site
+            </a>
+        </section>
+
+        <!-- Tabs -->
+        <nav class="flex flex-wrap gap-2 mb-8 bg-white border border-[#E3DDD3] rounded-xl p-2">
+            <a asp-page="/Admin/Index"
+               data-active="@IsActive("/Admin/Index")">
+                <i class="ph ph-eye"></i>Overview
+            </a>
+            <a asp-page="/Admin/Donation/Index"
+               data-active="@IsActive("/Admin/Donation")">
+                <i class="ph ph-heart"></i>Donations
+            </a>
+            <a asp-page="/Admin/Member/Index"
+               data-active="@IsActive("/Admin/Member")">
+                <i class="ph ph-users"></i>Members
+            </a>
+            <a asp-page="/Admin/Ngo/Index"
+               data-active="@IsActive("/Admin/Ngo")">
+                <i class="ph ph-globe"></i>NGOs
+            </a>
+            <a asp-page="/Admin/UserQuery/Index"
+               data-active="@IsActive("/Admin/UserQuery")">
+                <i class="ph ph-chat"></i>Queries
+            </a>
+            <a asp-page="/Admin/Gallery/Index"
+               data-active="@IsActive("/Admin/Gallery")">
+                <i class="ph ph-image"></i>Gallery
+            </a>
+        </nav>
+        @RenderBody()
+    </div>
+</div>
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", false)
+}

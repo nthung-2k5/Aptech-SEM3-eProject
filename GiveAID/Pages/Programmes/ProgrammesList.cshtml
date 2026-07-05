@@ -1,0 +1,150 @@
+@model ProgrammesList
+
+<div class="flex flex-col lg:flex-row gap-8">
+    <!-- Sidebar (Left) -->
+    <aside class="w-full lg:w-1/4">
+        <div class="bg-white p-6 rounded-xl shadow-sm border border-[#E3DDD3] space-y-6">
+            <div>
+                <label class="block font-semibold mb-2 text-[#1C1A17]">Search</label>
+                <label class="input w-full">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" asp-for="SearchTerm" bind on:input="@(() => Model.Search())"
+                           placeholder="Search programmes..."/>
+                </label>
+            </div>
+            <div>
+                <label class="block font-semibold mb-2 text-[#1C1A17]">Filter by Cause</label>
+                <select asp-for="Cause" bind on:change="@(() => Model.Search())" class="select w-full">
+                    <option value="">All Causes</option>
+                    <option value="Education">Education</option>
+                    <option value="Health">Health</option>
+                    <option value="Hunger">Hunger</option>
+                    <option value="Inclusion">Inclusion</option>
+                    <option value="Emergency">Emergency</option>
+                </select>
+            </div>
+            <div>
+                <label class="block font-semibold mb-2 text-[#1C1A17]">Filter by NGO</label>
+                <select asp-for="Ngo" bind on:change="@(() => Model.Search())" class="select w-full">
+                    <option value="">All NGOs</option>
+                    <option value="EduCare Foundation">EduCare Foundation</option>
+                    <option value="Water Aid">Water Aid</option>
+                    <option value="Food Bank">Food Bank</option>
+                    <option value="Global Women">Global Women</option>
+                    <option value="Red Cross">Red Cross</option>
+                </select>
+            </div>
+            <button on:click="@(() => Model.ClearFilters())" class="btn btn-outline btn-primary btn-block">Clear
+                Filters
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content (Right) -->
+    <div class="w-full lg:w-3/4 flex flex-col">
+        <!-- Top Bar -->
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold font-['Playfair_Display',serif] text-[#1C1A17]">
+                @if (Model.Programmes.Length > 0)
+                {
+                    <text>Found @Model.Programmes.Length Programmes</text>
+                }
+                else { <text>No programmes found.</text> }
+            </h2>
+        </div>
+
+        <!-- Cards Grid -->
+        <div class="grid md:grid-cols-2 gap-6 flex-grow">
+            @foreach (var p in Model.Programmes)
+            {
+                var timeRemaining = p.EndDate - DateTime.Now;
+                bool isStarted = p.StartDate <= DateTime.Now;
+                string timeText = isStarted ? timeRemaining.TotalDays > 0 ? $"{(int)timeRemaining.TotalDays} days left" : "Ended" : $"Starts in {(p.StartDate - DateTime.Now).Days} days";
+                int progress = p.TargetAmount is > 0 ? (int)(p.RaisedAmount / p.TargetAmount.Value * 100) : 0;
+                if (progress > 100) progress = 100;
+
+                <a asp-page="/Programmes/Details" asp-route-id="@p.Id"
+                   class="block bg-white border border-[#E3DDD3] rounded-xl overflow-hidden hover:shadow-lg transition-all group no-underline text-inherit flex flex-col">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="@p.ImageUrl" alt="@p.Name"
+                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                        <div class="absolute top-3 left-3 badge badge-primary font-semibold">
+                            @p.Cause
+                        </div>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col">
+                        <h3 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1C1A17] mb-2 group-hover:text-[#C97C2E] transition-colors">@p.Name</h3>
+                        <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
+                            <i class="ph ph-buildings"></i>
+                            <span>@p.Ngo</span>
+                        </div>
+                        <div class="mt-auto">
+                            <div class="flex justify-between text-sm mb-2 text-gray-600 font-medium">
+                                <span>$@p.RaisedAmount.ToString("N0") raised</span>
+                                @if (p.TargetAmount.HasValue)
+                                {
+                                    <span>of $@p.TargetAmount.Value.ToString("N0")</span>
+                                }
+                            </div>
+                            @if (p.TargetAmount.HasValue)
+                            {
+                                <div class="w-full bg-gray-200 rounded-full h-2 mb-4 overflow-hidden">
+                                    <div class="bg-[#C97C2E] h-2 rounded-full" style="width: @progress%"></div>
+                                </div>
+                            }
+
+                            <div class="flex items-center justify-between pt-4 border-t border-gray-100 text-sm">
+                                <div class="flex items-center gap-1 text-gray-500">
+                                    <i class="ph ph-users"></i>
+                                    <span>@p.DonationCount</span>
+                                </div>
+                                <div
+                                    class="flex items-center gap-1 text-[#1A5C6B] font-semibold bg-blue-50 px-3 py-1 rounded-full">
+                                    <i class="ph ph-clock"></i>
+                                    <span>@timeText</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+            }
+        </div>
+
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="mt-10 flex justify-center gap-2">
+                @if (Model.PageNumber > 1)
+                {
+                    <button on:click="@(() => Model.ChangePage(Model.PageNumber - 1))"
+                            class="px-4 py-2 bg-white border border-[#E3DDD3] rounded-lg hover:bg-gray-50 transition-colors no-underline text-[#1C1A17] cursor-pointer font-semibold">
+                        Previous
+                    </button>
+                }
+
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    int pageIndex = i;
+
+                    if (pageIndex == Model.PageNumber)
+                    {
+                        <span class="px-4 py-2 bg-[#1A5C6B] text-white rounded-lg font-semibold">@pageIndex</span>
+                    }
+                    else
+                    {
+                        <button on:click="@(() => Model.ChangePage(pageIndex))"
+                                class="px-4 py-2 bg-white border border-[#E3DDD3] rounded-lg hover:bg-gray-50 transition-colors no-underline text-[#1C1A17] cursor-pointer font-semibold">@pageIndex</button>
+                    }
+                }
+
+                @if (Model.PageNumber < Model.TotalPages)
+                {
+                    <button on:click="@(() => Model.ChangePage(Model.PageNumber + 1))"
+                            class="px-4 py-2 bg-white border border-[#E3DDD3] rounded-lg hover:bg-gray-50 transition-colors no-underline text-[#1C1A17] cursor-pointer font-semibold">
+                        Next
+                    </button>
+                }
+            </div>
+        }
+    </div>
+</div>

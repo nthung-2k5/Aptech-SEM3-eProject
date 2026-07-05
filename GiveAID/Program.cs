@@ -1,14 +1,25 @@
-using GiveAID.Data;
-using GiveAID.Services.Abstractions;
 using GiveAID.Services;
+using GiveAID.Services.Abstractions;
 using Hydro.Configuration;
-using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AddFolderRouteModelConvention("/Components", model => model.Selectors.Clear());
+});
+
 builder.Services.AddHydro();
+
+builder.Services.AddScoped<IAboutUsSubpageService, AboutUsSubpageService>();
+builder.Services.AddScoped<IProgrammeService, ProgrammeService>();
+builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<INgoService, NgoService>();
+builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+builder.Services.AddScoped<IGalleryImageService, GalleryImageService>();
+builder.Services.AddScoped<IDonationService, DonationService>();
+builder.Services.AddAuthentication("Cookies").AddCookie("Cookies", options => { options.LoginPath = "/Login"; });
 
 var app = builder.Build();
 
@@ -34,6 +45,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapStaticAssets();
