@@ -1,59 +1,68 @@
-﻿using GiveAID.Data;
+using GiveAID.Data;
 using GiveAID.Models;
 using GiveAID.Services.Abstractions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Text;
+using GiveAID.Dtos;
 
 namespace GiveAID.Services;
 
-public class AuthService(AppDbContext dbContext) : IAuthService
+public class AuthService(AppDbContext dbContext, IPasswordService passwordService, IConfiguration configuration) : IAuthService
 {
-    private readonly PasswordHasher<User> _userPasswordHasher = new();
-    private readonly PasswordHasher<Member> _memberPasswordHasher = new();
-
-    public async Task<LoginResult> LoginAsync(string email, string password, CancellationToken ct = default)
+    public async Task<LoginResultDto> LoginAsync(string email, string password, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
-            return LoginResult.Fail("Invalid credentials.");
+            throw new LoginException("Invalid credentials.");
         }
 
-        // 1. Check Admin (Users table) trước
-        var user = await dbContext.Users
-            .FirstOrDefaultAsync(u => u.Email == email, ct);
+        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
 
         if (user != null)
         {
-            var verifyResult = _userPasswordHasher.VerifyHashedPassword(user, user.PasswordHash, password);
-            if (verifyResult == PasswordVerificationResult.Success)
+            if (user.IsDeleted)
             {
-                return LoginResult.Ok(AccountRole.Admin, user.UserId);
+                throw new LoginException("This account has been deactivated.");
             }
 
-            return LoginResult.Fail("Invalid credentials.");
+            if (passwordService.VerifyPassword(password, user.PasswordHash))
+            {
+                string token = GenerateJwtToken(user);
+                return new LoginResultDto(user.UserId, user.Role, token);
+            }
         }
 
-        // 2. Nếu không phải Admin, check Member
-        var member = await dbContext.Members
-            .FirstOrDefaultAsync(m => m.Email == email, ct);
+        throw new LoginException("Invalid credentials.");
+    }
 
-        if (member != null)
+    private string GenerateJwtToken(User user)
+    {
+        var jwtSettings = configuration.GetSection("JwtSettings");
+        var secretKey = jwtSettings["Secret"] ?? "super_secret_default_key_replace_me_in_production_over_32_chars";
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var claims = new[]
         {
-            if (!member.IsActive)
-            {
-                return LoginResult.Fail("This account has been deactivated.");
-            }
+            new Claim(JwtRegisteredClaimNames.Sub, user.UserId.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+            new Claim(ClaimTypes.Role, user.Role.ToString())
+        };
 
-            var verifyResult = _memberPasswordHasher.VerifyHashedPassword(member, member.PasswordHash, password);
-            if (verifyResult == PasswordVerificationResult.Success)
-            {
-                return LoginResult.Ok(AccountRole.Member, member.MemberId);
-            }
+        var token = new JwtSecurityToken(
+            issuer: jwtSettings["Issuer"] ?? "GiveAID",
+            audience: jwtSettings["Audience"] ?? "GiveAID",
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(24),
+            signingCredentials: creds
+        );
 
-            return LoginResult.Fail("Invalid credentials.");
-        }
-
-        // Không tìm thấy email ở cả 2 bảng
-        return LoginResult.Fail("Invalid credentials.");
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
+
+public class LoginException(string message) : Exception(message);

@@ -1,149 +1,93 @@
 using GiveAID.Data;
-using GiveAID.Models;
+using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Services;
 
-public class MemberService(AppDbContext dbContext) : IMemberService
+public class MemberService(AppDbContext dbContext, IPasswordService passwordService) : IMemberService
 {
-    private readonly PasswordHasher<Member> _passwordHasher = new();
-
-    public async Task<PagedResult<Member>> GetMembersAsync(
-        string? searchTerm,
-        int page = 1,
-        int pageSize = 10,
-        CancellationToken ct = default)
+    public async Task<MemberSummaryDto[]> GetAllMembersAsync(string? searchTerm, int page = 1, int pageSize = 10,
+                                                             CancellationToken ct = default)
     {
-        var query = dbContext.Members.AsQueryable();
+        var query = dbContext.Members.AsNoTracking().Where(m => !m.IsDeleted).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            query = query.Where(m =>
-                m.FullName.Contains(searchTerm) ||
-                m.Email.Contains(searchTerm));
+            query = query.Where(m => m.FullName.Contains(searchTerm) || m.Email.Contains(searchTerm));
         }
 
-        var totalCount = await query.CountAsync(ct);
+        var items = await query.OrderByDescending(m => m.CreatedAt).Skip((page - 1) * pageSize).Take(pageSize)
+                .Select(u => new MemberSummaryDto(u.UserId, u.FullName, u.Email, u.DateOfBirth, u.PhoneNumber))
+                .ToArrayAsync(ct);
 
-        var items = await query
-            .OrderByDescending(m => m.RegisteredAt)
-            .Skip((page - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync(ct);
+        return items;
+    }
 
-        return new PagedResult<Member>
+    public async Task<MemberDto?> GetMemberByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        var user = await dbContext.Members.AsNoTracking().FirstOrDefaultAsync(m => m.UserId == id && !m.IsDeleted, ct);
+
+        return user != null
+                ? new MemberDto(
+                    user.UserId,
+                    user.FullName,
+                    user.Email,
+                    user.DateOfBirth,
+                    user.Address,
+                    user.PhoneNumber,
+                    user.Occupation)
+                : null;
+    }
+
+    public async Task<bool> CreateMemberAsync(MemberSaveDto member, CancellationToken ct = default)
+    {
+        if (member.Password == null)
         {
-            Items = items,
-            TotalCount = totalCount,
-            Page = page,
-            PageSize = pageSize
-        };
-    }
-
-    public async Task<Member?> GetMemberByIdAsync(Guid memberId, CancellationToken ct = default)
-    {
-        return await dbContext.Members
-            .FirstOrDefaultAsync(m => m.MemberId == memberId, ct);
-    }
-
-    public async Task<Member> CreateMemberAsync(Member member, CancellationToken ct = default)
-    {
-        member.IsActive = true;
-        member.RegisteredAt = DateTime.UtcNow;
-
-        dbContext.Members.Add(member);
-        await dbContext.SaveChangesAsync(ct);
-        return member;
-    }
-
-    public async Task<Member> UpdateMemberAsync(Member member, CancellationToken ct = default)
-    {
-        member.UpdatedAt = DateTime.UtcNow;
-        dbContext.Members.Update(member);
-        await dbContext.SaveChangesAsync(ct);
-        return member;
-    }
-
-    public async Task<bool> DeactivateMemberAsync(Guid memberId, CancellationToken ct = default)
-    {
-        var member = await dbContext.Members
-            .FirstOrDefaultAsync(m => m.MemberId == memberId, ct);
-
-        if (member == null)
-        {
-            return false;
+            throw new ArgumentException("Password cannot be null when creating a new member.");
         }
+        
+        bool exists = await dbContext.Users.AnyAsync(
+            u => u.Email == member.Email || u.PhoneNumber == member.PhoneNumber,
+            ct);
 
-        member.IsActive = false;
-        member.UpdatedAt = DateTime.UtcNow;
+        if (exists) { return false; }
+
+        var user = member.ToEntity(passwordService.HashPassword(member.Password));
+        dbContext.Users.Add(user);
         await dbContext.SaveChangesAsync(ct);
         return true;
     }
 
-    public async Task<RegisterResult> RegisterMemberAsync(Member member, string plainPassword, CancellationToken ct = default)
+    public async Task<bool> UpdateMemberAsync(Guid id, MemberSaveDto member, CancellationToken ct = default)
     {
-        var emailExists = await dbContext.Members
-            .AnyAsync(m => m.Email == member.Email, ct);
+        var user = await dbContext.Members.FirstOrDefaultAsync(u => u.UserId == id && !u.IsDeleted, ct);
 
-        if (emailExists)
+        if (user != null)
         {
-            return RegisterResult.Fail("Email address is already registered.");
+            user.FullName = member.FullName;
+            user.Email = member.Email;
+
+            if (!string.IsNullOrWhiteSpace(member.Password))
+            {
+                user.PasswordHash = passwordService.HashPassword(member.Password);
+            }
+
+            user.DateOfBirth = member.DateOfBirth;
+            user.Address = member.Address;
+            user.PhoneNumber = member.PhoneNumber;
+            user.Occupation = member.Occupation;
+
+            await dbContext.SaveChangesAsync(ct);
+            return true;
         }
 
-        if (string.IsNullOrWhiteSpace(plainPassword) || plainPassword.Length < 6)
-        {
-            return RegisterResult.Fail("Password must be at least 6 characters.");
-        }
-
-        member.PasswordHash = _passwordHasher.HashPassword(member, plainPassword);
-        member.IsActive = true;
-        member.RegisteredAt = DateTime.UtcNow;
-
-        dbContext.Members.Add(member);
-        await dbContext.SaveChangesAsync(ct);
-
-        return RegisterResult.Ok(member);
+        return false;
     }
 
-    public async Task<UpdateProfileResult> UpdateMemberProfileAsync(
-        Guid memberId,
-        string? fullName,
-        DateTime? dateOfBirth,
-        string? address,
-        string? occupation,
-        CancellationToken ct = default)
+    public async Task<bool> DeleteMemberAsync(Guid id, CancellationToken ct = default)
     {
-        var member = await dbContext.Members
-            .FirstOrDefaultAsync(m => m.MemberId == memberId, ct);
-
-        if (member == null)
-        {
-            return UpdateProfileResult.Fail("Member not found.");
-        }
-
-        // Validate: nếu có nhập full name thì không được rỗng
-        if (fullName != null && string.IsNullOrWhiteSpace(fullName))
-        {
-            return UpdateProfileResult.Fail("Full name cannot be empty.");
-        }
-
-        // Validate: ngày sinh không được ở tương lai
-        if (dateOfBirth.HasValue && dateOfBirth.Value > DateTime.UtcNow)
-        {
-            return UpdateProfileResult.Fail("Date of birth cannot be in the future.");
-        }
-
-        // Chỉ cập nhật field nào có giá trị (optional fields)
-        if (fullName != null) member.FullName = fullName;
-        if (dateOfBirth.HasValue) member.DateOfBirth = dateOfBirth;
-        if (address != null) member.Address = address;
-        if (occupation != null) member.Occupation = occupation;
-
-        member.UpdatedAt = DateTime.UtcNow;
-        await dbContext.SaveChangesAsync(ct);
-
-        return UpdateProfileResult.Ok(member);
+        return await dbContext.Members.Where(u => u.UserId == id && !u.IsDeleted)
+                .ExecuteUpdateAsync(u => u.SetProperty(m => m.IsDeleted, true), ct) > 0;
     }
 }

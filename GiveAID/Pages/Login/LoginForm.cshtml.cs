@@ -1,9 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using GiveAID.Models;
+using GiveAID.Services;
+using GiveAID.Services.Abstractions;
 using Hydro;
 
 namespace GiveAID.Pages.Login;
 
-public class LoginForm : HydroComponent
+public class LoginForm(IAuthService authService) : HydroComponent
 {
     [Required(ErrorMessage = "Email is required")]
     [EmailAddress(ErrorMessage = "Invalid email address")]
@@ -16,15 +19,28 @@ public class LoginForm : HydroComponent
 
     public bool HasError { get; set; }
 
-    public void Submit()
+    public async Task Submit()
     {
         if (!Validate()) { return; }
 
-        if (ModelState.IsValid)
+        try
         {
-            if (Email == "admin@give-aid.org") { Redirect("/Admin"); }
-            else if (string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(Password)) { HasError = true; }
-            else { Redirect("/"); }
+            var result = await authService.LoginAsync(Email, Password);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = RememberMe ? DateTime.UtcNow.AddDays(7) : DateTime.UtcNow.AddHours(24)
+            };
+            
+            HttpContext.Response.Cookies.Append("jwt_token", result.Token, cookieOptions);
+
+            Redirect(result.Role == UserRole.Admin ? "/Admin" : "/");
+        }
+        catch (LoginException ex)
+        {
+            HasError = true;
         }
     }
 }

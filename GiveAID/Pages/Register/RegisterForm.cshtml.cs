@@ -1,9 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using GiveAID.Dtos;
+using GiveAID.Models;
+using GiveAID.Services.Abstractions;
 using Hydro;
 
 namespace GiveAID.Pages.Register;
 
-public class RegisterForm : HydroComponent
+public class RegisterForm(IMemberService memberService) : HydroComponent
 {
     [Required(ErrorMessage = "Name is required")]
     public string Name { get; set; }
@@ -19,8 +22,8 @@ public class RegisterForm : HydroComponent
     [Required(ErrorMessage = "Date of Birth is required")]
     public string DOB { get; set; }
 
-    [MinLength(1, ErrorMessage = "Occupation is required")]
-    public string Occupation { get; set; }
+    [Required(ErrorMessage = "Occupation is required")]
+    public string? Occupation { get; set; }
     public string Address { get; set; }
 
     [Required(ErrorMessage = "Password is required")]
@@ -36,13 +39,34 @@ public class RegisterForm : HydroComponent
 
     public bool IsSuccess { get; set; }
 
-    public void Submit()
+    public async Task Submit()
     {
         if (!Validate())
         {
             return;
         }
         
-        if (ModelState.IsValid) { IsSuccess = true; }
+        if (ModelState.IsValid)
+        {
+            var user = new MemberSaveDto(
+                Name,
+                Email,
+                Password,
+                DateOnly.Parse(DOB),
+                Address,
+                Phone,
+                Occupation ?? string.Empty);
+
+            await memberService.CreateMemberAsync(user);
+
+            // if (result.Success)
+            // {
+            //     IsSuccess = true; 
+            // }
+            // else
+            // {
+            //     // Optionally handle registration errors here (e.g. email already registered)
+            // }
+        }
     }
 }
