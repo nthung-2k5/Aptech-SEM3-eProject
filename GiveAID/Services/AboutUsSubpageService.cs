@@ -1,9 +1,13 @@
+using System.Security.Claims;
+using GiveAID.Data;
 using GiveAID.Dtos;
+using GiveAID.Models;
 using GiveAID.Services.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Services;
 
-public class AboutUsSubpageService : IAboutUsSubpageService
+public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor) : IAboutUsSubpageService
 {
     private readonly List<AboutUsSubpageDetailsDto> pages =
     [
@@ -60,40 +64,84 @@ public class AboutUsSubpageService : IAboutUsSubpageService
                 </div>
                 """)
     ];
-
-    public Task<AboutUsSubpageSummaryDto[]> ListSubpagesAsync(CancellationToken ct = default) =>
-            Task.FromResult<AboutUsSubpageSummaryDto[]>(pages.ToArray());
-
-    public Task<AboutUsSubpageDetailsDto?> GetBySlugAsync(string slug, CancellationToken ct = default)
+    
+    private Guid? GetCurrentUserId()
     {
-        var page = pages.FirstOrDefault(p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase));
-        return Task.FromResult(page);
+        string? idClaim = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return Guid.TryParse(idClaim, out var id) ? id : null;
     }
 
-    public Task<bool> AddSubpageAsync(AboutUsSubpageDetailsDto page, CancellationToken ct = default)
+    public async Task<AboutUsSubpageSummaryDto[]> ListSubpagesAsync(CancellationToken ct = default)
     {
-        bool exists = pages.Any(p => p.Slug.Equals(page.Slug, StringComparison.OrdinalIgnoreCase));
-
-        if (!exists) { pages.Add(page); }
-
-        return Task.FromResult(!exists);
+        return await dbContext.AboutUsSubpages
+                .AsNoTracking()
+                .Include(s => 
+                        s.UserModifications.OrderByDescending(o => o.CreatedAt).Take(1))
+                .ProjectToSummaryDto()
+                .ToArrayAsync(ct);
     }
 
-    public Task<bool> UpdateSubpageAsync(AboutUsSubpageDetailsDto page, CancellationToken ct = default)
+    public async Task<AboutUsSubpageDetailsDto?> GetBySlugAsync(string slug, CancellationToken ct = default)
     {
-        bool exists = pages.Any(p => p.Slug.Equals(page.Slug, StringComparison.OrdinalIgnoreCase));
+        return await dbContext.AboutUsSubpages
+                .AsNoTracking()
+                .Include(s => s.UserModifications.OrderByDescending(o => o.CreatedAt).Take(1))
+                .ProjectToDto()
+                .FirstOrDefaultAsync(s => s.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase), ct);
+    }
+
+    public async Task<bool> AddSubpageAsync(AboutUsSubpageDetailsDto page, CancellationToken ct = default)
+    {
+        bool exists = await dbContext.AboutUsSubpages.AnyAsync(p => p.Slug == page.Slug, ct);
 
         if (exists)
         {
-            int index = pages.FindIndex(p => p.Slug.Equals(page.Slug, StringComparison.OrdinalIgnoreCase));
-            pages[index] = page;
+            return false;
         }
 
-        return Task.FromResult(exists);
+        var entity = page.MapToEntity();
+        
+        var modification = new UserModification
+        {
+            HtmlContent = page.HtmlContent,
+            UserId = GetCurrentUserId(),
+            Subpage = entity
+        };
+        
+        entity.UserModifications.Add(modification);
+
+        await dbContext.AboutUsSubpages.AddAsync(entity, ct);
+        await dbContext.SaveChangesAsync(ct);
+        return true;
     }
 
-    public Task<bool> DeleteSubpageAsync(string slug, CancellationToken ct = default)
+    public async Task<bool> UpdateSubpageAsync(AboutUsSubpageDetailsDto page, CancellationToken ct = default)
     {
-        return Task.FromResult(pages.RemoveAll(p => p.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase)) > 0);
+        var entity = await dbContext.AboutUsSubpages
+            .FirstOrDefaultAsync(p => p.Slug == page.Slug, ct);
+
+        if (entity == null)
+        {
+            return false;
+        }
+
+        entity.Title = page.Title;
+
+        var modification = new UserModification
+        {
+            UserId = GetCurrentUserId(),
+            SubpageId = entity.SubpageId,
+            HtmlContent = page.HtmlContent
+        };
+        
+        await dbContext.UserModifications.AddAsync(modification, ct);
+        await dbContext.SaveChangesAsync(ct);
+
+        return true;
+    }
+
+    public async Task<bool> DeleteSubpageAsync(string slug, CancellationToken ct = default)
+    {
+        return await dbContext.AboutUsSubpages.Where(p => p.Slug == slug).ExecuteDeleteAsync(ct) > 0;
     }
 }
