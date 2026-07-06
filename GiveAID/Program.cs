@@ -58,12 +58,14 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 
 builder.Services.AddScoped<IAboutUsSubpageService, AboutUsSubpageService>();
-builder.Services.AddScoped<IProgrammeService, ProgrammeService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IDonationCauseService, DonationCauseService>();
+builder.Services.AddScoped<IDonationService, DonationService>();
+builder.Services.AddScoped<IGalleryImageService, GalleryImageService>();
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<INgoService, NgoService>();
+builder.Services.AddScoped<IProgrammeService, ProgrammeService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
-builder.Services.AddScoped<IGalleryImageService, GalleryImageService>();
-builder.Services.AddScoped<IDonationService, DonationService>();
 
 var app = builder.Build();
 

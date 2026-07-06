@@ -21,6 +21,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> opts): DbContext(opts)
     public DbSet<GalleryImage> GalleryImages => Set<GalleryImage>();
     
     public IQueryable<User> Members => Users.Where(u => u.Role == UserRole.Member);
+    public IQueryable<DonationCause> ActiveDonationCauses => DonationCauses.Where(u => !u.IsDeleted);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
