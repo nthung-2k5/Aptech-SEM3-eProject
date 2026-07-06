@@ -25,7 +25,7 @@ public class IndexModel(
         TotalDonations = donations.Length;
         LatestDonations = donations.OrderByDescending(d => d.DonationDate).Take(5).ToList();
 
-        var members = await memberService.GetAllMembersAsync();
+        var members = await memberService.GetAllMembersAsync(null);
         TotalMembers = members.Length;
 
         var ngos = await ngoService.GetAllNgosAsync();
