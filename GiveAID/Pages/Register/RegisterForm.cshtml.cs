@@ -1,6 +1,5 @@
 using System.ComponentModel.DataAnnotations;
 using GiveAID.Dtos;
-using GiveAID.Models;
 using GiveAID.Services.Abstractions;
 using Hydro;
 
@@ -20,7 +19,7 @@ public class RegisterForm(IMemberService memberService) : HydroComponent
     public string Phone { get; set; }
 
     [Required(ErrorMessage = "Date of Birth is required")]
-    public string DOB { get; set; }
+    public string DateOfBirth { get; set; }
 
     [Required(ErrorMessage = "Occupation is required")]
     public string? Occupation { get; set; }
@@ -52,7 +51,7 @@ public class RegisterForm(IMemberService memberService) : HydroComponent
                 Name,
                 Email,
                 Password,
-                DateOnly.Parse(DOB),
+                DateOnly.Parse(DateOfBirth),
                 Address,
                 Phone,
                 Occupation ?? string.Empty);
