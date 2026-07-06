@@ -13,7 +13,7 @@
     int progress = p.TargetAmount.HasValue && p.TargetAmount.Value > 0 ? (int)(p.RaisedAmount / p.TargetAmount.Value * 100) : 0;
     if (progress > 100) progress = 100;
 
-    <div class="min-h-screen bg-[#F6F1E9] pb-12">
+    <div class="pb-12">
         <!-- Hero Section -->
         <div class="h-[40vh] min-h-[300px] max-h-[500px] relative">
             <img src="@p.ImageUrl" alt="@p.Name" class="w-full h-full object-cover"/>

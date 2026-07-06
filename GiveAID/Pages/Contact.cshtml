@@ -1,0 +1,65 @@
+@page
+@model ContactModel
+@{
+    ViewData["Title"] = "Contact Us";
+}
+
+<div>
+    <hero-component title="Contact Us" subtitle="Get in touch with the Give-AID team"/>
+    
+    <div class="max-w-7xl mx-auto px-6 py-12">
+        <div class="grid md:grid-cols-2 gap-12">
+            <div>
+                <h3 class="font-['Playfair_Display',serif] text-2xl font-bold text-[#1C1A17] mb-6">Reach Us</h3>
+                <div class="space-y-5">
+                    <div class="flex items-start gap-4">
+                        <div
+                            class="size-10 bg-[#1A5C6B]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="ph ph-map-pin text-[#1A5C6B]"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-[#6B6459] uppercase tracking-wide mb-0.5">Head Office
+                            </div>
+                            <div class="text-[#1C1A17] text-sm">12, Philanthropy Lane, Bandra West, Mumbai 400050</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div
+                            class="size-10 bg-[#1A5C6B]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="ph ph-phone text-[#1A5C6B]"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-[#6B6459] uppercase tracking-wide mb-0.5">Phone</div>
+                            <div class="text-[#1C1A17] text-sm">+91 22 4567 8900</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div
+                            class="size-10 bg-[#1A5C6B]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="ph ph-envelope text-[#1A5C6B]"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-[#6B6459] uppercase tracking-wide mb-0.5">Email</div>
+                            <div class="text-[#1C1A17] text-sm">info@give-aid.org</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div
+                            class="size-10 bg-[#1A5C6B]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                            <i class="ph ph-clock text-[#1A5C6B]"></i>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-[#6B6459] uppercase tracking-wide mb-0.5">Working Hours
+                            </div>
+                            <div class="text-[#1C1A17] text-sm">Mon–Fri, 9:00 AM – 6:00 PM IST</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white border border-[#E3DDD3] rounded-xl p-7">
+                <contact-form/>
+            </div>
+        </div>
+    </div>
+</div>

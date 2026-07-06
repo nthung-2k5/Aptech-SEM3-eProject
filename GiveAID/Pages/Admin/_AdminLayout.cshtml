@@ -7,7 +7,7 @@
     bool IsActive(string page) => ViewContext.RouteData.Values["Page"]?.ToString()?.StartsWith(page) == true;
 }
 
-<div id="admin" class="min-h-screen bg-[#F6F1E9]">
+<div id="admin">
     <div class="max-w-7xl mx-auto px-4 py-8">
         <!-- Header -->
         <section class="flex items-center justify-between mb-8">
@@ -43,10 +43,6 @@
             <a asp-page="/Admin/UserQuery/Index"
                data-active="@IsActive("/Admin/UserQuery")">
                 <i class="ph ph-chat"></i>Queries
-            </a>
-            <a asp-page="/Admin/Gallery/Index"
-               data-active="@IsActive("/Admin/Gallery")">
-                <i class="ph ph-image"></i>Gallery
             </a>
         </nav>
         @RenderBody()

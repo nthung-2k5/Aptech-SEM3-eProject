@@ -1,0 +1,80 @@
+@page
+@model FaqModel
+@{
+    ViewData["Title"] = "FAQ";
+}
+
+<div>
+    <hero-component title="FAQ" subtitle="Find answers to common questions"/>
+    
+    <div class="max-w-4xl mx-auto px-6 py-12">
+        <div>
+            <!-- FAQs -->
+            <div>
+                <h3 class="font-['Playfair_Display',serif] text-2xl font-bold text-[#1C1A17] mb-6">Frequently Asked
+                    Questions</h3>
+                <div class="space-y-3">
+                    <div class="bg-white border border-[#E3DDD3] rounded-xl overflow-hidden" x-data="{ open: false }">
+                        <button @@click="open = !open"
+                                class="w-full text-left px-5 py-4 flex items-center justify-between text-sm font-semibold text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors">
+                            How do I make a donation?
+                            <i class="ph ph-caret-down text-[#6B6459] transition-transform flex-shrink-0"
+                               :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open"
+                             class="px-5 pb-4 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3] pt-3"
+                             style="display: none;">
+                            Go to the Donate page, select your preferred amount and cause, then complete the secure
+                            payment form.
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-[#E3DDD3] rounded-xl overflow-hidden" x-data="{ open: false }">
+                        <button @@click="open = !open"
+                                class="w-full text-left px-5 py-4 flex items-center justify-between text-sm font-semibold text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors">
+                            Is my payment information secure?
+                            <i class="ph ph-caret-down text-[#6B6459] transition-transform flex-shrink-0"
+                               :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open"
+                             class="px-5 pb-4 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3] pt-3"
+                             style="display: none;">
+                            Yes. All transactions are processed with 256-bit SSL encryption. We do not store card
+                            details.
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-[#E3DDD3] rounded-xl overflow-hidden" x-data="{ open: false }">
+                        <button @@click="open = !open"
+                                class="w-full text-left px-5 py-4 flex items-center justify-between text-sm font-semibold text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors">
+                            Can I get a tax receipt?
+                            <i class="ph ph-caret-down text-[#6B6459] transition-transform flex-shrink-0"
+                               :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open"
+                             class="px-5 pb-4 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3] pt-3"
+                             style="display: none;">
+                            Yes. Donations are eligible for tax benefits under Section 80G. A receipt is emailed after
+                            each donation.
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-[#E3DDD3] rounded-xl overflow-hidden" x-data="{ open: false }">
+                        <button @@click="open = !open"
+                                class="w-full text-left px-5 py-4 flex items-center justify-between text-sm font-semibold text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors">
+                            How are donations allocated?
+                            <i class="ph ph-caret-down text-[#6B6459] transition-transform flex-shrink-0"
+                               :class="open ? 'rotate-180' : ''"></i>
+                        </button>
+                        <div x-show="open"
+                             class="px-5 pb-4 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3] pt-3"
+                             style="display: none;">
+                            100% of the donation amount (minus payment gateway fees) goes directly to the selected
+                            cause.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
