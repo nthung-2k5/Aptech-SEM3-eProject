@@ -16,6 +16,21 @@
       - "1433:1433"
     volumes:
       - mssql-data:/var/opt/mssql
+    healthcheck:
+      test: [ "CMD", "/opt/mssql-tools18/bin/sqlcmd", "-C", "-S", "localhost", "-U", "sa", "-P", "GiveAID@123", "-Q", "SELECT 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2025-latest
+    container_name: sqlserver_init_container
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    volumes:
+      - ./init.sql:/init.sql
+    entrypoint: /bin/bash -c "/opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P GiveAID@123 -i /init.sql -C"
 
 volumes:
   mssql-data:
