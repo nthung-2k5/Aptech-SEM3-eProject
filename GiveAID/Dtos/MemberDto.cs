@@ -2,7 +2,9 @@
 
 namespace GiveAID.Dtos;
 
-public record MemberSaveDto(string FullName, string Email, string? Password, DateOnly DateOfBirth, string Address, string PhoneNumber, string Occupation);
+public record MemberCreateDto(string FullName, string Email, string Password, DateOnly DateOfBirth, string Address, string PhoneNumber, string Occupation);
+
+public record MemberUpdateDto(string FullName, string Email, string? Password, DateOnly DateOfBirth, string Address, string PhoneNumber, string Occupation);
 
 public record MemberSummaryDto(Guid Id, string FullName, string Email, DateOnly DateOfBirth, string PhoneNumber);
 
@@ -16,7 +18,7 @@ public static class MemberMapper
         public MemberDto ToDto() => new(member.UserId, member.FullName, member.Email, member.DateOfBirth, member.Address, member.PhoneNumber, member.Occupation);
     }
 
-    public static User ToEntity(this MemberSaveDto dto, string passwordHash) => new()
+    public static User ToEntity(this MemberCreateDto dto, string passwordHash) => new()
     {
         FullName = dto.FullName,
         Email = dto.Email,
@@ -27,4 +29,13 @@ public static class MemberMapper
         Occupation = dto.Occupation,
         Role = UserRole.Member
     };
+    
+    extension(IQueryable<User> members)
+    {
+        public IQueryable<MemberSummaryDto> ProjectToSummaryDto() =>
+            members.Select(m => new MemberSummaryDto(m.UserId, m.FullName, m.Email, m.DateOfBirth, m.PhoneNumber));
+        
+        public IQueryable<MemberDto> ProjectToDto() =>
+            members.Select(m => new MemberDto(m.UserId, m.FullName, m.Email, m.DateOfBirth, m.Address, m.PhoneNumber, m.Occupation));
+    }
 }
