@@ -1,150 +1,131 @@
 using GiveAID.Data;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Models;
 using GiveAID.Services.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Services;
 
-public class ProgrammeService(AppDbContext dbContext) : IProgrammeService
+public class ProgrammeService(AppDbContext context, IUserInterestService userInterestService) : IProgrammeService
 {
-    public async Task<ProgrammeSummaryDto[]> GetAllProgrammesAsync(ProgrammeQueryParameters? query,
-                                                                   CancellationToken ct = default)
+    public async Task<ProgrammeDto[]> GetAvailableProgrammesAsync(ProgrammeQueryParameters? query,
+                                                                     CancellationToken ct = default)
     {
-        var q = dbContext.WelfareProgrammes
-            .AsNoTracking()
-            .Where(p => !p.IsDeleted);
+        var q = context.AvailableWelfareProgrammes.Include(p => p.Ngo).Include(p => p.Cause).Include(p => p.Donations)
+                .AsQueryable();
 
-        if (query != null)
+        q = ApplyQueryParameters(q, query);
+
+        return await q.ProjectToDto().ToArrayAsync(ct);
+    }
+
+    public async Task<ProgrammeDto[]> GetAllProgrammesAsync(ProgrammeQueryParameters? query,
+                                                            CancellationToken ct = default)
+    {
+        IQueryable<WelfareProgramme> q = context.AvailableWelfareProgrammes.Include(p => p.Ngo).Include(p => p.Cause)
+                .Include(p => p.Donations);
+
+        q = ApplyQueryParameters(q, query);
+
+        return await q.ProjectToDto().ToArrayAsync(ct);
+    }
+
+    private static IQueryable<WelfareProgramme> ApplyQueryParameters(IQueryable<WelfareProgramme> query,
+                                                                     ProgrammeQueryParameters? parameters)
+    {
+        if (parameters == null) { return query; }
+
+        if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
         {
-            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
-            {
-                q = q.Where(p => p.Name.Contains(query.SearchTerm) ||
-                                 p.Description.Contains(query.SearchTerm));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Ngo))
-            {
-                q = q.Where(p => p.Ngo.Name == query.Ngo);
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Cause))
-            {
-                q = q.Where(p => p.Cause.Name == query.Cause);
-            }
+            query = query.Where(p => p.Name.Contains(parameters.SearchTerm) ||
+                                     p.Description.Contains(parameters.SearchTerm));
         }
 
-        var pageNumber = query?.PageNumber ?? 1;
-        var pageSize = query?.PageSize > 0 ? query.PageSize : 10;
+        if (!string.IsNullOrWhiteSpace(parameters.Ngo))
+        {
+            query = query.Where(p => p.Ngo.Name.Contains(parameters.Ngo));
+        }
 
-        return await q
-            .OrderByDescending(p => p.CreatedAt)
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .Select(p => new ProgrammeSummaryDto(
-                p.ProgrammeId,
-                p.Name,
-                p.Cause.Name,
-                p.Ngo.Name,
-                p.ImageUrl,
-                p.StartTime.DateTime,
-                p.EndTime == null ? DateTime.MaxValue : p.EndTime.Value.DateTime,
-                p.Donations.Count(d => d.Status == DonationStatus.Completed),
-                p.MaxDonation,
-                p.Donations.Where(d => d.Status == DonationStatus.Completed).Sum(d => d.Amount)
-            ))
-            .ToArrayAsync(ct);
+        if (!string.IsNullOrWhiteSpace(parameters.Cause))
+        {
+            query = query.Where(p => p.Cause.Name.Contains(parameters.Cause));
+        }
+
+        return query.Skip((parameters.PageNumber - 1) * parameters.PageSize).Take(parameters.PageSize);
     }
 
     public async Task<ProgrammeDto?> GetProgrammeByIdAsync(Guid id, CancellationToken ct = default)
     {
-        return await dbContext.WelfareProgrammes
-            .AsNoTracking()
-            .Where(p => p.ProgrammeId == id && !p.IsDeleted)
-            .Select(p => new ProgrammeDto(
-                p.ProgrammeId,
-                p.Name,
-                p.Cause.Name,
-                p.Ngo.Name,
-                p.ImageUrl,
-                p.StartTime.DateTime,
-                p.EndTime == null ? DateTime.MaxValue : p.EndTime.Value.DateTime,
-                p.Donations.Count(d => d.Status == DonationStatus.Completed),
-                p.MaxDonation,
-                p.Donations.Where(d => d.Status == DonationStatus.Completed).Sum(d => d.Amount),
-                p.Description,
-                p.Ngo.Name  // OrganizerInfo = the managing NGO's name
-            ))
-            .FirstOrDefaultAsync(ct);
+        return await context.ActiveWelfareProgrammes.Include(p => p.Ngo).Include(p => p.Cause)
+                .Include(p => p.Donations).ProjectToDto().FirstOrDefaultAsync(p => p.Id == id, ct);
     }
 
-    public async Task<ProgrammeDto?> CreateProgrammeAsync(ProgrammeSaveDto programme, CancellationToken ct = default)
+    public async Task<ProgrammeDto> CreateProgrammeAsync(ProgrammeSaveDto dto, CancellationToken ct = default)
     {
         // Validate FK: NGO must exist and not be deleted
-        bool ngoExists = await dbContext.Ngos
-            .AnyAsync(n => n.NgoId == programme.NgoId && !n.IsDeleted, ct);
-        if (!ngoExists) return null;
-
-        // Validate FK: DonationCause must exist and not be deleted
-        bool causeExists = await dbContext.DonationCauses
-            .AnyAsync(c => c.CauseId == programme.CauseId && !c.IsDeleted, ct);
-        if (!causeExists) return null;
-
-        var entity = new WelfareProgramme
+        if (!await context.ActiveNgos.AnyAsync(n => n.NgoId == dto.NgoId, ct))
         {
-            NgoId = programme.NgoId,
-            CauseId = programme.CauseId,
-            Name = programme.Name,
-            Description = programme.Description,
-            ImageUrl = programme.ImageUrl,
-            StartTime = programme.StartTime,
-            EndTime = programme.EndTime,
-            MaxDonation = programme.MaxDonation,
-            Location = programme.Location,
-        };
-
-        dbContext.WelfareProgrammes.Add(entity);
-        await dbContext.SaveChangesAsync(ct);
-
-        // Re-query to get the full DTO with navigated Ngo.Name / Cause.Name
-        return await GetProgrammeByIdAsync(entity.ProgrammeId, ct);
-    }
-
-    public async Task<bool> UpdateProgrammeAsync(Guid id, ProgrammeSaveDto programme, CancellationToken ct = default)
-    {
-        // Validate FK: NGO must exist and not be deleted
-        bool ngoExists = await dbContext.Ngos
-            .AnyAsync(n => n.NgoId == programme.NgoId && !n.IsDeleted, ct);
-        if (!ngoExists) return false;
+            throw new MissingForeignEntityException(nameof(dto.NgoId));
+        }
 
         // Validate FK: DonationCause must exist and not be deleted
-        bool causeExists = await dbContext.DonationCauses
-            .AnyAsync(c => c.CauseId == programme.CauseId && !c.IsDeleted, ct);
-        if (!causeExists) return false;
+        if (await context.ActiveDonationCauses.AnyAsync(c => c.CauseId == dto.CauseId, ct))
+        {
+            throw new MissingForeignEntityException(nameof(dto.CauseId));
+        }
 
-        var entity = await dbContext.WelfareProgrammes
-            .FirstOrDefaultAsync(p => p.ProgrammeId == id && !p.IsDeleted, ct);
+        var programme = dto.ToEntity();
 
-        if (entity == null) return false;
+        context.WelfareProgrammes.Add(programme);
+        await context.SaveChangesAsync(ct);
 
-        entity.NgoId = programme.NgoId;
-        entity.CauseId = programme.CauseId;
-        entity.Name = programme.Name;
-        entity.Description = programme.Description;
-        entity.ImageUrl = programme.ImageUrl;
-        entity.StartTime = programme.StartTime;
-        entity.EndTime = programme.EndTime;
-        entity.MaxDonation = programme.MaxDonation;
-        entity.Location = programme.Location;
+        var ngo = await context.Ngos.FindAsync([dto.NgoId], ct);
 
-        await dbContext.SaveChangesAsync(ct);
-        return true;
+        if (ngo != null)
+        {
+            await userInterestService.NotifyInterestedUsersAsync(
+                dto.NgoId,
+                $"New Programme launched by {ngo.Name}: {programme.Name}");
+        }
+
+        return programme.ToDto();
     }
 
-    public async Task<bool> DeleteProgrammeAsync(Guid id, CancellationToken ct = default)
+    public async Task UpdateProgrammeAsync(Guid id, ProgrammeSaveDto dto, CancellationToken ct = default)
     {
-        return await dbContext.WelfareProgrammes
-            .Where(p => p.ProgrammeId == id && !p.IsDeleted)
-            .ExecuteUpdateAsync(s => s.SetProperty(p => p.IsDeleted, true), ct) > 0;
+        // Validate FK: NGO must exist and not be deleted
+        if (!await context.ActiveNgos.AnyAsync(n => n.NgoId == dto.NgoId, ct))
+        {
+            throw new MissingForeignEntityException(nameof(dto.NgoId));
+        }
+
+        // Validate FK: DonationCause must exist and not be deleted
+        if (await context.ActiveDonationCauses.AnyAsync(c => c.CauseId == dto.CauseId, ct))
+        {
+            throw new MissingForeignEntityException(nameof(dto.CauseId));
+        }
+
+        var programme = await context.WelfareProgrammes.FindAsync([id], ct);
+        
+        if (programme == null || programme.IsDeleted) { throw new NotFoundException(); }
+
+        programme.NgoId = dto.NgoId;
+        programme.CauseId = dto.CauseId;
+        programme.Name = dto.Name;
+        programme.ImageUrl = dto.ImageUrl;
+        programme.Description = dto.Description;
+        programme.StartTime = dto.StartTime;
+        programme.EndTime = dto.EndTime;
+        programme.MaxDonation = dto.MaxDonation;
+        programme.Location = dto.Location;
+
+        await context.SaveChangesAsync(ct);
+    }
+
+    public async Task DeleteProgrammeAsync(Guid id, CancellationToken ct = default)
+    {
+        await context.ActiveWelfareProgrammes.Where(p => p.ProgrammeId == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(p => p.IsDeleted, true), ct);
     }
 }
