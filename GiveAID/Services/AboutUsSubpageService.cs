@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Services;
 
-public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor) : IAboutUsSubpageService
+public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+        : IAboutUsSubpageService
 {
     private readonly List<AboutUsSubpageDetailsDto> pages =
     [
@@ -64,7 +65,7 @@ public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor 
                 </div>
                 """)
     ];
-    
+
     private Guid? GetCurrentUserId()
     {
         string? idClaim = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -73,20 +74,15 @@ public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor 
 
     public async Task<AboutUsSubpageSummaryDto[]> ListSubpagesAsync(CancellationToken ct = default)
     {
-        return await dbContext.AboutUsSubpages
-                .AsNoTracking()
-                .Include(s => 
-                        s.UserModifications.OrderByDescending(o => o.CreatedAt).Take(1))
-                .ProjectToSummaryDto()
+        return await dbContext.AboutUsSubpages.AsNoTracking()
+                .Include(s => s.UserModifications.OrderByDescending(o => o.CreatedAt).Take(1)).ProjectToSummaryDto()
                 .ToArrayAsync(ct);
     }
 
     public async Task<AboutUsSubpageDetailsDto?> GetBySlugAsync(string slug, CancellationToken ct = default)
     {
-        return await dbContext.AboutUsSubpages
-                .AsNoTracking()
-                .Include(s => s.UserModifications.OrderByDescending(o => o.CreatedAt).Take(1))
-                .ProjectToDto()
+        return await dbContext.AboutUsSubpages.AsNoTracking()
+                .Include(s => s.UserModifications.OrderByDescending(o => o.CreatedAt).Take(1)).ProjectToDto()
                 .FirstOrDefaultAsync(s => s.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase), ct);
     }
 
@@ -94,20 +90,17 @@ public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor 
     {
         bool exists = await dbContext.AboutUsSubpages.AnyAsync(p => p.Slug == page.Slug, ct);
 
-        if (exists)
-        {
-            return false;
-        }
+        if (exists) { return false; }
 
         var entity = page.MapToEntity();
-        
+
         var modification = new UserModification
         {
             HtmlContent = page.HtmlContent,
             UserId = GetCurrentUserId(),
             Subpage = entity
         };
-        
+
         entity.UserModifications.Add(modification);
 
         await dbContext.AboutUsSubpages.AddAsync(entity, ct);
@@ -117,13 +110,9 @@ public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor 
 
     public async Task<bool> UpdateSubpageAsync(AboutUsSubpageDetailsDto page, CancellationToken ct = default)
     {
-        var entity = await dbContext.AboutUsSubpages
-            .FirstOrDefaultAsync(p => p.Slug == page.Slug, ct);
+        var entity = await dbContext.AboutUsSubpages.FirstOrDefaultAsync(p => p.Slug == page.Slug, ct);
 
-        if (entity == null)
-        {
-            return false;
-        }
+        if (entity == null) { return false; }
 
         entity.Title = page.Title;
 
@@ -133,7 +122,7 @@ public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor 
             SubpageId = entity.SubpageId,
             HtmlContent = page.HtmlContent
         };
-        
+
         await dbContext.UserModifications.AddAsync(modification, ct);
         await dbContext.SaveChangesAsync(ct);
 
