@@ -1,8 +1,17 @@
-// using GiveAID.Models;
-//
-// namespace GiveAID.Services.Abstractions;
-//
-// public interface IPaymentService
-// {
-//     public Task<bool> ProcessPaymentAsync(Payment payment, CancellationToken ct = default);
-// }
+using GiveAID.Models;
+
+namespace GiveAID.Services.Abstractions;
+
+public record PaymentRequestDto(
+    decimal Amount,
+    string CardNumber,
+    string CardHolderName,
+    string ExpiryDate,
+    string Cvv,
+    string Gateway
+);
+
+public interface IPaymentService
+{
+    Task<Transaction> ProcessPaymentAsync(PaymentRequestDto request, CancellationToken ct = default);
+}
