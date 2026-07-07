@@ -15,7 +15,7 @@ public class Ngo : IHasCreatedAt
     [MaxLength(255)]
     public string? Address { get; set; }
 
-    [MaxLength(20)]
+    [MaxLength(11)]
     public string? PhoneNumber { get; set; }
 
     [MaxLength(1024)]

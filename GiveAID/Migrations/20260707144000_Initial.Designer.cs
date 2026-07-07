@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GiveAID.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260706170200_AddAdminCoreModules")]
-    partial class AddAdminCoreModules
+    [Migration("20260707144000_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

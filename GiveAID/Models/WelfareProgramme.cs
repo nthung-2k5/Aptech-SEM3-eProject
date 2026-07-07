@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Models;
@@ -39,5 +40,6 @@ public class WelfareProgramme : IHasCreatedAt
     public ICollection<GalleryImage> GalleryImages { get; set; } = new List<GalleryImage>();
     public ICollection<Donation> Donations { get; set; } = new List<Donation>();
     
+    [NotMapped]
     public IEnumerable<Donation> ValidDonations => Donations.Where(d => d.Status == DonationStatus.Completed);
 }
