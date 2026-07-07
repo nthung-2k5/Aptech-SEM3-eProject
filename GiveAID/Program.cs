@@ -63,6 +63,7 @@ builder.Services.AddScoped<IDonationCauseService, DonationCauseService>();
 builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IGalleryImageService, GalleryImageService>();
 builder.Services.AddScoped<IMemberService, MemberService>();
+builder.Services.AddScoped<IPartnerService, PartnerService>();
 builder.Services.AddScoped<INgoService, NgoService>();
 builder.Services.AddScoped<IProgrammeService, ProgrammeService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
