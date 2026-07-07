@@ -8,113 +8,100 @@ namespace GiveAID.Services;
 
 public class GalleryImageService(AppDbContext dbContext) : IGalleryImageService
 {
-        public async Task<GalleryImageDto[]> GetAllImagesAsync(CancellationToken ct = default)
+    public async Task<GalleryImageDto[]> GetAllImagesAsync(CancellationToken ct = default)
+    {
+        // Two-step: SQL projection first (Uri cannot be translated to SQL)
+        var rows = await dbContext.GalleryImages.AsNoTracking().OrderByDescending(i => i.ImageId).Select(i => new
         {
-                // Two-step: SQL projection first (Uri cannot be translated to SQL)
-                var rows = await dbContext.GalleryImages
-                    .AsNoTracking()
-                    .OrderByDescending(i => i.ImageId)
-                    .Select(i => new
-                    {
-                            i.ImageId,
-                            i.ImageUrl,
-                            i.Caption,
-                            Programme = i.Programme != null
-                            ? new { i.Programme.ProgrammeId, i.Programme.Name }
-                            : null
-                    })
-                    .ToArrayAsync(ct);
+            i.ImageId,
+            i.ImageUrl,
+            i.Caption,
+            Programme = i.Programme != null ? new { i.Programme.ProgrammeId, i.Programme.Name } : null
+        }).ToArrayAsync(ct);
 
-                return rows.Select(i => new GalleryImageDto(
-                    i.ImageId,
-                    ParseUri(i.ImageUrl),
-                    i.Caption ?? string.Empty,
-                    i.Programme != null ? (i.Programme.ProgrammeId, i.Programme.Name) : null
-                )).ToArray();
+        return rows.Select(i => new GalleryImageDto(
+            i.ImageId,
+            ParseUri(i.ImageUrl),
+            i.Caption ?? string.Empty,
+            i.Programme != null ? (i.Programme.ProgrammeId, i.Programme.Name) : null)).ToArray();
+    }
+
+    public async Task<GalleryImageDto?> GetImageByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        var row = await dbContext.GalleryImages.AsNoTracking().Where(i => i.ImageId == id).Select(i => new
+        {
+            i.ImageId,
+            i.ImageUrl,
+            i.Caption,
+            Programme = i.Programme != null ? new { i.Programme.ProgrammeId, i.Programme.Name } : null
+        }).FirstOrDefaultAsync(ct);
+
+        if (row == null) { return null; }
+
+        return new GalleryImageDto(
+            row.ImageId,
+            ParseUri(row.ImageUrl),
+            row.Caption ?? string.Empty,
+            row.Programme != null ? (row.Programme.ProgrammeId, row.Programme.Name) : null);
+    }
+
+    public async Task<bool> UploadImageAsync(GalleryImageSaveDto image, CancellationToken ct = default)
+    {
+        // Validate FK: programme must exist and not be soft-deleted
+        if (image.AssociatedProgrammeId.HasValue)
+        {
+            bool progExists = await dbContext.WelfareProgrammes.AnyAsync(
+                p => p.ProgrammeId == image.AssociatedProgrammeId.Value && !p.IsDeleted,
+                ct);
+
+            if (!progExists) { return false; }
         }
 
-        public async Task<GalleryImageDto?> GetImageByIdAsync(Guid id, CancellationToken ct = default)
+        var entity = new GalleryImage
         {
-                var row = await dbContext.GalleryImages
-                    .AsNoTracking()
-                    .Where(i => i.ImageId == id)
-                    .Select(i => new
-                    {
-                            i.ImageId,
-                            i.ImageUrl,
-                            i.Caption,
-                            Programme = i.Programme != null
-                            ? new { i.Programme.ProgrammeId, i.Programme.Name }
-                            : null
-                    })
-                    .FirstOrDefaultAsync(ct);
+            ImageUrl = image.ImageUri.ToString(),
+            Caption = image.Caption,
+            ProgrammeId = image.AssociatedProgrammeId
+        };
 
-                if (row == null) return null;
+        dbContext.GalleryImages.Add(entity);
+        return await dbContext.SaveChangesAsync(ct) > 0;
+    }
 
-                return new GalleryImageDto(
-                    row.ImageId,
-                    ParseUri(row.ImageUrl),
-                    row.Caption ?? string.Empty,
-                    row.Programme != null ? (row.Programme.ProgrammeId, row.Programme.Name) : null
-                );
+    public async Task<bool> UpdateImageAsync(Guid id, GalleryImageSaveDto image, CancellationToken ct = default)
+    {
+        // Validate FK: programme must exist and not be soft-deleted
+        if (image.AssociatedProgrammeId.HasValue)
+        {
+            bool progExists = await dbContext.WelfareProgrammes.AnyAsync(
+                p => p.ProgrammeId == image.AssociatedProgrammeId.Value && !p.IsDeleted,
+                ct);
+
+            if (!progExists) { return false; }
         }
 
-        public async Task<bool> UploadImageAsync(GalleryImageSaveDto image, CancellationToken ct = default)
-        {
-                // Validate FK: programme must exist and not be soft-deleted
-                if (image.AssociatedProgrammeId.HasValue)
-                {
-                        bool progExists = await dbContext.WelfareProgrammes
-                            .AnyAsync(p => p.ProgrammeId == image.AssociatedProgrammeId.Value && !p.IsDeleted, ct);
-                        if (!progExists) return false;
-                }
+        var entity = await dbContext.GalleryImages.FirstOrDefaultAsync(i => i.ImageId == id, ct);
 
-                var entity = new GalleryImage
-                {
-                        ImageUrl = image.ImageUri.ToString(),
-                        Caption = image.Caption,
-                        ProgrammeId = image.AssociatedProgrammeId,
-                };
+        if (entity == null) { return false; }
 
-                dbContext.GalleryImages.Add(entity);
-                return await dbContext.SaveChangesAsync(ct) > 0;
-        }
+        entity.ImageUrl = image.ImageUri.ToString();
+        entity.Caption = image.Caption;
+        entity.ProgrammeId = image.AssociatedProgrammeId;
 
-        public async Task<bool> UpdateImageAsync(Guid id, GalleryImageSaveDto image, CancellationToken ct = default)
-        {
-                // Validate FK: programme must exist and not be soft-deleted
-                if (image.AssociatedProgrammeId.HasValue)
-                {
-                        bool progExists = await dbContext.WelfareProgrammes
-                            .AnyAsync(p => p.ProgrammeId == image.AssociatedProgrammeId.Value && !p.IsDeleted, ct);
-                        if (!progExists) return false;
-                }
+        await dbContext.SaveChangesAsync(ct);
+        return true;
+    }
 
-                var entity = await dbContext.GalleryImages
-                    .FirstOrDefaultAsync(i => i.ImageId == id, ct);
+    public async Task<bool> DeleteImageAsync(Guid id, CancellationToken ct = default)
+    {
+        // Hard delete — GalleryImage has no IsDeleted field
+        return await dbContext.GalleryImages.Where(i => i.ImageId == id).ExecuteDeleteAsync(ct) > 0;
+    }
 
-                if (entity == null) return false;
-
-                entity.ImageUrl = image.ImageUri.ToString();
-                entity.Caption = image.Caption;
-                entity.ProgrammeId = image.AssociatedProgrammeId;
-
-                await dbContext.SaveChangesAsync(ct);
-                return true;
-        }
-
-        public async Task<bool> DeleteImageAsync(Guid id, CancellationToken ct = default)
-        {
-                // Hard delete — GalleryImage has no IsDeleted field
-                return await dbContext.GalleryImages
-                    .Where(i => i.ImageId == id)
-                    .ExecuteDeleteAsync(ct) > 0;
-        }
-
-        /// <summary>
-        /// Safely parses a URL string into a Uri.
-        /// Returns a fallback Uri if the stored string is malformed or empty.
-        /// </summary>
-        private static Uri ParseUri(string url) =>
+    /// <summary>
+    /// Safely parses a URL string into a Uri.
+    /// Returns a fallback Uri if the stored string is malformed or empty.
+    /// </summary>
+    private static Uri ParseUri(string url) =>
             Uri.TryCreate(url, UriKind.Absolute, out var uri) ? uri : new Uri("about:blank");
 }

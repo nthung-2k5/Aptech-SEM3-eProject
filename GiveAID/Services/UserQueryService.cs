@@ -6,8 +6,7 @@ namespace GiveAID.Services;
 
 public class UserQueryService : IUserQueryService
 {
-    public Task<UserQueryDto[]> GetAllQueriesAsync(CancellationToken ct = default) =>
-            Task.FromResult(MockData.Queries);
+    public Task<UserQueryDto[]> GetAllQueriesAsync(CancellationToken ct = default) => Task.FromResult(MockData.Queries);
 
     public Task<UserQueryDto[]> GetUnansweredQueriesAsync(CancellationToken ct = default) =>
             Task.FromResult(MockData.Queries.Where(q => string.IsNullOrEmpty(q.ReplyText)).ToArray());
