@@ -1,3 +1,4 @@
+using EntityFramework.Exceptions.SqlServer;
 using GiveAID.Data;
 using GiveAID.Services;
 using GiveAID.Services.Abstractions;
@@ -53,7 +54,7 @@ var auditingInterceptor = new AuditingInterceptor();
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(connectionString).AddInterceptors(auditingInterceptor));
+        options.UseSqlServer(connectionString).AddInterceptors(auditingInterceptor).UseExceptionProcessor());
 
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 
