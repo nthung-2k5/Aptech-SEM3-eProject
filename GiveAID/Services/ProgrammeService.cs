@@ -80,14 +80,7 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
         context.WelfareProgrammes.Add(programme);
         await context.SaveChangesAsync(ct);
 
-        var ngo = await context.Ngos.FindAsync([dto.NgoId], ct);
-
-        if (ngo != null)
-        {
-            await userInterestService.NotifyInterestedUsersAsync(
-                dto.NgoId,
-                $"New Programme launched by {ngo.Name}: {programme.Name}");
-        }
+        await userInterestService.NotifyInterestedUsersAsync(programme, ct);
 
         return programme.ToDto();
     }
