@@ -1,49 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+using GiveAID.Models;
 
 namespace GiveAID.Dtos;
-
-public record ProgrammeSaveDto(
-    [property: Required(ErrorMessage = "NGO is required.")]
-    Guid NgoId,
-
-    [property: Required(ErrorMessage = "Cause is required.")]
-    Guid CauseId,
-
-    [property: Required(ErrorMessage = "Programme name is required.")]
-    [property: MaxLength(255, ErrorMessage = "Name cannot exceed 255 characters.")]
-    string Name,
-
-    [property: Required(ErrorMessage = "Description is required.")]
-    string Description,
-
-    [property: Required(ErrorMessage = "Image URL is required.")]
-    [property: Url(ErrorMessage = "Invalid image URL format.")]
-    string ImageUrl,
-
-    [property: Required(ErrorMessage = "Start time is required.")]
-    DateTimeOffset StartTime,
-
-    DateTimeOffset? EndTime,
-
-    [property: Range(0, double.MaxValue, ErrorMessage = "Target amount must be a positive number.")]
-    decimal? MaxDonation,
-
-    [property: MaxLength(500, ErrorMessage = "Location cannot exceed 500 characters.")]
-    string? Location
-);
-
-public record ProgrammeSummaryDto(
-    Guid Id,
-    string Name,
-    string Cause,
-    string Ngo,
-    string ImageUrl,
-    DateTime StartDate,
-    DateTime EndDate,
-    long DonationCount,
-    decimal? TargetAmount,
-    decimal RaisedAmount
-);
 
 public record ProgrammeDto(
     Guid Id,
@@ -51,22 +8,70 @@ public record ProgrammeDto(
     string Cause,
     string Ngo,
     string ImageUrl,
-    DateTime StartDate,
-    DateTime EndDate,
+    DateTimeOffset StartDate,
+    DateTimeOffset? EndDate,
     long DonationCount,
     decimal? TargetAmount,
     decimal RaisedAmount,
     string Description,
-    string OrganizerInfo
-) : ProgrammeSummaryDto(
-    Id,
-    Name,
-    Cause,
-    Ngo,
-    ImageUrl,
-    StartDate,
-    EndDate,
-    DonationCount,
-    TargetAmount,
-    RaisedAmount
+    string? Location
 );
+
+public record ProgrammeSaveDto(
+    Guid NgoId,
+    Guid CauseId,
+    string Name,
+    string ImageUrl,
+    string Description,
+    DateTimeOffset StartTime,
+    DateTimeOffset? EndTime,
+    decimal? MaxDonation,
+    string? Location
+);
+
+public static class ProgrammeMapper
+{
+    public static ProgrammeDto ToDto(this WelfareProgramme programme) => new(
+        programme.ProgrammeId,
+        programme.Name,
+        programme.Cause.Name,
+        programme.Ngo.Name,
+        programme.ImageUrl,
+        programme.StartTime,
+        programme.EndTime,
+        programme.ValidDonations.Count(),
+        programme.MaxDonation,
+        programme.ValidDonations.Sum(d => d.Amount),
+        programme.Description,
+        programme.Location
+    );
+    
+    public static IQueryable<ProgrammeDto> ProjectToDto(this IQueryable<WelfareProgramme> programmes) =>
+        programmes.Select(p => new ProgrammeDto(
+            p.ProgrammeId,
+            p.Name,
+            p.Cause.Name,
+            p.Ngo.Name,
+            p.ImageUrl,
+            p.StartTime,
+            p.EndTime,
+            p.ValidDonations.Count(),
+            p.MaxDonation,
+            p.ValidDonations.Sum(d => d.Amount),
+            p.Description,
+            p.Location
+        ));
+    
+    public static WelfareProgramme ToEntity(this ProgrammeSaveDto dto) => new()
+    {
+        NgoId = dto.NgoId,
+        CauseId = dto.CauseId,
+        Name = dto.Name,
+        ImageUrl = dto.ImageUrl,
+        Description = dto.Description,
+        StartTime = dto.StartTime,
+        EndTime = dto.EndTime,
+        MaxDonation = dto.MaxDonation,
+        Location = dto.Location
+    };
+}

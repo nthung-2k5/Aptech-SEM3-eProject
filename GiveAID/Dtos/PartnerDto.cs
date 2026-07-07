@@ -1,26 +1,35 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using GiveAID.Models;
 
 namespace GiveAID.Dtos;
 
-public record PartnerSaveDto(
-    [property: Required(ErrorMessage = "Partner name is required.")]
-    [property: MaxLength(200, ErrorMessage = "Partner name cannot exceed 200 characters.")]
-    string Name,
-
-    [property: Required(ErrorMessage = "Logo URL is required.")]
-    [property: Url(ErrorMessage = "Invalid URL format for Logo.")]
-    string LogoUrl,
-
-    [property: Required(ErrorMessage = "Description is required.")]
-    string Description,
-
-    [property: Required(ErrorMessage = "Website link is required.")]
-    [property: Url(ErrorMessage = "Invalid URL format for Website.")]
-    string WebsiteLink
-);
+public record PartnerSaveDto(string Name, string LogoUrl, string Description, string WebsiteLink);
 
 public record PartnerSummaryDto(Guid Id, string Name, string LogoUrl);
 
 public record PartnerDto(Guid Id, string Name, string LogoUrl, string Description, string WebsiteLink)
-    : PartnerSummaryDto(Id, Name, LogoUrl);
+        : PartnerSummaryDto(Id, Name, LogoUrl);
+
+public static class PartnerMapper
+{
+    extension(CorporatePartner partner)
+    {
+            public PartnerDto ToDto() =>
+                            new(partner.PartnerId, partner.Name, partner.LogoUrl, partner.Description, partner.WebsiteLink);
+
+            public PartnerSaveDto ToSaveDto() =>
+                            new(partner.Name, partner.LogoUrl, partner.Description, partner.WebsiteLink);
+    }
+    
+    public static IQueryable<PartnerSummaryDto> ProjectToSummaryDto(this IQueryable<CorporatePartner> partners) =>
+        partners.Select(p => new PartnerSummaryDto(p.PartnerId, p.Name, p.LogoUrl));
+    
+    public static CorporatePartner ToEntity(this PartnerSaveDto dto) => new()
+    {
+        Name = dto.Name,
+        LogoUrl = dto.LogoUrl,
+        Description = dto.Description,
+        WebsiteLink = dto.WebsiteLink
+    };
+}
