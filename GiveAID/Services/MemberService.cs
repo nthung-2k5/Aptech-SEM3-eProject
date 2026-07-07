@@ -56,12 +56,12 @@ public class MemberService(AppDbContext dbContext, IPasswordService passwordServ
 
         if (user == null || user.IsDeleted) { throw new NotFoundException(); }
 
-        if (await dbContext.Users.AnyAsync(u => u.Email == dto.Email, ct))
+        if (await dbContext.Users.AnyAsync(u => u.Email == dto.Email || u.UserId != id, ct))
         {
             throw new DuplicateException(nameof(dto.Email));
         }
 
-        if (await dbContext.Users.AnyAsync(u => u.PhoneNumber == dto.PhoneNumber, ct))
+        if (await dbContext.Users.AnyAsync(u => u.PhoneNumber == dto.PhoneNumber || u.UserId != id, ct))
         {
             throw new DuplicateException(nameof(dto.PhoneNumber));
         }
