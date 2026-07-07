@@ -21,7 +21,7 @@ public record DonationSaveDto(Guid UserId, DonationTarget Target, decimal Amount
 
 public record UserDonationDto(DonationTargetDto Target, decimal Amount, DateTimeOffset DonationDate);
 
-public record DonationDto(Guid Id, Guid DonorId, string DonorName, DonationTargetDto Target, decimal Amount, DateTimeOffset DonationDate);
+public record DonationDto(Guid Id, Guid DonorId, string DonorName, DonationTargetDto Target, decimal Amount, DateTimeOffset DonationDate, DonationStatus Status);
 
 public static class DonationMapper
 {
@@ -31,7 +31,8 @@ public static class DonationMapper
         donation.User.FullName,
         GetTarget(donation),
         donation.Amount,
-        donation.CreatedAt
+        donation.CreatedAt,
+        donation.Status
     );
 
     private static DonationTargetDto GetTarget(Donation donation)
@@ -58,7 +59,8 @@ public static class DonationMapper
             d.User.FullName,
             GetTarget(d),
             d.Amount,
-            d.CreatedAt
+            d.CreatedAt,
+            d.Status
         ));
     
     public static Donation ToEntity(this DonationSaveDto dto) => new()

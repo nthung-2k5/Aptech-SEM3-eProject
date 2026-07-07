@@ -1,4 +1,6 @@
-﻿namespace GiveAID.Dtos;
+﻿using GiveAID.Models;
+
+namespace GiveAID.Dtos;
 
 public class MockData
 {
@@ -33,9 +35,9 @@ public class MockData
     ];
 
     public static DonationDto[] Donations { get; set; } = [
-        new(Guid.NewGuid(), Members[0].Id, Members[0].FullName, new DonateForProgrammeTarget(Programmes[0].Id), 100m, DateTimeOffset.Now.AddDays(-5)),
-        new(Guid.NewGuid(), Members[1].Id, Members[1].FullName, new DonateForNgoTarget(Ngos[1].Id, Guid.NewGuid()), 50m, DateTimeOffset.Now.AddDays(-3)),
-        new(Guid.NewGuid(), Members[2].Id, Members[2].FullName, new DonateForProgrammeTarget(Programmes[2].Id), 25m, DateTimeOffset.Now.AddDays(-1))
+        new(Guid.NewGuid(), Members[0].Id, Members[0].FullName, new DonateForProgrammeTargetDto(Programmes[0].Id, Programmes[0].Name), 100m, DateTimeOffset.Now.AddDays(-5), DonationStatus.Completed),
+        // new(Guid.NewGuid(), Members[1].Id, Members[1].FullName, new DonateForNgoTargetDto(Ngos[1].Id, Guid.NewGuid()), 50m, DateTimeOffset.Now.AddDays(-3)),
+        new(Guid.NewGuid(), Members[2].Id, Members[2].FullName, new DonateForProgrammeTargetDto(Programmes[2].Id, Programmes[2].Name), 25m, DateTimeOffset.Now.AddDays(-1), DonationStatus.Void)
     ];
 
     public static GalleryImageDto[] GalleryImages { get; set; } = [
