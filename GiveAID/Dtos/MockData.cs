@@ -10,11 +10,11 @@ public class MockData
         new(Guid.NewGuid(), "Alice Johnson", "alice.j@example.com", new DateOnly(1992, 8, 20), "789 Oak St", "1112223333", "Teacher")
     ];
 
-    public static NgoDto[] Ngos { get; set; } = [
-        new(Guid.NewGuid(), "Global Helpers", "An NGO dedicated to global health.", "100 Health Way", "1-800-HELP", "https://globalhelpers.org"),
-        new(Guid.NewGuid(), "Education First", "Providing education to children worldwide.", "200 School Dr", "1-800-EDU", "https://educationfirst.org"),
-        new(Guid.NewGuid(), "Green Earth", "Environmental protection and conservation.", "300 Nature Ln", "1-800-GREEN", "https://greenearth.org")
-    ];
+    // public static NgoDto[] Ngos { get; set; } = [
+    //     new(Guid.NewGuid(), "Global Helpers", "An NGO dedicated to global health.", "100 Health Way", "1-800-HELP", "https://globalhelpers.org"),
+    //     new(Guid.NewGuid(), "Education First", "Providing education to children worldwide.", "200 School Dr", "1-800-EDU", "https://educationfirst.org"),
+    //     new(Guid.NewGuid(), "Green Earth", "Environmental protection and conservation.", "300 Nature Ln", "1-800-GREEN", "https://greenearth.org")
+    // ];
 
     public static PartnerDto[] Partners { get; set; } = [
         new(Guid.NewGuid(), "TechCorp Inc", "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?q=80&w=2070&auto=format&fit=crop", "Leading technology company committed to social impact.", "https://techcorp.example.com"),

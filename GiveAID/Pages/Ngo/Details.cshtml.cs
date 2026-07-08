@@ -7,13 +7,14 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace GiveAID.Pages.Ngo;
 
 public class DetailsModel(
-    INgoService ngoService, 
+    INgoService ngoService,
     IDonationCauseService donationCauseService,
-    IUserInterestService userInterestService) : PageModel
+    IUserInterestService userInterestService
+) : PageModel
 {
     public NgoDto? Ngo { get; set; }
     public DonationCauseDto[] Causes { get; set; } = [];
-    
+
     public bool IsFollowing { get; set; }
 
     [BindProperty]
@@ -25,16 +26,15 @@ public class DetailsModel(
     public async Task<IActionResult> OnGetAsync(Guid id)
     {
         Ngo = await ngoService.GetNgoByIdAsync(id);
-        if (Ngo == null)
-        {
-            return NotFound();
-        }
+
+        if (Ngo == null) { return NotFound(); }
 
         Causes = await donationCauseService.GetAllDonationCausesAsync();
 
         if (User.Identity?.IsAuthenticated == true && User.IsInRole("Member"))
         {
-            var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
             if (Guid.TryParse(userIdStr, out var userId))
             {
                 IsFollowing = await userInterestService.IsFollowingNgoAsync(userId, id);
@@ -43,11 +43,9 @@ public class DetailsModel(
 
         return Page();
     }
-    
-    public IActionResult OnPostDonate(Guid id)
-    {
-        return RedirectToPage("/Donate/Index", new { ngoId = id, causeId = SelectedCauseId, amount = Amount });
-    }
+
+    public IActionResult OnPostDonate(Guid id) =>
+            RedirectToPage("/Donate/Index", new { ngoId = id, causeId = SelectedCauseId, amount = Amount });
 
     public async Task<IActionResult> OnPostToggleFollowAsync(Guid id)
     {
@@ -56,20 +54,16 @@ public class DetailsModel(
             return RedirectToPage("/Login/Index");
         }
 
-        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
         if (Guid.TryParse(userIdStr, out var userId))
         {
-            var isFollowing = await userInterestService.IsFollowingNgoAsync(userId, id);
-            if (isFollowing)
-            {
-                await userInterestService.UnfollowNgoAsync(userId, id);
-            }
-            else
-            {
-                await userInterestService.FollowNgoAsync(userId, id);
-            }
+            bool isFollowing = await userInterestService.IsFollowingNgoAsync(userId, id);
+
+            if (isFollowing) { await userInterestService.UnfollowNgoAsync(userId, id); }
+            else { await userInterestService.FollowNgoAsync(userId, id); }
         }
-        
+
         return RedirectToPage(new { id });
     }
 }

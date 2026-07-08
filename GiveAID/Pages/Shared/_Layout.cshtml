@@ -131,9 +131,12 @@
                                     }
                                 </div>
                                 <div class="max-h-64 overflow-y-auto">
-                                    @if (notifications.Length == 0) { <div
-                                        class="p-6 text-center text-gray-500 text-sm">No notifications yet.
-                                    </div> }
+                                    @if (notifications.Length == 0)
+                                    {
+                                        <div
+                                            class="p-6 text-center text-gray-500 text-sm">No notifications yet.
+                                        </div>
+                                    }
                                     else
                                     {
                                         @foreach (var notif in notifications)

@@ -33,14 +33,11 @@ public class LoginForm(IAuthService authService) : HydroComponent
                 SameSite = SameSiteMode.Strict,
                 Expires = RememberMe ? DateTimeOffset.UtcNow.AddDays(7) : DateTimeOffset.UtcNow.AddHours(24)
             };
-            
+
             HttpContext.Response.Cookies.Append("jwt_token", result.Token, cookieOptions);
 
             Redirect(result.Role == UserRole.Admin ? "/Admin" : "/");
         }
-        catch (LoginException ex)
-        {
-            HasError = true;
-        }
+        catch (LoginException ex) { HasError = true; }
     }
 }

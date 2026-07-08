@@ -9,7 +9,6 @@ public class LoginModel : PageModel
         HttpContext.Response.Cookies.Delete("jwt_token");
         Redirect("/Index");
     }
-    public void OnGet()
-    {
-    }
+
+    public void OnGet() { }
 }

@@ -49,7 +49,7 @@
                         @*     <span class="text-[#6B6459] ml-2">@d.CauseName</span> *@
                         @* </div> *@
                         <span class="font-medium text-[#1C1A17]">@d.DonorName</span>
-                        <span class="text-[#1A5C6B] font-semibold">Rs. @d.Amount</span>
+                        <span class="text-[#1A5C6B] font-semibold">$@d.Amount</span>
                     </div>
                 }
                 @if (!Model.LatestDonations.Any()) { <p class="text-[#6B6459] text-sm">No donations found.</p> }

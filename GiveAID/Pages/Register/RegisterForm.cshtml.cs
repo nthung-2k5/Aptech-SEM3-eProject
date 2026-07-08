@@ -23,6 +23,7 @@ public class RegisterForm(IMemberService memberService) : HydroComponent
 
     [Required(ErrorMessage = "Occupation is required")]
     public string? Occupation { get; set; }
+
     public string Address { get; set; }
 
     [Required(ErrorMessage = "Password is required")]
@@ -40,11 +41,8 @@ public class RegisterForm(IMemberService memberService) : HydroComponent
 
     public async Task Submit()
     {
-        if (!Validate())
-        {
-            return;
-        }
-        
+        if (!Validate()) { return; }
+
         if (ModelState.IsValid)
         {
             var user = new MemberCreateDto(

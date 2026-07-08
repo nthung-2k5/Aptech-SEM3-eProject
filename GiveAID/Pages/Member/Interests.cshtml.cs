@@ -15,7 +15,8 @@ public class InterestsModel(IUserInterestService userInterestService) : PageMode
     public async Task<IActionResult> OnGetAsync()
     {
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdStr, out var userId)) return RedirectToPage("/Login/Index");
+
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
 
         Interests = await userInterestService.GetUserInterestsAsync(userId);
 
@@ -25,7 +26,8 @@ public class InterestsModel(IUserInterestService userInterestService) : PageMode
     public async Task<IActionResult> OnPostUnfollowAsync(Guid ngoId)
     {
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdStr, out var userId)) return RedirectToPage("/Login/Index");
+
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
 
         await userInterestService.UnfollowNgoAsync(userId, ngoId);
 

@@ -31,7 +31,13 @@ public class NgoService(AppDbContext dbContext) : INgoService
 
         var entity = dto.ToEntity();
 
-        dbContext.Ngos.Add(entity);
+        await dbContext.Ngos.AddAsync(entity, ct);
+        await dbContext.NgoPartners.AddRangeAsync(dto.PartnersId.Select(partnerId => new NgoPartner
+        {
+            NgoId = entity.NgoId,
+            PartnerId = partnerId
+        }), ct);
+        
         await dbContext.SaveChangesAsync(ct);
 
         return entity.ToDto();
@@ -54,6 +60,13 @@ public class NgoService(AppDbContext dbContext) : INgoService
         entity.Address = dto.Address;
         entity.PhoneNumber = dto.PhoneNumber;
         entity.Website = dto.Website;
+        
+        await dbContext.NgoPartners.Where(p => p.NgoId == id).ExecuteDeleteAsync(ct);
+        await dbContext.NgoPartners.AddRangeAsync(dto.PartnersId.Select(partnerId => new NgoPartner
+        {
+            NgoId = entity.NgoId,
+            PartnerId = partnerId
+        }), ct);
 
         await dbContext.SaveChangesAsync(ct);
     }

@@ -18,7 +18,8 @@ public class DonationsModel(IDonationService service) : PageModel
     public async Task<IActionResult> OnGetAsync(CancellationToken ct = default)
     {
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdStr, out var userId)) return RedirectToPage("/Login/Index");
+
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
 
         Donations = await service.GetDonationsByUserAsync(userId, ct);
 
