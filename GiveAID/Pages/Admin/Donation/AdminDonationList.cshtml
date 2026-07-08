@@ -3,7 +3,7 @@
 
 <div class="bg-white rounded-xl border border-[#E3DDD3] overflow-hidden">
     <div class="p-6 border-b border-[#E3DDD3] flex justify-between items-center">
-        <h3 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1C1A17]">Donation Records</h3>
+        <h3 class="text-[#1C1A17]">Donation Records</h3>
     </div>
     <div class="overflow-x-auto">
         <table class="w-full table">
@@ -13,7 +13,7 @@
                 <th>Target</th>
                 <th>Amount</th>
                 <th>Status</th>
-                <th>Date</th>
+                <th>Date/Time (GMT)</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -48,7 +48,7 @@
                             }
                         }
                     </td>
-                    <td class="font-medium">$@d.Amount.ToString("N2")</td>
+                    <td class="font-medium">@d.Amount.ToUsCurrencyString()</td>
                     <td class="px-5 py-3.5 text-sm">
                         @if (d.Status == DonationStatus.Completed)
                         {
@@ -61,7 +61,7 @@
                                 class="bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-1 rounded-full">Void</span>
                         }
                     </td>
-                    <td class="px-5 py-3.5 text-sm text-[#6B6459]">@d.DonationDate.ToString("MMM dd, yyyy")</td>
+                    <td class="px-5 py-3.5 text-sm text-[#6B6459]">@d.DonationDate.ToString("g")</td>
                     <td class="px-5 py-3.5">
                         @if (d.Status == DonationStatus.Completed)
                         {
@@ -78,8 +78,8 @@
         </table>
         @if (Model.Donations.Length == 0)
         {
-            <div class="p-8 text-center text-[#6B6459] text-sm">No donation records
-                found.
+            <div class="p-8 text-center text-[#6B6459] text-sm">
+                No donation records found.
             </div>
         }
     </div>

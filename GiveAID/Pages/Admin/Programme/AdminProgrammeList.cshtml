@@ -2,9 +2,8 @@
 
 <div class="bg-white rounded-xl border border-[#E3DDD3] overflow-hidden">
     <div class="p-6 border-b border-[#E3DDD3] flex justify-between items-center">
-        <h3 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1C1A17]">Welfare Programmes</h3>
-        <a href="/Admin/Programme/Editor"
-           class="flex items-center gap-2 px-4 py-2 bg-[#1A5C6B] text-white text-sm font-semibold rounded-lg hover:bg-[#154D5A] no-underline">
+        <h3 class="text-[#1C1A17]">Welfare Programmes</h3>
+        <a asp-page="/Admin/Programme/Editor" class="btn btn-primary">
             <i class="ph ph-plus"></i> Add Programme
         </a>
     </div>
@@ -15,7 +14,6 @@
                 <th>Name</th>
                 <th>NGO</th>
                 <th>Cause</th>
-                <th>Location</th>
                 <th>Raised / Target</th>
                 <th>Period</th>
                 <th>Status</th>
@@ -38,25 +36,16 @@
                 };
 
                 <tr>
-                    <td>
-                        <div class="flex items-center gap-3">
-                            @if (!string.IsNullOrEmpty(p.ImageUrl))
-                            {
-                                <img src="@p.ImageUrl" alt="@p.Name" class="w-9 h-9 rounded object-cover shrink-0"/>
-                            }
-                            <span class="text-sm font-semibold text-[#1C1A17]">@p.Name</span>
-                        </div>
-                    </td>
+                    <th>@p.Name</th>
                     <td>@p.Ngo</td>
                     <td>
                         <span class="bg-[#1A5C6B]/10 text-[#1A5C6B] text-xs font-semibold px-2 py-0.5 rounded-full">@p.Cause</span>
                     </td>
-                    <td>@(p.Location ?? "—")</td>
                     <td>
-                        <span class="text-[#1A5C6B] font-semibold">$@p.RaisedAmount.ToString("N0")</span>
+                        <span class="text-[#1A5C6B] font-semibold">@p.RaisedAmount.ToUsCurrencyString()</span>
                         @if (p.TargetAmount.HasValue)
                         {
-                            <span class="text-[#6B6459]"> / $@p.TargetAmount.Value.ToString("N0")</span>
+                            <span class="text-[#6B6459]"> / @p.TargetAmount.Value.ToUsCurrencyString()</span>
                         }
                         else
                         {
@@ -64,8 +53,8 @@
                         }
                     </td>
                     <td>
-                        @p.StartDate.ToString("MMM dd, yyyy")<br/>
-                        @(p.EndDate.HasValue ? "→ " + p.EndDate.Value.ToString("MMM dd, yyyy") : "→ ongoing")
+                        @p.StartDate.Date.ToShortDateString()<br/>
+                        @(p.EndDate.HasValue ? "→ " + p.EndDate.Value.Date.ToShortDateString() : "→ ongoing")
                     </td>
                     <td>
                         <span class="text-xs font-semibold px-2.5 py-1 rounded-full @statusCss">@statusLabel</span>

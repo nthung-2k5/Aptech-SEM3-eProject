@@ -1,18 +1,16 @@
 ﻿@model AdminMemberEditor
 
 <form on:submit="@(() => Model.Save())" class="bg-white border border-[#E3DDD3] rounded-xl p-6">
-    <h4 class="font-['Playfair_Display',serif] font-bold text-[#1C1A17] mb-4">@(Model.Id.HasValue ? "Edit Member" : "Add Member")</h4>
+    <h4 class="font-bold text-[#1C1A17] mb-4">@(Model.Id.HasValue ? "Edit Member" : "Add Member")</h4>
     <div class="grid md:grid-cols-2 gap-4 mb-4">
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Full Name <span class="text-red-500">*</span></label>
-            <input type="text" asp-for="Form.FullName" required
-                   class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            <input type="text" asp-for="Form.FullName" required class="input w-full"/>
         </div>
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Email <span
                     class="text-red-500">*</span></label>
-            <input type="email" asp-for="Form.Email" required
-                   class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            <input type="email" asp-for="Form.Email" required class="input w-full"/>
         </div>
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">
@@ -20,36 +18,27 @@
                 @if (!Model.Id.HasValue) { <span class="text-red-500">*</span> }
                 else { <span class="text-xs text-[#6B6459] font-normal">(leave blank to keep current)</span> }
             </label>
-            <input type="password" asp-for="Form.Password" autocomplete="new-password"
-                   class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            <input type="password" asp-for="Form.Password" autocomplete="new-password" class="input w-full"/>
         </div>
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Phone Number</label>
-            <input type="text" asp-for="Form.PhoneNumber" placeholder="0912345678"
-                   class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            <input type="text" asp-for="Form.PhoneNumber" placeholder="0912345678" class="input w-full"/>
         </div>
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Date of Birth</label>
-            <input type="date" asp-for="Form.DateOfBirth"
-                   class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            <input type="date" asp-for="Form.DateOfBirth" class="input w-full"/>
         </div>
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Occupation</label>
-            <input type="text" asp-for="Form.Occupation" placeholder="e.g. Engineer, Student..."
-                   class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            <input type="text" asp-for="Form.Occupation" placeholder="e.g. Engineer, Student..." class="input w-full"/>
         </div>
         <div class="md:col-span-2">
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Address</label>
-            <input type="text" asp-for="Form.Address" placeholder="Full address"
-                   class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            <input type="text" asp-for="Form.Address" placeholder="Full address" class="input w-full"/>
         </div>
     </div>
-    <div class="flex gap-2">
-        <button type="submit"
-                class="px-5 py-2.5 bg-[#C97C2E] text-white font-semibold rounded-lg text-sm hover:bg-[#B06B20]">Save
-            Member
-        </button>
-        <a href="/Admin/Member"
-           class="px-5 py-2.5 bg-gray-200 text-gray-800 font-semibold rounded-lg text-sm hover:bg-gray-300 no-underline">Cancel</a>
+    <div class="flex justify-end gap-2">
+        <a asp-page="/Admin/Member/Index" class="btn btn-soft">Cancel</a>
+        <button type="submit" class="btn btn-secondary">Save Member</button>
     </div>
 </form>

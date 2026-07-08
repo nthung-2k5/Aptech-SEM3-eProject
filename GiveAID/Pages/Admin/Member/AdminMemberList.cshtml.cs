@@ -14,20 +14,18 @@ public class AdminMemberList(IMemberService memberService) : HydroComponent
         await memberService.DeleteMemberAsync(id);
         Members = await memberService.GetAllMemberDtosAsync(null);
     }
-    
+
     public bool OpenModal { get; set; }
     public MemberDto? SelectedMember { get; set; }
-    
+
     public async Task ShowMemberInfo(Guid memberId)
     {
         var member = await memberService.GetMemberByIdAsync(memberId);
 
         OpenModal = true;
+
         if (member != null) { SelectedMember = member; }
     }
 
-    public void CloseModal()
-    {
-        OpenModal = false;
-    }
+    public void CloseModal() { OpenModal = false; }
 }
