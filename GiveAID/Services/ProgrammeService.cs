@@ -23,7 +23,7 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
     public async Task<ProgrammeDto[]> GetAllProgrammesAsync(ProgrammeQueryParameters? query,
                                                             CancellationToken ct = default)
     {
-        IQueryable<WelfareProgramme> q = context.AvailableWelfareProgrammes.AsNoTracking().Include(p => p.Ngo)
+        IQueryable<WelfareProgramme> q = context.ActiveWelfareProgrammes.AsNoTracking().Include(p => p.Ngo)
                 .Include(p => p.Cause).Include(p => p.Donations);
 
         q = ApplyQueryParameters(q, query);
@@ -55,6 +55,14 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
                 .Include(p => p.Donations).Where(p => p.ProgrammeId == id).ProjectToDto().FirstOrDefaultAsync(ct);
     }
 
+    public async Task<ProgrammeSaveDto?> GetProgrammeSaveDtoByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        return await context.ActiveWelfareProgrammes.AsNoTracking()
+            .Where(p => p.ProgrammeId == id)
+            .Select(p => new ProgrammeSaveDto(p.NgoId, p.CauseId, p.Name, p.ImageUrl, p.Description, p.StartTime, p.EndTime, p.MaxDonation, p.Location))
+            .FirstOrDefaultAsync(ct);
+    }
+
     public async Task<ProgrammeDto> CreateProgrammeAsync(ProgrammeSaveDto dto, CancellationToken ct = default)
     {
         // Validate FK: NGO must exist and not be deleted
@@ -64,7 +72,7 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
         }
 
         // Validate FK: DonationCause must exist and not be deleted
-        if (await context.ActiveDonationCauses.AnyAsync(c => c.CauseId == dto.CauseId, ct))
+        if (!await context.ActiveDonationCauses.AnyAsync(c => c.CauseId == dto.CauseId, ct))
         {
             throw new MissingForeignEntityException(nameof(dto.CauseId));
         }
@@ -88,7 +96,7 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
         }
 
         // Validate FK: DonationCause must exist and not be deleted
-        if (await context.ActiveDonationCauses.AnyAsync(c => c.CauseId == dto.CauseId, ct))
+        if (!await context.ActiveDonationCauses.AnyAsync(c => c.CauseId == dto.CauseId, ct))
         {
             throw new MissingForeignEntityException(nameof(dto.CauseId));
         }

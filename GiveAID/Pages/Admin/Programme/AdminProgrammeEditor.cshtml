@@ -1,0 +1,101 @@
+@model AdminProgrammeEditor
+
+<form on:submit="@(() => Model.Save())" class="bg-white border border-[#E3DDD3] rounded-xl p-6 space-y-6">
+    <h4 class="font-['Playfair_Display',serif] font-bold text-[#1C1A17]">
+        @(Model.Id.HasValue ? "Edit Programme" : "Add Programme")
+    </h4>
+
+    @* Core details *@
+    <div class="grid md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Programme Name <span class="text-red-500">*</span></label>
+            <input type="text" asp-for="Form.Name" required placeholder="e.g. Clean Water Initiative"
+                   class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">NGO <span class="text-red-500">*</span></label>
+            <select asp-for="Form.NgoId" required
+                    class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B] bg-white">
+                <option value="">— Select NGO —</option>
+                @foreach (var n in Model.AvailableNgos)
+                {
+                    <option value="@n.Id">@n.Name</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Cause <span class="text-red-500">*</span></label>
+            <select asp-for="Form.CauseId" required
+                    class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B] bg-white">
+                <option value="">— Select Cause —</option>
+                @foreach (var c in Model.AvailableCauses)
+                {
+                    <option value="@c.Id">@c.Name</option>
+                }
+            </select>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Location</label>
+            <input type="text" asp-for="Form.Location" placeholder="City, Country or region"
+                   class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Image URL</label>
+            <input type="url" asp-for="Form.ImageUrl" placeholder="https://example.com/image.jpg"
+                   class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+        </div>
+
+        <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Description <span class="text-red-500">*</span></label>
+            <textarea asp-for="Form.Description" rows="4" required placeholder="Describe the programme's goals and impact..."
+                      class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"></textarea>
+        </div>
+    </div>
+
+    @* Dates & Funding *@
+    <div>
+        <div class="text-xs font-bold uppercase tracking-widest text-[#6B6459] mb-3">Schedule & Funding</div>
+        <div class="grid md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Start Date <span class="text-red-500">*</span></label>
+                <input type="datetime-local" asp-for="Form.StartTime" required
+                       class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">End Date <span class="text-xs text-[#6B6459] font-normal">(optional)</span></label>
+                <input type="datetime-local" asp-for="Form.EndTime"
+                       class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Donation Target ($) <span class="text-xs text-[#6B6459] font-normal">(optional)</span></label>
+                <input type="number" asp-for="Form.MaxDonation" min="0" step="0.01" placeholder="e.g. 50000"
+                       class="w-full border border-[#E3DDD3] rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            </div>
+        </div>
+    </div>
+
+    @* Image preview *@
+    @if (!string.IsNullOrEmpty(Model.Form.ImageUrl))
+    {
+        <div>
+            <div class="text-xs font-bold uppercase tracking-widest text-[#6B6459] mb-2">Image Preview</div>
+            <img src="@Model.Form.ImageUrl" alt="Programme image preview"
+                 class="w-full max-h-48 object-cover rounded-xl border border-[#E3DDD3]"/>
+        </div>
+    }
+
+    <div class="flex gap-2 pt-2">
+        <button type="submit"
+                class="px-5 py-2.5 bg-[#C97C2E] text-white font-semibold rounded-lg text-sm hover:bg-[#B06B20]">
+            Save Programme
+        </button>
+        <a href="/Admin/Programme"
+           class="px-5 py-2.5 bg-gray-200 text-gray-800 font-semibold rounded-lg text-sm hover:bg-gray-300 no-underline">
+            Cancel
+        </a>
+    </div>
+</form>
