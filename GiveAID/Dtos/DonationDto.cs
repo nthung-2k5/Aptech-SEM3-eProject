@@ -45,24 +45,27 @@ public static class DonationMapper
         return donation.Programme != null ? new DonateForProgrammeTargetDto(donation.Programme.ProgrammeId, donation.Programme.Name) : throw new InvalidOperationException("Donation must have either an NGO or a Programme target.");
     }
     
-    public static IQueryable<UserDonationDto> ProjectToUserDto(this IQueryable<Donation> donations) =>
-            donations.Select(d => new UserDonationDto(
-                GetTarget(d),
-                d.Amount,
-                d.CreatedAt
-            ));
-    
-    public static IQueryable<DonationDto> ProjectToDto(this IQueryable<Donation> donations) =>
-        donations.Select(d => new DonationDto(
-            d.DonationId,
-            d.UserId,
-            d.User.FullName,
-            GetTarget(d),
-            d.Amount,
-            d.CreatedAt,
-            d.Status
-        ));
-    
+    extension(IQueryable<Donation> donations)
+    {
+        public IQueryable<UserDonationDto> ProjectToUserDto() =>
+                donations.Select(d => new UserDonationDto(
+                    GetTarget(d),
+                    d.Amount,
+                    d.CreatedAt
+                ));
+
+        public IQueryable<DonationDto> ProjectToDto() =>
+                donations.Select(d => new DonationDto(
+                    d.DonationId,
+                    d.UserId,
+                    d.User.FullName,
+                    GetTarget(d),
+                    d.Amount,
+                    d.CreatedAt,
+                    d.Status
+                ));
+    }
+
     public static Donation ToEntity(this DonationSaveDto dto) => new()
     {
         UserId = dto.UserId,
