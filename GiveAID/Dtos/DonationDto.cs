@@ -5,21 +5,44 @@ using OneOf.Serialization;
 
 namespace GiveAID.Dtos;
 
-public record DonateForNgoTarget(Guid NgoId, Guid? CauseId);
+public class DonateForNgoTarget(Guid ngoId, Guid? causeId) : OneOfCase
+{
+    public Guid NgoId { get; } = ngoId;
+    public Guid? CauseId { get; } = causeId;
+}
 
-public record DonateForProgrammeTarget(Guid ProgrammeId);
+public class DonateForProgrammeTarget(Guid programmeId) : OneOfCase
+{
+    public Guid ProgrammeId { get; } = programmeId;
+}
 
-public record DonateForNgoTargetDto((Guid Id, string Name) Ngo, (Guid Id, string Name)? Cause);
+public class DonateForNgoTargetDto((Guid, string) ngo, (Guid, string)? cause) : OneOfCase
+{
+    public (Guid Id, string Name) Ngo { get; } = ngo;
+    public (Guid Id, string Name)? Cause { get; } = cause;
+}
 
-public record DonateForProgrammeTargetDto(Guid ProgrammeId, string ProgrammeName);
+public class DonateForProgrammeTargetDto(Guid programmeId, string programmeName) : OneOfCase
+{
+    public Guid ProgrammeId { get; } = programmeId;
+    public string ProgrammeName { get; } = programmeName;
+}
 
 [JsonConverter(typeof(OneOfJsonConverter<DonationTarget>))]
 [GenerateOneOf]
-public partial class DonationTarget : OneOfBase<DonateForNgoTarget, DonateForProgrammeTarget>;
+public partial class DonationTarget : OneOfBase<DonateForNgoTarget, DonateForProgrammeTarget>
+{
+    public DonationTarget(DonateForNgoTarget ngoTarget) : base(ngoTarget) { }
+    public DonationTarget(DonateForProgrammeTarget programmeTarget) : base(programmeTarget) { }
+}
 
 [JsonConverter(typeof(OneOfJsonConverter<DonationTargetDto>))]
 [GenerateOneOf]
-public partial class DonationTargetDto : OneOfBase<DonateForNgoTargetDto, DonateForProgrammeTargetDto>;
+public partial class DonationTargetDto : OneOfBase<DonateForNgoTargetDto, DonateForProgrammeTargetDto>
+{
+    public DonationTargetDto(DonateForNgoTargetDto ngoTarget) : base(ngoTarget) { }
+    public DonationTargetDto(DonateForProgrammeTargetDto programmeTarget) : base(programmeTarget) { }
+}
 
 public record DonationSaveDto(Guid UserId, DonationTarget Target, decimal Amount, Guid TransactionId);
 

@@ -9,32 +9,36 @@
         </a>
     </div>
     <div class="overflow-x-auto">
-        <table class="w-full">
-            <thead class="bg-[#F6F1E9]">
+        <table class="w-full table">
+            <thead>
             <tr>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Name</th>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">NGO</th>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Cause</th>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Location</th>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Raised / Target</th>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Period</th>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Status</th>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Actions</th>
+                <th>Name</th>
+                <th>NGO</th>
+                <th>Cause</th>
+                <th>Location</th>
+                <th>Raised / Target</th>
+                <th>Period</th>
+                <th>Status</th>
+                <th>Actions</th>
             </tr>
             </thead>
             <tbody>
             @foreach (var p in Model.Programmes)
             {
                 var now = DateTimeOffset.UtcNow;
-                var statusLabel = p.EndDate.HasValue && p.EndDate < now ? "Ended"
+                string statusLabel = p.EndDate.HasValue && p.EndDate < now ? "Ended"
                     : p.StartDate > now ? "Upcoming"
                     : "Active";
-                var statusCss = statusLabel == "Active" ? "bg-emerald-100 text-emerald-700"
-                    : statusLabel == "Upcoming" ? "bg-blue-100 text-blue-700"
-                    : "bg-gray-100 text-gray-600";
+                
+                string statusCss = statusLabel switch
+                {
+                    "Active" => "bg-emerald-100 text-emerald-700",
+                    "Upcoming" => "bg-blue-100 text-blue-700",
+                    _ => "bg-gray-100 text-gray-600"
+                };
 
-                <tr class="border-t border-[#E3DDD3] hover:bg-[#F6F1E9]">
-                    <td class="px-5 py-3.5">
+                <tr>
+                    <td>
                         <div class="flex items-center gap-3">
                             @if (!string.IsNullOrEmpty(p.ImageUrl))
                             {
@@ -43,12 +47,12 @@
                             <span class="text-sm font-semibold text-[#1C1A17]">@p.Name</span>
                         </div>
                     </td>
-                    <td class="px-5 py-3.5 text-sm text-[#6B6459]">@p.Ngo</td>
-                    <td class="px-5 py-3.5 text-sm">
+                    <td>@p.Ngo</td>
+                    <td>
                         <span class="bg-[#1A5C6B]/10 text-[#1A5C6B] text-xs font-semibold px-2 py-0.5 rounded-full">@p.Cause</span>
                     </td>
-                    <td class="px-5 py-3.5 text-sm text-[#6B6459]">@(p.Location ?? "—")</td>
-                    <td class="px-5 py-3.5 text-sm">
+                    <td>@(p.Location ?? "—")</td>
+                    <td>
                         <span class="text-[#1A5C6B] font-semibold">$@p.RaisedAmount.ToString("N0")</span>
                         @if (p.TargetAmount.HasValue)
                         {
@@ -59,21 +63,23 @@
                             <span class="text-[#6B6459]"> / —</span>
                         }
                     </td>
-                    <td class="px-5 py-3.5 text-xs text-[#6B6459]">
+                    <td>
                         @p.StartDate.ToString("MMM dd, yyyy")<br/>
                         @(p.EndDate.HasValue ? "→ " + p.EndDate.Value.ToString("MMM dd, yyyy") : "→ ongoing")
                     </td>
-                    <td class="px-5 py-3.5">
+                    <td>
                         <span class="text-xs font-semibold px-2.5 py-1 rounded-full @statusCss">@statusLabel</span>
                     </td>
-                    <td class="px-5 py-3.5 text-sm flex gap-2">
-                        <a href="/Admin/Programme/Editor/@p.Id" class="text-blue-500 hover:text-blue-700" title="Edit">
-                            <i class="ph ph-pencil-simple"></i>
-                        </a>
-                        <button on:click="@(() => Model.Delete(p.Id))" class="text-red-500 hover:text-red-700"
-                                title="Delete">
-                            <i class="ph ph-trash"></i>
-                        </button>
+                    <td>
+                        <div class="flex gap-2">
+                            <a href="/Admin/Programme/Editor/@p.Id" class="edit-button" title="Edit">
+                                <i class="ph ph-pencil-simple"></i>
+                            </a>
+                            <button on:click="@(() => Model.Delete(p.Id))" class="delete-button"
+                                    title="Delete">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             }
