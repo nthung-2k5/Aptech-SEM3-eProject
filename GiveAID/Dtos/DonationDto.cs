@@ -1,5 +1,7 @@
 ﻿using GiveAID.Models;
+using Newtonsoft.Json;
 using OneOf;
+using OneOf.Serialization;
 
 namespace GiveAID.Dtos;
 
@@ -11,9 +13,11 @@ public record DonateForNgoTargetDto((Guid Id, string Name) Ngo, (Guid Id, string
 
 public record DonateForProgrammeTargetDto(Guid ProgrammeId, string ProgrammeName);
 
+[JsonConverter(typeof(OneOfJsonConverter<DonationTarget>))]
 [GenerateOneOf]
 public partial class DonationTarget : OneOfBase<DonateForNgoTarget, DonateForProgrammeTarget>;
 
+[JsonConverter(typeof(OneOfJsonConverter<DonationTargetDto>))]
 [GenerateOneOf]
 public partial class DonationTargetDto : OneOfBase<DonateForNgoTargetDto, DonateForProgrammeTargetDto>;
 
