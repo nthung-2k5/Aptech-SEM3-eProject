@@ -1,11 +1,13 @@
 using GiveAID.Dtos;
+using GiveAID.Models;
 using GiveAID.Services.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace GiveAID.Pages.AboutUs;
 
-// [Authorize(Roles = "Admin")]
+[Authorize(Roles = nameof(UserRole.Admin))]
 public class EditorModel(IAboutUsSubpageService aboutUsService) : PageModel
 {
     public AboutUsSubpageDto? CurrentPage { get; set; }
