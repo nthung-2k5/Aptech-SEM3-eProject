@@ -4,12 +4,16 @@ using Hydro;
 
 namespace GiveAID.Pages.Gallery;
 
-public class GalleryBoard(IGalleryImageService galleryService, IProgrammeService programmeService, IWebHostEnvironment env) : HydroComponent
+public class GalleryBoard(
+    IGalleryImageService galleryService,
+    IProgrammeService programmeService,
+    IWebHostEnvironment env
+) : HydroComponent
 {
     public GalleryImageDto[] Images { get; set; } = [];
     public ProgrammeDto[] Programmes { get; set; } = [];
     public string Filter { get; set; } = "All";
-    
+
     public bool IsModalOpen { get; set; }
     public Guid? EditingId { get; set; }
     public string? PreviewImageUrl { get; set; }
@@ -23,10 +27,7 @@ public class GalleryBoard(IGalleryImageService galleryService, IProgrammeService
 
     public FormModel Form { get; set; } = new();
 
-    public override async Task MountAsync()
-    {
-        await LoadData();
-    }
+    public override async Task MountAsync() { await LoadData(); }
 
     private async Task LoadData()
     {
@@ -34,10 +35,7 @@ public class GalleryBoard(IGalleryImageService galleryService, IProgrammeService
         Programmes = await programmeService.GetAllProgrammesAsync(null);
     }
 
-    public void SetFilter(string filter)
-    {
-        Filter = filter;
-    }
+    public void SetFilter(string filter) { Filter = filter; }
 
     public void OpenCreateModal()
     {
@@ -51,22 +49,20 @@ public class GalleryBoard(IGalleryImageService galleryService, IProgrammeService
     {
         EditingId = id;
         var image = await galleryService.GetImageByIdAsync(id);
+
         if (image != null)
         {
-            Form = new FormModel 
-            { 
-                Caption = image.Caption, 
-                AssociatedProgrammeId = image.AssociatedProgramme?.Id 
+            Form = new FormModel
+            {
+                Caption = image.Caption,
+                AssociatedProgrammeId = image.AssociatedProgramme?.Id
             };
             PreviewImageUrl = image.ImageUri.ToString();
             IsModalOpen = true;
         }
     }
 
-    public void CloseModal()
-    {
-        IsModalOpen = false;
-    }
+    public void CloseModal() { IsModalOpen = false; }
 
     public async Task Save()
     {
@@ -75,10 +71,8 @@ public class GalleryBoard(IGalleryImageService galleryService, IProgrammeService
         if (EditingId.HasValue)
         {
             var existing = await galleryService.GetImageByIdAsync(EditingId.Value);
-            if (existing != null)
-            {
-                imageUri = existing.ImageUri;
-            }
+
+            if (existing != null) { imageUri = existing.ImageUri; }
         }
 
         if (Form.ImageFile is { Length: > 0 })
@@ -92,23 +86,14 @@ public class GalleryBoard(IGalleryImageService galleryService, IProgrammeService
             {
                 await Form.ImageFile.CopyToAsync(stream);
             }
-            
+
             imageUri = new Uri($"/images/gallery/{uniqueFileName}", UriKind.RelativeOrAbsolute);
         }
 
-        var saveDto = new GalleryImageSaveDto(
-            imageUri,
-            Form.Caption,
-            Form.AssociatedProgrammeId);
+        var saveDto = new GalleryImageSaveDto(imageUri, Form.Caption, Form.AssociatedProgrammeId);
 
-        if (!EditingId.HasValue || EditingId.Value == Guid.Empty)
-        {
-            await galleryService.UploadImageAsync(saveDto);
-        }
-        else
-        {
-            await galleryService.UpdateImageAsync(EditingId.Value, saveDto);
-        }
+        if (!EditingId.HasValue || EditingId.Value == Guid.Empty) { await galleryService.UploadImageAsync(saveDto); }
+        else { await galleryService.UpdateImageAsync(EditingId.Value, saveDto); }
 
         IsModalOpen = false;
         await LoadData();

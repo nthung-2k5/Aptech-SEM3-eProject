@@ -12,10 +12,7 @@ public class ProfileModel : PageModel
 {
     private readonly AppDbContext _context;
 
-    public ProfileModel(AppDbContext context)
-    {
-        _context = context;
-    }
+    public ProfileModel(AppDbContext context) => _context = context;
 
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -29,7 +26,9 @@ public class ProfileModel : PageModel
         public string Email { get; set; } = string.Empty;
 
         [Required]
-        [RegularExpression(@"^(?:\+84|0)(?:3[2-9]|5[2|5|6|8|9]|7[0|6-9]|8[1-9]|9[0-4|6-9])[0-9]{7}$", ErrorMessage = "The phone number is not valid.")]
+        [RegularExpression(
+            @"^(?:\+84|0)(?:3[2-9]|5[2|5|6|8|9]|7[0|6-9]|8[1-9]|9[0-4|6-9])[0-9]{7}$",
+            ErrorMessage = "The phone number is not valid.")]
         public string PhoneNumber { get; set; } = string.Empty;
 
         [Required]
@@ -44,11 +43,13 @@ public class ProfileModel : PageModel
 
     public async Task<IActionResult> OnGetAsync()
     {
-        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdStr, out var userId)) return RedirectToPage("/Login/Index");
+        string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
 
         var user = await _context.Users.FindAsync(userId);
-        if (user == null) return RedirectToPage("/Login/Index");
+
+        if (user == null) { return RedirectToPage("/Login/Index"); }
 
         Input = new InputModel
         {
@@ -65,16 +66,15 @@ public class ProfileModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            return Page();
-        }
+        if (!ModelState.IsValid) { return Page(); }
 
-        var userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (!Guid.TryParse(userIdStr, out var userId)) return RedirectToPage("/Login/Index");
+        string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
 
         var user = await _context.Users.FindAsync(userId);
-        if (user == null) return RedirectToPage("/Login/Index");
+
+        if (user == null) { return RedirectToPage("/Login/Index"); }
 
         user.FullName = Input.FullName;
         user.PhoneNumber = Input.PhoneNumber;

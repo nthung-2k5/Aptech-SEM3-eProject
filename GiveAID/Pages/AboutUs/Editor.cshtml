@@ -30,7 +30,8 @@
                     </div>
                 </div>
                 <div class="mt-6 flex justify-end gap-3">
-                    <a asp-page="/AboutUs/Index" asp-route-slug="@(Model.CurrentPage?.Slug ?? "")" class="btn btn-ghost">Cancel</a>
+                    <a asp-page="/AboutUs/Index" asp-route-slug="@(Model.CurrentPage?.Slug ?? "")"
+                       class="btn btn-ghost">Cancel</a>
                     <button type="submit"
                             class="btn btn-primary bg-[#1A5C6B] text-white border-none hover:bg-[#154a56]">
                         @(Model.IsEditMode ? "Save Changes" : "Create Subpage")
