@@ -1,43 +1,118 @@
+using GiveAID.Data;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Models;
 using GiveAID.Services.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Services;
 
-public class ProgrammeService : IProgrammeService
+public class ProgrammeService(AppDbContext context, IUserInterestService userInterestService) : IProgrammeService
 {
-    public Task<ProgrammeSummaryDto[]> GetAllProgrammesAsync(ProgrammeQueryParameters? query,
-                                                          CancellationToken ct = default)
+    public async Task<ProgrammeDto[]> GetAvailableProgrammesAsync(ProgrammeQueryParameters? query,
+                                                                  CancellationToken ct = default)
     {
-        var q = MockData.Programmes.AsQueryable();
+        IQueryable<WelfareProgramme> q = context.AvailableWelfareProgrammes.AsNoTracking().Include(p => p.Ngo)
+                .Include(p => p.Cause).Include(p => p.Donations);
 
-        if (query != null)
-        {
-            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
-            {
-                q = q.Where(p => p.Name.Contains(query.SearchTerm, StringComparison.OrdinalIgnoreCase) ||
-                                 p.Description.Contains(query.SearchTerm, StringComparison.OrdinalIgnoreCase));
-            }
+        q = ApplyQueryParameters(q, query);
 
-            if (!string.IsNullOrWhiteSpace(query.Ngo))
-            {
-                q = q.Where(p => p.Ngo.Equals(query.Ngo, StringComparison.OrdinalIgnoreCase));
-            }
-
-            if (!string.IsNullOrWhiteSpace(query.Cause))
-            {
-                q = q.Where(p => p.Cause.Equals(query.Cause, StringComparison.OrdinalIgnoreCase));
-            }
-
-            q = q.Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize);
-        }
-
-        return Task.FromResult<ProgrammeSummaryDto[]>(q.ToArray());
+        return await q.ProjectToDto().ToArrayAsync(ct);
     }
 
-    public Task<ProgrammeDto?> GetProgrammeByIdAsync(Guid id, CancellationToken ct = default)
+    public async Task<ProgrammeDto[]> GetAllProgrammesAsync(ProgrammeQueryParameters? query,
+                                                            CancellationToken ct = default)
     {
-        var prog = MockData.Programmes.FirstOrDefault(p => p.Id == id);
-        return Task.FromResult(prog);
+        IQueryable<WelfareProgramme> q = context.AvailableWelfareProgrammes.AsNoTracking().Include(p => p.Ngo)
+                .Include(p => p.Cause).Include(p => p.Donations);
+
+        q = ApplyQueryParameters(q, query);
+
+        return await q.ProjectToDto().ToArrayAsync(ct);
+    }
+
+    private static IQueryable<WelfareProgramme> ApplyQueryParameters(IQueryable<WelfareProgramme> query,
+                                                                     ProgrammeQueryParameters? parameters)
+    {
+        if (parameters == null) { return query; }
+
+        if (!string.IsNullOrWhiteSpace(parameters.SearchTerm))
+        {
+            query = query.Where(p => p.Name.Contains(parameters.SearchTerm) ||
+                                     p.Description.Contains(parameters.SearchTerm));
+        }
+
+        if (parameters.NgoId != null) { query = query.Where(p => p.Ngo.NgoId == parameters.NgoId); }
+
+        if (parameters.CauseId != null) { query = query.Where(p => p.Cause.CauseId == parameters.CauseId); }
+
+        return query.Skip((parameters.PageNumber - 1) * parameters.PageSize).Take(parameters.PageSize);
+    }
+
+    public async Task<ProgrammeDto?> GetProgrammeByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        return await context.ActiveWelfareProgrammes.AsNoTracking().Include(p => p.Ngo).Include(p => p.Cause)
+                .Include(p => p.Donations).Where(p => p.ProgrammeId == id).ProjectToDto().FirstOrDefaultAsync(ct);
+    }
+
+    public async Task<ProgrammeDto> CreateProgrammeAsync(ProgrammeSaveDto dto, CancellationToken ct = default)
+    {
+        // Validate FK: NGO must exist and not be deleted
+        if (!await context.ActiveNgos.AnyAsync(n => n.NgoId == dto.NgoId, ct))
+        {
+            throw new MissingForeignEntityException(nameof(dto.NgoId));
+        }
+
+        // Validate FK: DonationCause must exist and not be deleted
+        if (await context.ActiveDonationCauses.AnyAsync(c => c.CauseId == dto.CauseId, ct))
+        {
+            throw new MissingForeignEntityException(nameof(dto.CauseId));
+        }
+
+        var programme = dto.ToEntity();
+
+        context.WelfareProgrammes.Add(programme);
+        await context.SaveChangesAsync(ct);
+
+        await userInterestService.NotifyInterestedUsersAsync(programme, ct);
+
+        return programme.ToDto();
+    }
+
+    public async Task UpdateProgrammeAsync(Guid id, ProgrammeSaveDto dto, CancellationToken ct = default)
+    {
+        // Validate FK: NGO must exist and not be deleted
+        if (!await context.ActiveNgos.AnyAsync(n => n.NgoId == dto.NgoId, ct))
+        {
+            throw new MissingForeignEntityException(nameof(dto.NgoId));
+        }
+
+        // Validate FK: DonationCause must exist and not be deleted
+        if (await context.ActiveDonationCauses.AnyAsync(c => c.CauseId == dto.CauseId, ct))
+        {
+            throw new MissingForeignEntityException(nameof(dto.CauseId));
+        }
+
+        var programme = await context.WelfareProgrammes.FindAsync([id], ct);
+
+        if (programme == null || programme.IsDeleted) { throw new NotFoundException(); }
+
+        programme.NgoId = dto.NgoId;
+        programme.CauseId = dto.CauseId;
+        programme.Name = dto.Name;
+        programme.ImageUrl = dto.ImageUrl;
+        programme.Description = dto.Description;
+        programme.StartTime = dto.StartTime;
+        programme.EndTime = dto.EndTime;
+        programme.MaxDonation = dto.MaxDonation;
+        programme.Location = dto.Location;
+
+        await context.SaveChangesAsync(ct);
+    }
+
+    public async Task DeleteProgrammeAsync(Guid id, CancellationToken ct = default)
+    {
+        await context.ActiveWelfareProgrammes.Where(p => p.ProgrammeId == id)
+                .ExecuteUpdateAsync(s => s.SetProperty(p => p.IsDeleted, true), ct);
     }
 }

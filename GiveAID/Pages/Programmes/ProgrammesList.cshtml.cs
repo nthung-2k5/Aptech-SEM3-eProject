@@ -7,11 +7,11 @@ namespace GiveAID.Pages.Programmes;
 public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
 {
     public string SearchTerm { get; set; } = string.Empty;
-    public string Cause { get; set; } = string.Empty;
-    public string Ngo { get; set; } = string.Empty;
+    public string? CauseId { get; set; }
+    public string? NgoId { get; set; }
     public int PageNumber { get; set; } = 1;
 
-    public ProgrammeSummaryDto[] Programmes { get; set; } = [];
+    public ProgrammeDto[] Programmes { get; set; } = [];
     public int TotalPages => (int)Math.Ceiling(Programmes.Length / 6.0);
 
     public override async Task MountAsync() { await LoadProgrammesAsync(); }
@@ -31,8 +31,8 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
     public async Task ClearFilters()
     {
         SearchTerm = string.Empty;
-        Cause = string.Empty;
-        Ngo = string.Empty;
+        CauseId = null;
+        NgoId = null;
         PageNumber = 1;
         await LoadProgrammesAsync();
     }
@@ -42,8 +42,8 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
         var query = new ProgrammeQueryParameters
         {
             SearchTerm = SearchTerm,
-            Cause = Cause,
-            Ngo = Ngo,
+            CauseId = !string.IsNullOrEmpty(CauseId) ? Guid.Parse(CauseId) : null,
+            NgoId = !string.IsNullOrEmpty(NgoId) ? Guid.Parse(NgoId) : null,
             PageNumber = PageNumber,
             PageSize = 6
         };

@@ -22,7 +22,7 @@ public class Transaction
     [MaxLength(50)]
     public string ReferenceCode { get; set; } = string.Empty;
 
-    public DateTimeOffset TransactionTime { get; set; }
+    public DateTimeOffset TransactionTime { get; set; } = DateTimeOffset.UtcNow;
     
     public ICollection<Donation> Donations { get; set; } = new List<Donation>();
 }

@@ -26,7 +26,7 @@ public class Donation: IHasCreatedAt
     [Precision(18, 2)]
     public decimal Amount { get; set; }
 
-    public DonationStatus Status { get; set; }
+    public DonationStatus Status { get; set; } = DonationStatus.Completed;
 
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

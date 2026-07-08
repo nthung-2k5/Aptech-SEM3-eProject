@@ -1,4 +1,6 @@
-﻿namespace GiveAID.Dtos;
+﻿using GiveAID.Models;
+
+namespace GiveAID.Dtos;
 
 public class MockData
 {
@@ -14,6 +16,12 @@ public class MockData
         new(Guid.NewGuid(), "Green Earth", "Environmental protection and conservation.", "300 Nature Ln", "1-800-GREEN", "https://greenearth.org")
     ];
 
+    public static PartnerDto[] Partners { get; set; } = [
+        new(Guid.NewGuid(), "TechCorp Inc", "https://images.unsplash.com/photo-1611532736597-de2d4265fba3?q=80&w=2070&auto=format&fit=crop", "Leading technology company committed to social impact.", "https://techcorp.example.com"),
+        new(Guid.NewGuid(), "EcoSolutions Ltd", "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop", "Environmental solutions and sustainable practices partner.", "https://ecosolutions.example.com"),
+        new(Guid.NewGuid(), "Global Finance Group", "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=2070&auto=format&fit=crop", "Financial services dedicated to supporting charitable causes.", "https://globalfinance.example.com")
+    ];
+
     public static ProgrammeDto[] Programmes { get; set; } = [
         new(Guid.NewGuid(), "Clean Water Initiative", "Clean Water", "Global Helpers", "https://images.unsplash.com/photo-1516905542749-d3e91122d250?q=80&w=2070&auto=format&fit=crop", DateTime.Now.AddDays(-30), DateTime.Now.AddDays(30), 150, 10000m, 5000m, "Providing clean water to communities in need.", "Global Helpers Team"),
         new(Guid.NewGuid(), "Build a School", "Education", "Education First", "https://images.unsplash.com/photo-1509062522246-3755977927d7?q=80&w=2132&auto=format&fit=crop", DateTime.Now.AddDays(-60), DateTime.Now.AddDays(60), 300, 50000m, 25000m, "Building schools in rural areas.", "Education First Team"),
@@ -27,9 +35,9 @@ public class MockData
     ];
 
     public static DonationDto[] Donations { get; set; } = [
-        new(Guid.NewGuid(), Members[0].Id, Members[0].FullName, new DonateForProgrammeTarget(Programmes[0].Id), 100m, DateTimeOffset.Now.AddDays(-5)),
-        new(Guid.NewGuid(), Members[1].Id, Members[1].FullName, new DonateForNgoTarget(Ngos[1].Id, Guid.NewGuid()), 50m, DateTimeOffset.Now.AddDays(-3)),
-        new(Guid.NewGuid(), Members[2].Id, Members[2].FullName, new DonateForProgrammeTarget(Programmes[2].Id), 25m, DateTimeOffset.Now.AddDays(-1))
+        new(Guid.NewGuid(), Members[0].Id, Members[0].FullName, new DonateForProgrammeTargetDto(Programmes[0].Id, Programmes[0].Name), 100m, DateTimeOffset.Now.AddDays(-5), DonationStatus.Completed),
+        // new(Guid.NewGuid(), Members[1].Id, Members[1].FullName, new DonateForNgoTargetDto(Ngos[1].Id, Guid.NewGuid()), 50m, DateTimeOffset.Now.AddDays(-3)),
+        new(Guid.NewGuid(), Members[2].Id, Members[2].FullName, new DonateForProgrammeTargetDto(Programmes[2].Id, Programmes[2].Name), 25m, DateTimeOffset.Now.AddDays(-1), DonationStatus.Void)
     ];
 
     public static GalleryImageDto[] GalleryImages { get; set; } = [
@@ -38,3 +46,4 @@ public class MockData
         new GalleryImageDto(Guid.NewGuid(), new Uri("https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2113&auto=format&fit=crop"), "Tree planting event", (Programmes[2].Id, Programmes[2].Name))
     ];
 }
+

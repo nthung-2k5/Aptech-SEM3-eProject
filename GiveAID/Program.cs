@@ -1,8 +1,13 @@
+using System.Text;
+using EntityFramework.Exceptions.SqlServer;
 using GiveAID.Data;
+using GiveAID.Models;
 using GiveAID.Services;
 using GiveAID.Services.Abstractions;
 using Hydro.Configuration;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,22 +15,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AddFolderRouteModelConvention("/Components", model => model.Selectors.Clear());
+    options.Conventions.AuthorizeFolder("/Admin", "AdminOnly");
 });
 
 builder.Services.AddHydro();
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme =
-            Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme =
-            Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignOutScheme = "Cookies";
 }).AddCookie("Cookies", options => { options.LoginPath = "/Login"; }).AddJwtBearer(options =>
 {
     var jwtSettings = builder.Configuration.GetSection("JwtSettings");
     string secretKey = jwtSettings["Secret"] ?? "super_secret_default_key_replace_me_in_production_over_32_chars";
 
-    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
         ValidateAudience = true,
@@ -33,11 +38,10 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = jwtSettings["Issuer"] ?? "GiveAID",
         ValidAudience = jwtSettings["Audience"] ?? "GiveAID",
-        IssuerSigningKey =
-                new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secretKey))
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
     };
 
-    options.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+    options.Events = new JwtBearerEvents
     {
         OnMessageReceived = context =>
         {
@@ -47,15 +51,19 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddAuthorizationBuilder()
+        .AddPolicy("AdminOnly", policy => policy.RequireRole(nameof(UserRole.Admin)));
+
 builder.Services.AddHttpContextAccessor();
 
 var auditingInterceptor = new AuditingInterceptor();
 
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-        options.UseSqlServer(connectionString).AddInterceptors(auditingInterceptor));
+        options.UseSqlServer(connectionString).AddInterceptors(auditingInterceptor).UseExceptionProcessor());
 
 builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 builder.Services.AddScoped<IAboutUsSubpageService, AboutUsSubpageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
@@ -64,7 +72,10 @@ builder.Services.AddScoped<IDonationService, DonationService>();
 builder.Services.AddScoped<IGalleryImageService, GalleryImageService>();
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<INgoService, NgoService>();
+builder.Services.AddScoped<IPartnerService, PartnerService>();
+builder.Services.AddScoped<IPaymentService, FakePaymentService>();
 builder.Services.AddScoped<IProgrammeService, ProgrammeService>();
+builder.Services.AddScoped<IUserInterestService, UserInterestService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 
 var app = builder.Build();
@@ -73,6 +84,9 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     db.Database.Migrate(); // This applies all pending migrations
+
+    var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
+    await DbSeeder.SeedAsync(db, passwordService);
 }
 
 // Configure the HTTP request pipeline.

@@ -21,8 +21,16 @@ public class AppDbContext(DbContextOptions<AppDbContext> opts): DbContext(opts)
     public DbSet<GalleryImage> GalleryImages => Set<GalleryImage>();
     
     public IQueryable<User> Members => Users.Where(u => u.Role == UserRole.Member);
+    public IQueryable<User> ActiveMembers => Members.Where(u => !u.IsDeleted);
+    
+    public IQueryable<Ngo> ActiveNgos => Ngos.Where(u => !u.IsDeleted);
     public IQueryable<DonationCause> ActiveDonationCauses => DonationCauses.Where(u => !u.IsDeleted);
+    
+    public IQueryable<WelfareProgramme> ActiveWelfareProgrammes => WelfareProgrammes.Where(u => !u.IsDeleted);
+    public IQueryable<WelfareProgramme> AvailableWelfareProgrammes => ActiveWelfareProgrammes.Where(u => u.StartTime >= DateTimeOffset.UtcNow || u.EndTime >= DateTimeOffset.UtcNow);
 
+    public IQueryable<Donation> ValidDonations => Donations.Where(u => u.Status == DonationStatus.Completed);
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

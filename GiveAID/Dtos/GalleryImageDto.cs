@@ -1,5 +1,16 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace GiveAID.Dtos;
 
-public record GalleryImageSaveDto(Uri ImageUri, string Caption, Guid? AssociatedProgrammeId);
+public record GalleryImageSaveDto(
+    [property: Required(ErrorMessage = "Image URI is required.")]
+    Uri ImageUri,
+
+    [property: MaxLength(255, ErrorMessage = "Caption cannot exceed 255 characters.")]
+    string? Caption,
+
+    Guid? AssociatedProgrammeId
+);
 
 public record GalleryImageDto(Guid Id, Uri ImageUri, string Caption, (Guid Id, string Name)? AssociatedProgramme);

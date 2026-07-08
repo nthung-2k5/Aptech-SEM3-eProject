@@ -4,7 +4,7 @@ namespace GiveAID.Dtos;
 
 public record AboutUsSubpageSummaryDto(string Slug, string Title);
 
-public record AboutUsSubpageDetailsDto(string Slug, string Title, string HtmlContent)
+public record AboutUsSubpageDto(string Slug, string Title, string HtmlContent)
         : AboutUsSubpageSummaryDto(Slug, Title);
 
 public static class AboutUsSubpageMapper
@@ -13,10 +13,10 @@ public static class AboutUsSubpageMapper
     {
         public AboutUsSubpageSummaryDto MapToSummaryDto() => new(subpage.Slug, subpage.Title);
 
-        public AboutUsSubpageDetailsDto MapToDto() => new(subpage.Slug, subpage.Title, subpage.HtmlContent);
+        public AboutUsSubpageDto MapToDto() => new(subpage.Slug, subpage.Title, subpage.HtmlContent);
     }
 
-    extension(AboutUsSubpageDetailsDto dto)
+    extension(AboutUsSubpageDto dto)
     {
         public AboutUsSubpage MapToEntity() =>
                 new()
@@ -31,8 +31,8 @@ public static class AboutUsSubpageMapper
         public IQueryable<AboutUsSubpageSummaryDto> ProjectToSummaryDto() =>
                 subpages.Select(subpage => new AboutUsSubpageSummaryDto(subpage.Slug, subpage.Title));
 
-        public IQueryable<AboutUsSubpageDetailsDto> ProjectToDto() =>
+        public IQueryable<AboutUsSubpageDto> ProjectToDto() =>
                 subpages.Select(subpage =>
-                        new AboutUsSubpageDetailsDto(subpage.Slug, subpage.Title, subpage.HtmlContent));
+                        new AboutUsSubpageDto(subpage.Slug, subpage.Title, subpage.HtmlContent));
     }
 }

@@ -1,15 +1,18 @@
 using System.Security.Claims;
+using EntityFramework.Exceptions.Common;
 using GiveAID.Data;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Models;
 using GiveAID.Services.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Services;
 
-public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor) : IAboutUsSubpageService
+public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+        : IAboutUsSubpageService
 {
-    private readonly List<AboutUsSubpageDetailsDto> pages =
+    private readonly List<AboutUsSubpageDto> pages =
     [
         new(
             "what-we-do",
@@ -64,7 +67,7 @@ public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor 
                 </div>
                 """)
     ];
-    
+
     private Guid? GetCurrentUserId()
     {
         string? idClaim = httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -73,75 +76,71 @@ public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor 
 
     public async Task<AboutUsSubpageSummaryDto[]> ListSubpagesAsync(CancellationToken ct = default)
     {
-        return await dbContext.AboutUsSubpages
-                .AsNoTracking()
-                .Include(s => 
-                        s.UserModifications.OrderByDescending(o => o.CreatedAt).Take(1))
-                .ProjectToSummaryDto()
+        return await dbContext.AboutUsSubpages.AsNoTracking()
+                .Include(s => s.UserModifications.OrderByDescending(o => o.CreatedAt).Take(1)).ProjectToSummaryDto()
                 .ToArrayAsync(ct);
     }
 
-    public async Task<AboutUsSubpageDetailsDto?> GetBySlugAsync(string slug, CancellationToken ct = default)
+    public async Task<AboutUsSubpageDto?> GetBySlugAsync(string slug, CancellationToken ct = default)
     {
-        return await dbContext.AboutUsSubpages
-                .AsNoTracking()
+        return await dbContext.AboutUsSubpages.AsNoTracking()
                 .Include(s => s.UserModifications.OrderByDescending(o => o.CreatedAt).Take(1))
-                .ProjectToDto()
-                .FirstOrDefaultAsync(s => s.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase), ct);
+                .Where(s => s.Slug == slug).ProjectToDto().FirstOrDefaultAsync(ct);
     }
 
-    public async Task<bool> AddSubpageAsync(AboutUsSubpageDetailsDto page, CancellationToken ct = default)
+    public async Task AddSubpageAsync(AboutUsSubpageDto dto, CancellationToken ct = default)
     {
-        bool exists = await dbContext.AboutUsSubpages.AnyAsync(p => p.Slug == page.Slug, ct);
-
-        if (exists)
+        if (await dbContext.AboutUsSubpages.AnyAsync(s => s.Slug == dto.Slug, ct))
         {
-            return false;
+            throw new DuplicateException(nameof(dto.Slug));
         }
 
-        var entity = page.MapToEntity();
-        
-        var modification = new UserModification
+        if (await dbContext.AboutUsSubpages.AnyAsync(s => s.Title == dto.Title, ct))
         {
-            HtmlContent = page.HtmlContent,
-            UserId = GetCurrentUserId(),
-            Subpage = entity
-        };
-        
-        entity.UserModifications.Add(modification);
+            throw new DuplicateException(nameof(dto.Title));
+        }
+
+        var entity = dto.MapToEntity();
+        await dbContext.AboutUsSubpages.AddAsync(entity, ct);
+
+        entity.UserModifications.Add(
+            new UserModification
+            {
+                HtmlContent = dto.HtmlContent,
+                UserId = GetCurrentUserId(),
+                Subpage = entity
+            });
 
         await dbContext.AboutUsSubpages.AddAsync(entity, ct);
         await dbContext.SaveChangesAsync(ct);
-        return true;
     }
 
-    public async Task<bool> UpdateSubpageAsync(AboutUsSubpageDetailsDto page, CancellationToken ct = default)
+    public async Task UpdateSubpageAsync(AboutUsSubpageDto dto, CancellationToken ct = default)
     {
-        var entity = await dbContext.AboutUsSubpages
-            .FirstOrDefaultAsync(p => p.Slug == page.Slug, ct);
-
-        if (entity == null)
+        try
         {
-            return false;
-        }
+            int result = await dbContext.AboutUsSubpages.Where(p => p.Slug == dto.Slug).ExecuteUpdateAsync(
+                s => s.SetProperty(p => p.Title, dto.Title),
+                ct);
 
-        entity.Title = page.Title;
+            if (result == 0) { throw new NotFoundException(); }
+        }
+        catch (UniqueConstraintException) { throw new DuplicateException(nameof(dto.Title)); }
 
         var modification = new UserModification
         {
             UserId = GetCurrentUserId(),
-            SubpageId = entity.SubpageId,
-            HtmlContent = page.HtmlContent
+            SubpageId = await dbContext.AboutUsSubpages.Where(p => p.Slug == dto.Slug).Select(p => p.SubpageId)
+                    .FirstAsync(ct),
+            HtmlContent = dto.HtmlContent
         };
-        
+
         await dbContext.UserModifications.AddAsync(modification, ct);
         await dbContext.SaveChangesAsync(ct);
-
-        return true;
     }
 
-    public async Task<bool> DeleteSubpageAsync(string slug, CancellationToken ct = default)
+    public async Task DeleteSubpageAsync(string slug, CancellationToken ct = default)
     {
-        return await dbContext.AboutUsSubpages.Where(p => p.Slug == slug).ExecuteDeleteAsync(ct) > 0;
+        await dbContext.AboutUsSubpages.Where(p => p.Slug == slug).ExecuteDeleteAsync(ct);
     }
 }

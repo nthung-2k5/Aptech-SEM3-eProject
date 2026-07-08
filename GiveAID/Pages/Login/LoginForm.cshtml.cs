@@ -31,7 +31,7 @@ public class LoginForm(IAuthService authService) : HydroComponent
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = RememberMe ? DateTime.UtcNow.AddDays(7) : DateTime.UtcNow.AddHours(24)
+                Expires = RememberMe ? DateTimeOffset.UtcNow.AddDays(7) : DateTimeOffset.UtcNow.AddHours(24)
             };
             
             HttpContext.Response.Cookies.Append("jwt_token", result.Token, cookieOptions);

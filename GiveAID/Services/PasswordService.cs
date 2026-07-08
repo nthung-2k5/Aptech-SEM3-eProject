@@ -8,23 +8,22 @@ namespace GiveAID.Services;
 public class PasswordService : IPasswordService
 {
     // Configuration constants matching OWASP / robust baseline profiles
-    private const int SaltSize = 16;         // 128-bit salt
-    private const int HashSize = 32;         // 256-bit output hash
-    private const int Iterations = 3;       // Time cost
-    private const int MemorySize = 65536;    // 64 MB memory cost
-    private const int Parallelism = 4;       // Number of threads to use
+    private const int SaltSize = 16; // 128-bit salt
+    private const int HashSize = 32; // 256-bit output hash
+    private const int Iterations = 3; // Time cost
+    private const int MemorySize = 65536; // 64 MB memory cost
+    private const int Parallelism = 4; // Number of threads to use
 
     public string HashPassword(string password)
     {
         // 1. Generate a cryptographically secure random salt
         byte[] salt = new byte[SaltSize];
-        using (var rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(salt);
-        }
+
+        using (var rng = RandomNumberGenerator.Create()) { rng.GetBytes(salt); }
 
         // 2. Initialize and configure Argon2id
         byte[] passwordBytes = Encoding.UTF8.GetBytes(password);
+
         using (var argon2 = new Argon2id(passwordBytes))
         {
             argon2.Salt = salt;
@@ -74,9 +73,6 @@ public class PasswordService : IPasswordService
             // 5. Compare the hashes using a fixed-time comparison to prevent side-channel attacks
             return CryptographicOperations.FixedTimeEquals(originalHash, verificationHash);
         }
-        catch
-        {
-            return false;
-        }
+        catch { return false; }
     }
 }

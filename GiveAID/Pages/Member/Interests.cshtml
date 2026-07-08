@@ -1,0 +1,46 @@
+﻿@page
+@model InterestsModel
+@{
+    ViewData["Title"] = "My Interests";
+}
+
+<div class="max-w-7xl mx-auto py-10 px-4 sm:px-6">
+    <div class="bg-white rounded-lg shadow p-6">
+        <h1 class="text-2xl font-bold mb-6">My NGO Interests</h1>
+        
+        <p class="text-gray-600 mb-6">You will receive notifications whenever these NGOs launch new programmes.</p>
+
+        @if (Model.Interests.Length == 0)
+        {
+            <div class="text-gray-500 py-8 text-center bg-gray-50 rounded-lg">
+                You haven't followed any NGOs yet.
+                <div class="mt-4">
+                    <a asp-page="/Partners" class="text-[#1A5C6B] font-medium hover:underline">Discover Partners</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var ngo in Model.Interests)
+                {
+                    <div class="border border-gray-200 rounded-lg p-5 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-semibold text-[#1A5C6B] mb-2">@ngo.Name</h3>
+                            <p class="text-sm text-gray-500 line-clamp-3 mb-4">@ngo.Description</p>
+                        </div>
+                        <div class="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+                            <a asp-page="/Ngo/Details" asp-route-id="@ngo.Id" class="text-sm font-medium text-[#C97C2E] hover:underline">View Profile</a>
+                            
+                            <form method="post" asp-page-handler="Unfollow" asp-route-ngoId="@ngo.Id">
+                                <button type="submit" class="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 py-1 px-3 rounded transition-colors">
+                                    Unfollow
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>

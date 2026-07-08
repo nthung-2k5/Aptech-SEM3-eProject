@@ -1,9 +1,9 @@
 @page "{slug?}"
+@using GiveAID.Models
 @model AboutModel
 @{
     ViewData["Title"] = Model.CurrentPage?.Title ?? "About Us";
-    // bool isAdmin = User.Identity?.IsAuthenticated == true;
-    bool isAdmin = true;
+    bool isAdmin = User.Identity?.IsAuthenticated == true && User.IsInRole(nameof(UserRole.Admin));
 }
 
 <div id="about-us">

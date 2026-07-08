@@ -6,7 +6,7 @@ public interface IDonationCauseService
 {
     Task<DonationCauseDto[]> GetAllDonationCausesAsync(CancellationToken ct = default);
     Task<DonationCauseDto?> GetDonationCauseByIdAsync(Guid id, CancellationToken ct = default);
-    Task<bool> CreateDonationCauseAsync(DonationCauseSaveDto dto, CancellationToken ct = default);
-    Task<bool> UpdateDonationCauseAsync(Guid id, DonationCauseSaveDto dto, CancellationToken ct = default);
-    Task<bool> DeleteDonationCauseAsync(Guid id, CancellationToken ct = default);
+    Task<DonationCauseDto> CreateDonationCauseAsync(DonationCauseSaveDto dto, CancellationToken ct = default);
+    Task UpdateDonationCauseAsync(Guid id, DonationCauseSaveDto dto, CancellationToken ct = default);
+    Task DeleteDonationCauseAsync(Guid id, CancellationToken ct = default);
 }

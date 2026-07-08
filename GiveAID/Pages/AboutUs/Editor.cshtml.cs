@@ -1,14 +1,16 @@
 using GiveAID.Dtos;
+using GiveAID.Models;
 using GiveAID.Services.Abstractions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace GiveAID.Pages.AboutUs;
 
-// [Authorize(Roles = "Admin")]
+[Authorize(Roles = nameof(UserRole.Admin))]
 public class EditorModel(IAboutUsSubpageService aboutUsService) : PageModel
 {
-    public AboutUsSubpageDetailsDto? CurrentPage { get; set; }
+    public AboutUsSubpageDto? CurrentPage { get; set; }
     public bool IsEditMode { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string? slug, CancellationToken ct)
@@ -28,7 +30,7 @@ public class EditorModel(IAboutUsSubpageService aboutUsService) : PageModel
     public async Task<IActionResult> OnPostAsync(string? originalSlug, string slug, string title, string content,
                                                  CancellationToken ct)
     {
-        var page = new AboutUsSubpageDetailsDto(title, slug, content);
+        var page = new AboutUsSubpageDto(title, slug, content);
 
         if (!string.IsNullOrEmpty(originalSlug)) { await aboutUsService.UpdateSubpageAsync(page, ct); }
         else { await aboutUsService.AddSubpageAsync(page, ct); }
