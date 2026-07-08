@@ -19,7 +19,8 @@ public class DonationService(AppDbContext dbContext) : IDonationService
 
     public async Task<UserDonationDto[]> GetDonationsByUserAsync(Guid userId, CancellationToken ct = default)
     {
-        return await dbContext.ValidDonations.Where(d => d.UserId == userId).ProjectToUserDto().ToArrayAsync(ct);
+        return await dbContext.ValidDonations.Include(d => d.Ngo).Include(d => d.Cause).Where(d => d.UserId == userId)
+                .ProjectToUserDto().ToArrayAsync(ct);
     }
 
     public async Task<DonationDto?> CreateDonationAsync(DonationSaveDto donation, CancellationToken ct = default)
