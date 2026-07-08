@@ -8,7 +8,7 @@ namespace GiveAID.Pages.AboutUs;
 public class AboutModel(IAboutUsSubpageService aboutUsService) : PageModel
 {
     public AboutUsSubpageSummaryDto[] Subpages { get; set; } = [];
-    public AboutUsSubpageDetailsDto? CurrentPage { get; set; }
+    public AboutUsSubpageDto? CurrentPage { get; set; }
 
     public async Task<IActionResult> OnGetAsync(string? slug, CancellationToken ct)
     {

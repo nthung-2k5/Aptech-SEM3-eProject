@@ -20,7 +20,7 @@ public class AuthService(AppDbContext dbContext, IPasswordService passwordServic
             throw new LoginException("Invalid credentials.");
         }
 
-        var user = await dbContext.Users.FirstOrDefaultAsync(u => u.Email == email, ct);
+        var user = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email, ct);
 
         if (user != null)
         {

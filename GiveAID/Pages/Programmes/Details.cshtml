@@ -7,10 +7,21 @@
 @if (Model.Programme != null)
 {
     var p = Model.Programme;
-    var timeRemaining = p.EndDate - DateTime.Now;
-    bool isStarted = p.StartDate <= DateTime.Now;
-    string timeText = isStarted ? timeRemaining.TotalDays > 0 ? $"{(int)timeRemaining.TotalDays} days left" : "Ended" : $"Starts in {(p.StartDate - DateTime.Now).Days} days";
-    int progress = p.TargetAmount.HasValue && p.TargetAmount.Value > 0 ? (int)(p.RaisedAmount / p.TargetAmount.Value * 100) : 0;
+    
+    var timeRemaining = p.EndDate - DateTimeOffset.Now;
+    bool isStarted = p.StartDate <= DateTimeOffset.Now;
+    string? timeText = null;
+
+    if (!isStarted)
+    {
+        timeText = $"Starts in {(p.StartDate - DateTimeOffset.Now).Days} days";
+    }
+    else if (timeRemaining.HasValue)
+    {
+        timeText = timeRemaining.Value.TotalDays > 0 ? $"{timeRemaining.Value.Days} days left" : "Ended";
+    }
+
+    int progress = p.TargetAmount is > 0 ? (int)(p.RaisedAmount / p.TargetAmount.Value * 100) : 0;
     if (progress > 100) progress = 100;
 
     <div class="pb-12">
@@ -29,10 +40,13 @@
                             <i class="ph ph-buildings text-xl"></i>
                             <span class="text-lg">@p.Ngo</span>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <i class="ph ph-clock text-xl"></i>
-                            <span class="text-lg">@timeText</span>
-                        </div>
+                        @if (timeText != null)
+                        {
+                            <div class="flex items-center gap-2">
+                                <i class="ph ph-clock text-xl"></i>
+                                <span class="text-lg">@timeText</span>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -57,7 +71,7 @@
                             </div>
                             <div>
                                 <h3 class="text-xl font-bold mb-2">@p.Ngo</h3>
-                                <p class="text-gray-600 leading-relaxed">@p.OrganizerInfo</p>
+                                @* <p class="text-gray-600 leading-relaxed">@p.OrganizerInfo</p> *@
                             </div>
                         </div>
                     </div>

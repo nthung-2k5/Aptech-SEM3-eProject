@@ -47,7 +47,7 @@ public class RegisterForm(IMemberService memberService) : HydroComponent
         
         if (ModelState.IsValid)
         {
-            var user = new MemberSaveDto(
+            var user = new MemberCreateDto(
                 Name,
                 Email,
                 Password,

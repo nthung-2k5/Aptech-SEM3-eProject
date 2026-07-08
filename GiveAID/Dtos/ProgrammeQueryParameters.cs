@@ -6,8 +6,8 @@ public class ProgrammeQueryParameters
     public string? SearchTerm { get; set; }
 
     // Filter
-    public string? Ngo { get; set; }
-    public string? Cause { get; set; }
+    public Guid? NgoId { get; set; }
+    public Guid? CauseId { get; set; }
 
     // Pagination
     private const int MaxPageSize = 50;

@@ -7,7 +7,7 @@ namespace GiveAID.Pages.Gallery;
 public class GalleryBoard(IGalleryImageService galleryService, IProgrammeService programmeService, IWebHostEnvironment env) : HydroComponent
 {
     public GalleryImageDto[] Images { get; set; } = [];
-    public ProgrammeSummaryDto[] Programmes { get; set; } = [];
+    public ProgrammeDto[] Programmes { get; set; } = [];
     public string Filter { get; set; } = "All";
     
     public bool IsModalOpen { get; set; }

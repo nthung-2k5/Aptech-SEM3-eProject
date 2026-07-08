@@ -1,4 +1,9 @@
+@using GiveAID.Services
+@using GiveAID.Services.Abstractions
 @model ProgrammesList
+
+@inject IDonationCauseService DonationCauseService
+@inject INgoService NgoService
 
 <div class="flex flex-col lg:flex-row gap-8">
     <!-- Sidebar (Left) -->
@@ -8,30 +13,31 @@
                 <label class="block font-semibold mb-2 text-[#1C1A17]">Search</label>
                 <label class="input w-full">
                     <i class="ph ph-magnifying-glass"></i>
-                    <input type="text" asp-for="SearchTerm" bind on:input="@(() => Model.Search())"
+                    <input type="text" asp-for="SearchTerm" bind:keydown.debounce.500ms
+                           on:input="@(() => Model.Search())"
                            placeholder="Search programmes..."/>
                 </label>
             </div>
             <div>
                 <label class="block font-semibold mb-2 text-[#1C1A17]">Filter by Cause</label>
-                <select asp-for="Cause" bind on:change="@(() => Model.Search())" class="select w-full">
+                <select asp-for="CauseId" bind on:change="@(() => Model.Search())" class="select w-full">
                     <option value="">All Causes</option>
-                    <option value="Education">Education</option>
-                    <option value="Health">Health</option>
-                    <option value="Hunger">Hunger</option>
-                    <option value="Inclusion">Inclusion</option>
-                    <option value="Emergency">Emergency</option>
+
+                    @foreach (var cause in await DonationCauseService.GetAllDonationCausesAsync())
+                    {
+                        <option value="@cause.Id.ToString()">@cause.Name</option>
+                    }
                 </select>
             </div>
             <div>
                 <label class="block font-semibold mb-2 text-[#1C1A17]">Filter by NGO</label>
-                <select asp-for="Ngo" bind on:change="@(() => Model.Search())" class="select w-full">
+                <select asp-for="NgoId" bind on:change="@(() => Model.Search())" class="select w-full">
                     <option value="">All NGOs</option>
-                    <option value="EduCare Foundation">EduCare Foundation</option>
-                    <option value="Water Aid">Water Aid</option>
-                    <option value="Food Bank">Food Bank</option>
-                    <option value="Global Women">Global Women</option>
-                    <option value="Red Cross">Red Cross</option>
+
+                    @foreach (var ngo in await NgoService.GetAllNgosAsync())
+                    {
+                        <option value="@ngo.Id.ToString()">@ngo.Name</option>
+                    }
                 </select>
             </div>
             <button on:click="@(() => Model.ClearFilters())" class="btn btn-outline btn-primary btn-block">Clear
@@ -57,9 +63,13 @@
         <div class="grid md:grid-cols-2 gap-6 flex-grow">
             @foreach (var p in Model.Programmes)
             {
-                var timeRemaining = p.EndDate - DateTime.Now;
-                bool isStarted = p.StartDate <= DateTime.Now;
-                string timeText = isStarted ? timeRemaining.TotalDays > 0 ? $"{(int)timeRemaining.TotalDays} days left" : "Ended" : $"Starts in {(p.StartDate - DateTime.Now).Days} days";
+                var timeRemaining = p.EndDate - DateTimeOffset.Now;
+                bool isStarted = p.StartDate <= DateTimeOffset.Now;
+                string? timeText = null;
+
+                if (!isStarted) { timeText = $"Starts in {(p.StartDate - DateTimeOffset.Now).Days} days"; }
+                else if (timeRemaining.HasValue) { timeText = timeRemaining.Value.TotalDays > 0 ? $"{timeRemaining.Value.Days} days left" : "Ended"; }
+
                 int progress = p.TargetAmount is > 0 ? (int)(p.RaisedAmount / p.TargetAmount.Value * 100) : 0;
                 if (progress > 100) progress = 100;
 
@@ -98,11 +108,14 @@
                                     <i class="ph ph-users"></i>
                                     <span>@p.DonationCount</span>
                                 </div>
-                                <div
-                                    class="flex items-center gap-1 text-[#1A5C6B] font-semibold bg-blue-50 px-3 py-1 rounded-full">
-                                    <i class="ph ph-clock"></i>
-                                    <span>@timeText</span>
-                                </div>
+                                @if (timeText != null)
+                                {
+                                    <div
+                                        class="flex items-center gap-1 text-[#1A5C6B] font-semibold bg-blue-50 px-3 py-1 rounded-full">
+                                        <i class="ph ph-clock"></i>
+                                        <span>@timeText</span>
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

@@ -10,10 +10,10 @@ namespace GiveAID.Services;
 public class ProgrammeService(AppDbContext context, IUserInterestService userInterestService) : IProgrammeService
 {
     public async Task<ProgrammeDto[]> GetAvailableProgrammesAsync(ProgrammeQueryParameters? query,
-                                                                     CancellationToken ct = default)
+                                                                  CancellationToken ct = default)
     {
-        var q = context.AvailableWelfareProgrammes.Include(p => p.Ngo).Include(p => p.Cause).Include(p => p.Donations)
-                .AsQueryable();
+        IQueryable<WelfareProgramme> q = context.AvailableWelfareProgrammes.AsNoTracking().Include(p => p.Ngo)
+                .Include(p => p.Cause).Include(p => p.Donations);
 
         q = ApplyQueryParameters(q, query);
 
@@ -23,8 +23,8 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
     public async Task<ProgrammeDto[]> GetAllProgrammesAsync(ProgrammeQueryParameters? query,
                                                             CancellationToken ct = default)
     {
-        IQueryable<WelfareProgramme> q = context.AvailableWelfareProgrammes.Include(p => p.Ngo).Include(p => p.Cause)
-                .Include(p => p.Donations);
+        IQueryable<WelfareProgramme> q = context.AvailableWelfareProgrammes.AsNoTracking().Include(p => p.Ngo)
+                .Include(p => p.Cause).Include(p => p.Donations);
 
         q = ApplyQueryParameters(q, query);
 
@@ -42,23 +42,17 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
                                      p.Description.Contains(parameters.SearchTerm));
         }
 
-        if (!string.IsNullOrWhiteSpace(parameters.Ngo))
-        {
-            query = query.Where(p => p.Ngo.Name.Contains(parameters.Ngo));
-        }
+        if (parameters.NgoId != null) { query = query.Where(p => p.Ngo.NgoId == parameters.NgoId); }
 
-        if (!string.IsNullOrWhiteSpace(parameters.Cause))
-        {
-            query = query.Where(p => p.Cause.Name.Contains(parameters.Cause));
-        }
+        if (parameters.CauseId != null) { query = query.Where(p => p.Cause.CauseId == parameters.CauseId); }
 
         return query.Skip((parameters.PageNumber - 1) * parameters.PageSize).Take(parameters.PageSize);
     }
 
     public async Task<ProgrammeDto?> GetProgrammeByIdAsync(Guid id, CancellationToken ct = default)
     {
-        return await context.ActiveWelfareProgrammes.Include(p => p.Ngo).Include(p => p.Cause)
-                .Include(p => p.Donations).ProjectToDto().FirstOrDefaultAsync(p => p.Id == id, ct);
+        return await context.ActiveWelfareProgrammes.AsNoTracking().Include(p => p.Ngo).Include(p => p.Cause)
+                .Include(p => p.Donations).Where(p => p.ProgrammeId == id).ProjectToDto().FirstOrDefaultAsync(ct);
     }
 
     public async Task<ProgrammeDto> CreateProgrammeAsync(ProgrammeSaveDto dto, CancellationToken ct = default)
@@ -100,7 +94,7 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
         }
 
         var programme = await context.WelfareProgrammes.FindAsync([id], ct);
-        
+
         if (programme == null || programme.IsDeleted) { throw new NotFoundException(); }
 
         programme.NgoId = dto.NgoId;

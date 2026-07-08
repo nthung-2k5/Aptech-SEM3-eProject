@@ -55,9 +55,9 @@ public static class ProgrammeMapper
             p.ImageUrl,
             p.StartTime,
             p.EndTime,
-            p.ValidDonations.Count(),
+            p.Donations.Count(d => d.Status == DonationStatus.Completed),
             p.MaxDonation,
-            p.ValidDonations.Sum(d => d.Amount),
+            p.Donations.Where(d => d.Status == DonationStatus.Completed).Sum(d => d.Amount),
             p.Description,
             p.Location
         ));
