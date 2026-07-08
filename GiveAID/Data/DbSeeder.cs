@@ -452,22 +452,22 @@ public static class DbSeeder
             }
 
             // John's donations
-            AddDonation(john, saveTheChildren, schoolProgramme,   educationCause,   500m,  "VNPay",   "9704123456789012", "Donate school project",    "TXN-JD-001", DateTimeOffset.UtcNow.AddDays(-45));
-            AddDonation(john, greenEarth,      reforestProgramme, environmentCause, 300m,  "MoMo",    "0912345678",       "Plant trees for future",   "TXN-JD-002", DateTimeOffset.UtcNow.AddDays(-30));
-            AddDonation(john, healthFirst,     clinicProgramme,   healthCause,      750m,  "VNPay",   "9704123456789012", "Support mobile clinic",    "TXN-JD-003", DateTimeOffset.UtcNow.AddDays(-10));
+            AddDonation(john, null, schoolProgramme,   null,   500m,  "VNPay",   "9704123456789012", "Donate school project",    "TXN-JD-001", DateTimeOffset.UtcNow.AddDays(-45));
+            AddDonation(john, null,      reforestProgramme, null, 300m,  "MoMo",    "0912345678",       "Plant trees for future",   "TXN-JD-002", DateTimeOffset.UtcNow.AddDays(-30));
+            AddDonation(john, healthFirst,     null,   healthCause,      750m,  "VNPay",   "9704123456789012", "Support mobile clinic",    "TXN-JD-003", DateTimeOffset.UtcNow.AddDays(-10));
 
             // Jane's donations
-            AddDonation(jane, saveTheChildren, schoolProgramme,   educationCause,   1000m, "ZaloPay", "0934567890",       "Education for all",        "TXN-JS-001", DateTimeOffset.UtcNow.AddDays(-50));
-            AddDonation(jane, healthFirst,     floodProgramme,    disasterCause,    250m,  "MoMo",    "0934567890",       "Flood relief support",     "TXN-JS-002", DateTimeOffset.UtcNow.AddDays(-2));
-            AddDonation(jane, greenEarth,      reforestProgramme, environmentCause, 200m,  "VNPay",   "9704098765432100", "Reforestation donation",   "TXN-JS-003", DateTimeOffset.UtcNow.AddDays(-15), DonationStatus.Void);
+            AddDonation(jane, saveTheChildren, null,   educationCause,   1000m, "ZaloPay", "0934567890",       "Education for all",        "TXN-JS-001", DateTimeOffset.UtcNow.AddDays(-50));
+            AddDonation(jane, healthFirst,     null,    disasterCause,    250m,  "MoMo",    "0934567890",       "Flood relief support",     "TXN-JS-002", DateTimeOffset.UtcNow.AddDays(-2));
+            AddDonation(jane, null,      reforestProgramme, null, 200m,  "VNPay",   "9704098765432100", "Reforestation donation",   "TXN-JS-003", DateTimeOffset.UtcNow.AddDays(-15), DonationStatus.Void);
 
             // Michael's donations
-            AddDonation(michael, healthFirst,  clinicProgramme,   healthCause,      2000m, "VNPay",   "9704111122223333", "Medical support donation", "TXN-MT-001", DateTimeOffset.UtcNow.AddDays(-20));
-            AddDonation(michael, healthFirst,  floodProgramme,    disasterCause,    500m,  "ZaloPay", "0978123456",       "Emergency flood aid",      "TXN-MT-002", DateTimeOffset.UtcNow.AddDays(-1));
+            AddDonation(michael, healthFirst,  null,   healthCause,      2000m, "VNPay",   "9704111122223333", "Medical support donation", "TXN-MT-001", DateTimeOffset.UtcNow.AddDays(-20));
+            AddDonation(michael, null,  floodProgramme,    null,    500m,  "ZaloPay", "0978123456",       "Emergency flood aid",      "TXN-MT-002", DateTimeOffset.UtcNow.AddDays(-1));
 
             // Emily's donations
-            AddDonation(emily, greenEarth,     reforestProgramme, environmentCause, 800m,  "MoMo",    "0956789012",       "Go green initiative",      "TXN-EN-001", DateTimeOffset.UtcNow.AddDays(-7));
-            AddDonation(emily, saveTheChildren, schoolProgramme,  educationCause,   400m,  "VNPay",   "9704444455556666", "Kids deserve a future",    "TXN-EN-002", DateTimeOffset.UtcNow.AddDays(-3));
+            AddDonation(emily, greenEarth,     null, environmentCause, 800m,  "MoMo",    "0956789012",       "Go green initiative",      "TXN-EN-001", DateTimeOffset.UtcNow.AddDays(-7));
+            AddDonation(emily, null, schoolProgramme,  null,   400m,  "VNPay",   "9704444455556666", "Kids deserve a future",    "TXN-EN-002", DateTimeOffset.UtcNow.AddDays(-3));
 
             await context.Transactions.AddRangeAsync(transactions);
             await context.Donations.AddRangeAsync(donations);
