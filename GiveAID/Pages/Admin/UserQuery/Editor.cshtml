@@ -1,0 +1,47 @@
+﻿@page "{id:guid?}"
+@model EditorModel
+@{
+    ViewData["Title"] = "Edit UserQuery";
+}
+<div>
+    <div class="max-w-7xl mx-auto px-4 py-8">
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <div class="flex items-center gap-2 text-[#C97C2E] text-xs font-bold uppercase tracking-widest mb-1">
+                    <i class="ph ph-shield"></i> Admin Dashboard
+                </div>
+                <h1 class="text-[#1C1A17]">Give-AID Control Panel</h1>
+            </div>
+            <a href="/" class="text-sm text-[#6B6459] hover:text-[#1A5C6B] flex items-center gap-1 no-underline">
+                <i class="ph ph-caret-left"></i> Back to Site
+            </a>
+        </div>
+        <div class="flex flex-wrap gap-2 mb-8 bg-white border border-[#E3DDD3] rounded-xl p-2">
+            <a href="/Admin"
+               class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-[#6B6459] hover:bg-[#F6F1E9] no-underline">
+                <i class="ph ph-eye"></i>Overview
+            </a>
+            <a href="/Admin/Donation"
+               class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-[#6B6459] hover:bg-[#F6F1E9] no-underline">
+                <i class="ph ph-heart"></i>Donations
+            </a>
+            <a href="/Admin/Member"
+               class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-[#6B6459] hover:bg-[#F6F1E9] no-underline">
+                <i class="ph ph-users"></i>Members
+            </a>
+            <a href="/Admin/Ngo"
+               class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-[#6B6459] hover:bg-[#F6F1E9] no-underline">
+                <i class="ph ph-globe"></i>NGOs
+            </a>
+            <a href="/Admin/UserQuery"
+               class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-[#6B6459] hover:bg-[#F6F1E9] no-underline">
+                <i class="ph ph-chat"></i>Queries
+            </a>
+            <a href="/Admin/Gallery"
+               class="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors text-[#6B6459] hover:bg-[#F6F1E9] no-underline">
+                <i class="ph ph-image"></i>Gallery
+            </a>
+        </div>
+        <hydro name="AdminUserQueryEditor" params="new { Model.Id }"/>
+    </div>
+</div>

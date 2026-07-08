@@ -1,0 +1,7 @@
+﻿@page "{id:guid?}"
+@model EditorModel
+@{
+    ViewData["Title"] = Model.Id.HasValue ? "Edit Member" : "Create Member";
+}
+
+<admin-member-editor id="@Model.Id"/>

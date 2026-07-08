@@ -1,0 +1,40 @@
+﻿@model AdminUserQueryList
+
+<div class="space-y-4">
+    <h3 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1C1A17] bg-white p-4 rounded-lg border border-[#E3DDD3]">
+        User Queries</h3>
+    @foreach (var q in Model.Queries)
+    {
+        <div class="bg-white border border-[#E3DDD3] rounded-xl p-6">
+            <div class="flex items-start justify-between mb-3">
+                <div>
+                    <span class="font-semibold text-[#1C1A17]">@q.UserName</span>
+                    <p class="text-sm text-[#6B6459] mt-1">@q.MessageText</p>
+                </div>
+                <span
+                    class="text-xs font-semibold px-3 py-1 rounded-full @(string.IsNullOrEmpty(q.ReplyText) ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600")">
+                    @(string.IsNullOrEmpty(q.ReplyText) ? "Open" : "Replied")
+                </span>
+            </div>
+            @if (!string.IsNullOrEmpty(q.ReplyText))
+            {
+                <div class="bg-[#F6F1E9] rounded-lg px-4 py-2.5 text-sm text-[#6B6459] border-l-2 border-[#1A5C6B]">
+                    <span class="font-semibold text-[#1A5C6B]">Admin replied: </span>@q.ReplyText
+                </div>
+            }
+            else
+            {
+                <form class="flex gap-3 mt-3" on:submit="@(() => Model.Reply(q.Id))">
+                    <input type="text" asp-for="ReplyText" placeholder="Type your reply..." required
+                           class="flex-1 border border-[#E3DDD3] rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+                    <button type="submit"
+                            class="px-4 py-2 bg-[#1A5C6B] text-white text-sm font-semibold rounded-lg hover:bg-[#154D5A] flex items-center gap-1">
+                        <i class="ph ph-paper-plane-right"></i> Reply
+                    </button>
+                </form>
+            }
+        </div>
+    }
+</div>
+
+

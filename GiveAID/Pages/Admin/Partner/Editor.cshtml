@@ -1,0 +1,7 @@
+@page "{id:guid?}"
+@model EditorModel
+@{
+    ViewData["Title"] = Model.Id.HasValue ? "Edit Partner" : "Create Partner";
+}
+
+<admin-partner-editor id="@Model.Id"/>

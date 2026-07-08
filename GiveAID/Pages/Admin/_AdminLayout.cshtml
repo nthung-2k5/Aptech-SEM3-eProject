@@ -1,4 +1,4 @@
-﻿@{
+@{
     Layout = "Shared/_Layout";
 }
 
@@ -39,6 +39,10 @@
             <a asp-page="/Admin/Ngo/Index"
                data-active="@IsActive("/Admin/Ngo")">
                 <i class="ph ph-globe"></i>NGOs
+            </a>
+            <a asp-page="/Admin/Partner/Index"
+               data-active="@IsActive("/Admin/Partner")">
+                <i class="ph ph-handshake"></i>Partners
             </a>
             <a asp-page="/Admin/UserQuery/Index"
                data-active="@IsActive("/Admin/UserQuery")">
