@@ -24,6 +24,18 @@ public class MemberService(AppDbContext dbContext, IPasswordService passwordServ
         return items;
     }
 
+    public async Task<MemberDto[]> GetAllMemberDtosAsync(string? searchTerm, CancellationToken ct = default)
+    {
+        var query = dbContext.ActiveMembers.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+        {
+            query = query.Where(m => m.FullName.Contains(searchTerm) || m.Email.Contains(searchTerm));
+        }
+
+        return await query.OrderByDescending(m => m.CreatedAt).ProjectToDto().ToArrayAsync(ct);
+    }
+
     public async Task<MemberDto?> GetMemberByIdAsync(Guid id, CancellationToken ct = default)
     {
         return await dbContext.ActiveMembers.AsNoTracking().Where(m => m.UserId == id).ProjectToDto()

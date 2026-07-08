@@ -15,6 +15,13 @@ public class PartnerService(AppDbContext dbContext) : IPartnerService
                 .Select(p => new PartnerSummaryDto(p.PartnerId, p.Name, p.LogoUrl)).ToArrayAsync(ct);
     }
 
+    public async Task<PartnerDto[]> GetAllPartnerDtosAsync(CancellationToken ct = default)
+    {
+        return await dbContext.CorporatePartners.AsNoTracking().OrderBy(p => p.Name)
+                .Select(p => new PartnerDto(p.PartnerId, p.Name, p.LogoUrl, p.Description, p.WebsiteLink))
+                .ToArrayAsync(ct);
+    }
+
     public async Task<PartnerDto?> GetPartnerByIdAsync(Guid id, CancellationToken ct = default)
     {
         return await dbContext.CorporatePartners.AsNoTracking().Where(p => p.PartnerId == id)
