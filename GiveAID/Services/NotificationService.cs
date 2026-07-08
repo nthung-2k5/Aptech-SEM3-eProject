@@ -13,12 +13,11 @@ public class NotificationService(AppDbContext context) : INotificationService
         return await context.Notifications.Where(n => n.UserId == userId && !n.IsRead).CountAsync(ct);
     }
 
-    public async Task<NotificationDto[]> GetUserNotificationsAsync(Guid userId, int limit = 10, CancellationToken ct = default)
+    public async Task<NotificationDto[]>
+            GetUserNotificationsAsync(Guid userId, int limit = 10, CancellationToken ct = default)
     {
-        return await context.Notifications
-                .Where(n => n.UserId == userId).OrderByDescending(n => n.CreatedAt)
-                .Take(limit)
-                .ProjectToDto().ToArrayAsync(ct);
+        return await context.Notifications.Where(n => n.UserId == userId).OrderByDescending(n => n.CreatedAt)
+                .Take(limit).ProjectToDto().ToArrayAsync(ct);
     }
 
     public async Task MarkAsReadAsync(Guid notificationId, CancellationToken ct = default)
@@ -35,11 +34,12 @@ public class NotificationService(AppDbContext context) : INotificationService
 
     public async Task CreateNotificationAsync(Guid userId, string content, CancellationToken ct = default)
     {
-        context.Notifications.Add(new Notification
-        {
-            UserId = userId,
-            Content = content
-        });
+        context.Notifications.Add(
+            new Notification
+            {
+                UserId = userId,
+                Content = content
+            });
         await context.SaveChangesAsync(ct);
     }
 }

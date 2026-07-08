@@ -17,7 +17,8 @@ public class NgoService(AppDbContext dbContext) : INgoService
 
     public async Task<NgoDto?> GetNgoByIdAsync(Guid id, CancellationToken ct = default)
     {
-        return await dbContext.ActiveNgos.AsNoTracking().ProjectToDto().FirstOrDefaultAsync(n => n.Id == id, ct);
+        return await dbContext.ActiveNgos.AsNoTracking().Where(n => n.NgoId == id).ProjectToDto()
+                .FirstOrDefaultAsync(ct);
     }
 
     public async Task<NgoDto> CreateNgoAsync(NgoSaveDto dto, CancellationToken ct = default)

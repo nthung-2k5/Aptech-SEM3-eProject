@@ -84,8 +84,8 @@ public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor 
     public async Task<AboutUsSubpageDto?> GetBySlugAsync(string slug, CancellationToken ct = default)
     {
         return await dbContext.AboutUsSubpages.AsNoTracking()
-                .Include(s => s.UserModifications.OrderByDescending(o => o.CreatedAt).Take(1)).ProjectToDto()
-                .FirstOrDefaultAsync(s => s.Slug.Equals(slug, StringComparison.OrdinalIgnoreCase), ct);
+                .Include(s => s.UserModifications.OrderByDescending(o => o.CreatedAt).Take(1))
+                .Where(s => s.Slug == slug).ProjectToDto().FirstOrDefaultAsync(ct);
     }
 
     public async Task AddSubpageAsync(AboutUsSubpageDto dto, CancellationToken ct = default)
@@ -99,16 +99,17 @@ public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor 
         {
             throw new DuplicateException(nameof(dto.Title));
         }
-        
+
         var entity = dto.MapToEntity();
         await dbContext.AboutUsSubpages.AddAsync(entity, ct);
 
-        entity.UserModifications.Add(new UserModification
-        {
-            HtmlContent = dto.HtmlContent,
-            UserId = GetCurrentUserId(),
-            Subpage = entity
-        });
+        entity.UserModifications.Add(
+            new UserModification
+            {
+                HtmlContent = dto.HtmlContent,
+                UserId = GetCurrentUserId(),
+                Subpage = entity
+            });
 
         await dbContext.AboutUsSubpages.AddAsync(entity, ct);
         await dbContext.SaveChangesAsync(ct);
@@ -122,20 +123,15 @@ public class AboutUsSubpageService(AppDbContext dbContext, IHttpContextAccessor 
                 s => s.SetProperty(p => p.Title, dto.Title),
                 ct);
 
-            if (result == 0)
-            {
-                throw new NotFoundException();
-            }
+            if (result == 0) { throw new NotFoundException(); }
         }
-        catch (UniqueConstraintException)
-        {
-            throw new DuplicateException(nameof(dto.Title));
-        }
-        
+        catch (UniqueConstraintException) { throw new DuplicateException(nameof(dto.Title)); }
+
         var modification = new UserModification
         {
             UserId = GetCurrentUserId(),
-            SubpageId = await dbContext.AboutUsSubpages.Where(p => p.Slug == dto.Slug).Select(p => p.SubpageId).FirstAsync(ct),
+            SubpageId = await dbContext.AboutUsSubpages.Where(p => p.Slug == dto.Slug).Select(p => p.SubpageId)
+                    .FirstAsync(ct),
             HtmlContent = dto.HtmlContent
         };
 

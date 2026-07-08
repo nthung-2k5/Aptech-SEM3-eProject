@@ -33,10 +33,7 @@ public class PartnerService(AppDbContext dbContext) : IPartnerService
 
             return entity.ToDto();
         }
-        catch (UniqueConstraintException)
-        {
-            throw new DuplicateException(nameof(dto.Name));
-        }
+        catch (UniqueConstraintException) { throw new DuplicateException(nameof(dto.Name)); }
     }
 
     public async Task UpdatePartnerAsync(Guid id, PartnerSaveDto dto, CancellationToken ct = default)
@@ -49,15 +46,9 @@ public class PartnerService(AppDbContext dbContext) : IPartnerService
                         .SetProperty(p => p.WebsiteLink, dto.WebsiteLink),
                 ct);
 
-            if (result == 0)
-            {
-                throw new NotFoundException();
-            }
+            if (result == 0) { throw new NotFoundException(); }
         }
-        catch (UniqueConstraintException)
-        {
-            throw new DuplicateException(nameof(dto.Name));
-        }
+        catch (UniqueConstraintException) { throw new DuplicateException(nameof(dto.Name)); }
     }
 
     public async Task DeletePartnerAsync(Guid id, CancellationToken ct = default)
