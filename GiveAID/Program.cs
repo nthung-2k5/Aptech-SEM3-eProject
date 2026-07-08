@@ -1,6 +1,7 @@
 using System.Text;
 using EntityFramework.Exceptions.SqlServer;
 using GiveAID.Data;
+using GiveAID.Models;
 using GiveAID.Services;
 using GiveAID.Services.Abstractions;
 using Hydro.Configuration;
@@ -14,6 +15,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages(options =>
 {
     options.Conventions.AddFolderRouteModelConvention("/Components", model => model.Selectors.Clear());
+    options.Conventions.AuthorizeFolder("/Admin", "AdminOnly");
 });
 
 builder.Services.AddHydro();
@@ -47,6 +49,9 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
+
+builder.Services.AddAuthorizationBuilder()
+        .AddPolicy("AdminOnly", policy => policy.RequireRole(nameof(UserRole.Admin)));
 
 builder.Services.AddHttpContextAccessor();
 
