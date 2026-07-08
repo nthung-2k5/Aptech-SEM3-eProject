@@ -19,10 +19,12 @@
     <link rel="stylesheet" href="~/app.css" asp-append-version="true"/>
 
     <link rel="stylesheet" href="~/GiveAID.styles.css" asp-append-version="true"/>
-    
+
     <!-- Sweetalert 2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.all.min.js" integrity="sha256-Tobw4i5HcbW4qsJMYTxmGAameLGvooTQPPatA9PiGgo=" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.min.css" integrity="sha256-oRc+Vv1HS+BN2++oG9dcxGVifvL12yYXkufSX7eHF0M=" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.all.min.js"
+            integrity="sha256-Tobw4i5HcbW4qsJMYTxmGAameLGvooTQPPatA9PiGgo=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.26.25/dist/sweetalert2.min.css"
+          integrity="sha256-oRc+Vv1HS+BN2++oG9dcxGVifvL12yYXkufSX7eHF0M=" crossorigin="anonymous">
 
     <!-- Phosphor Icons -->
     <link
@@ -78,8 +80,11 @@
                     </a>
                     <div
                         class="absolute left-0 mt-1 w-40 bg-white text-black shadow-lg rounded-b-md hidden group-hover:block border border-[#E3DDD3]">
-                        <a asp-page="/Faq" class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] no-underline transition-colors">FAQ</a>
-                        <a asp-page="/Contact" class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] no-underline transition-colors">Contact Us</a>
+                        <a asp-page="/Faq"
+                           class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] no-underline transition-colors">FAQ</a>
+                        <a asp-page="/Contact"
+                           class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] no-underline transition-colors">Contact
+                            Us</a>
                     </div>
                 </div>
 
@@ -98,80 +103,105 @@
 
                         <!-- Notifications Dropdown -->
                         <div class="relative group" x-data="{ open: false }">
-                            <button @@click="open = !open" @@click.outside="open = false" class="navbar-button flex items-center gap-1 relative">
+                            <button @@click="open = !open" @@click.outside="open = false"
+                                    class="navbar-button flex items-center gap-1 relative">
                                 <i class="ph-fill ph-bell text-lg"></i>
                                 @if (unreadCount > 0)
                                 {
                                     <span class="absolute top-1 right-1 flex size-2">
-                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                        <span
+                                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                         <span class="relative inline-flex rounded-full size-2 bg-red-500"></span>
                                     </span>
                                 }
                             </button>
-                            <div x-show="open" style="display: none;" class="absolute right-0 mt-2 w-80 bg-white text-black shadow-lg rounded-md border border-[#E3DDD3] overflow-hidden">
+                            <div x-show="open" style="display: none;"
+                                 class="absolute right-0 mt-2 w-80 bg-white text-black shadow-lg rounded-md border border-[#E3DDD3] overflow-hidden">
                                 <div class="flex justify-between items-center p-3 border-b border-[#E3DDD3] bg-gray-50">
                                     <span class="font-bold text-sm">Notifications</span>
                                     @if (unreadCount > 0)
                                     {
-                                        <form method="post" asp-page="/Notifications" asp-page-handler="MarkAllRead" class="m-0">
-                                            <button type="submit" class="text-xs text-[#1A5C6B] hover:underline font-medium">Mark all as read</button>
+                                        <form method="post" asp-page="/Notifications" asp-page-handler="MarkAllRead"
+                                              class="m-0">
+                                            <button type="submit"
+                                                    class="text-xs text-[#1A5C6B] hover:underline font-medium">Mark all
+                                                as read
+                                            </button>
                                         </form>
                                     }
                                 </div>
                                 <div class="max-h-64 overflow-y-auto">
-                                    @if (notifications.Length == 0)
-                                    {
-                                        <div class="p-6 text-center text-gray-500 text-sm">No notifications yet.</div>
-                                    }
+                                    @if (notifications.Length == 0) { <div
+                                        class="p-6 text-center text-gray-500 text-sm">No notifications yet.
+                                    </div> }
                                     else
                                     {
                                         @foreach (var notif in notifications)
                                         {
-                                            <form method="post" asp-page="/Notifications" asp-page-handler="MarkRead" asp-route-id="@notif.Id" class="block m-0">
-                                                <button type="submit" class="w-full text-left p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors @(notif.IsRead ? "opacity-60" : "bg-blue-50/50")">
+                                            <form method="post" asp-page="/Notifications" asp-page-handler="MarkRead"
+                                                  asp-route-id="@notif.Id" class="block m-0">
+                                                <button type="submit"
+                                                        class="w-full text-left p-3 border-b border-gray-100 hover:bg-gray-50 transition-colors @(notif.IsRead ? "opacity-60" : "bg-blue-50/50")">
                                                     <p class="text-sm text-gray-800 line-clamp-2">@notif.Content</p>
-                                                    <span class="text-xs text-gray-400 mt-1 block">@notif.CreatedAt.ToString("MMM dd, HH:mm")</span>
+                                                    <span
+                                                        class="text-xs text-gray-400 mt-1 block">@notif.CreatedAt.ToString("MMM dd, HH:mm")</span>
                                                 </button>
                                             </form>
                                         }
                                     }
                                 </div>
-                                <a asp-page="/Notifications" class="block p-3 text-center text-sm font-medium text-[#C97C2E] hover:bg-gray-50 border-t border-[#E3DDD3]">View All Notifications</a>
+                                <a asp-page="/Notifications"
+                                   class="block p-3 text-center text-sm font-medium text-[#C97C2E] hover:bg-gray-50 border-t border-[#E3DDD3]">View
+                                    All Notifications</a>
                             </div>
                         </div>
 
                         <!-- Member Dropdown -->
                         <div class="relative group" x-data="{ open: false }">
-                            <button @@click="open = !open" @@click.outside="open = false" class="navbar-button flex items-center gap-1">
+                            <button @@click="open = !open" @@click.outside="open = false"
+                                    class="navbar-button flex items-center gap-1">
                                 <i class="ph-fill ph-user-circle text-xl"></i> @userName
                                 <i class="ph ph-caret-down text-xs ml-1"></i>
                             </button>
-                            <div x-show="open" style="display: none;" class="absolute right-0 mt-2 w-48 bg-white text-black shadow-lg rounded-md border border-[#E3DDD3] overflow-hidden">
-                                <a asp-page="/Member/Profile" class="block px-4 py-2.5 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] no-underline transition-colors flex items-center gap-2">
+                            <div x-show="open" style="display: none;"
+                                 class="absolute right-0 mt-2 w-48 bg-white text-black shadow-lg rounded-md border border-[#E3DDD3] overflow-hidden">
+                                <a asp-page="/Member/Profile"
+                                   class="block px-4 py-2.5 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] no-underline transition-colors flex items-center gap-2">
                                     <i class="ph ph-user"></i> My Profile
                                 </a>
-                                <a asp-page="/Member/Donations" class="block px-4 py-2.5 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] no-underline transition-colors flex items-center gap-2">
+                                <a asp-page="/Member/Donations"
+                                   class="block px-4 py-2.5 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] no-underline transition-colors flex items-center gap-2">
                                     <i class="ph ph-hand-heart"></i> My Donations
                                 </a>
-                                <a asp-page="/Member/Interests" class="block px-4 py-2.5 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] no-underline transition-colors flex items-center gap-2">
+                                <a asp-page="/Member/Interests"
+                                   class="block px-4 py-2.5 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] no-underline transition-colors flex items-center gap-2">
                                     <i class="ph ph-star"></i> My Interests
                                 </a>
-                                <a asp-page="/Login" asp-page-handler="Logout" class="block px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 no-underline transition-colors flex items-center gap-2">
-                                    <i class="ph ph-sign-out"></i> Logout
-                                </a>
+                                <form asp-page="/Logout" method="post">
+                                    <button type="submit"
+                                            class="block px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 no-underline transition-colors flex items-center gap-2">
+                                        <i class="ph ph-sign-out"></i> Logout
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     }
                     else if (isAdmin)
                     {
                         <a asp-page="/Admin/Index" class="navbar-button">Admin Dashboard</a>
-                        <a asp-page="/Login" asp-page-handler="Logout" class="px-3 py-2 text-white/80 hover:text-white text-sm transition-colors no-underline">Logout</a>
+                        <form asp-page="/Logout" method="post">
+                            <button type="submit"
+                                    class="px-3 py-2 text-white/80 hover:text-white text-sm transition-colors no-underline">
+                                Logout
+                            </button>
+                        </form>
                     }
                 }
                 else
                 {
                     <a asp-page="/Register/Index" class="btn btn-secondary">Register</a>
-                    <a asp-page="/Login/Index" class="px-3 py-2 text-white/80 hover:text-white text-sm transition-colors no-underline">Login</a>
+                    <a asp-page="/Login/Index"
+                       class="px-3 py-2 text-white/80 hover:text-white text-sm transition-colors no-underline">Login</a>
                 }
             </nav>
         </div>

@@ -24,6 +24,7 @@ builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultSignOutScheme = "Cookies";
 }).AddCookie("Cookies", options => { options.LoginPath = "/Login"; }).AddJwtBearer(options =>
 {
     var jwtSettings = builder.Configuration.GetSection("JwtSettings");
