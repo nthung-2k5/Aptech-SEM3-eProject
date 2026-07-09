@@ -15,7 +15,6 @@
                 <th>Email</th>
                 <th>Phone</th>
                 <th>Date of Birth</th>
-                <th>Occupation</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -27,7 +26,6 @@
                     <td>@m.Email</td>
                     <td>@m.PhoneNumber</td>
                     <td>@m.DateOfBirth.ToShortDateString()</td>
-                    <td>@m.Occupation</td>
                     <td>
                         <div class="flex gap-2">
                             <button on:click="@(() => Model.ShowMemberInfo(m.Id))"

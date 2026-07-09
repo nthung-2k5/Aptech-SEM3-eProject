@@ -91,8 +91,7 @@ public class AdminMemberEditor(
 
             RuleFor(x => x.Form.PhoneNumber)
                 .NotEmpty().WithMessage("Phone number is required")
-                .MaximumLength(10).WithMessage("Phone number cannot exceed 10 characters")
-                .Matches(@"^0\d{9}$").WithMessage("Phone number must start with 0 and be 10 digits long");
+                .PhoneNumber().WithMessage("Phone number must be in E.164 format");
 
             RuleFor(x => x.Form.Address)
                 .MaximumLength(255).WithMessage("Address cannot exceed 255 characters");

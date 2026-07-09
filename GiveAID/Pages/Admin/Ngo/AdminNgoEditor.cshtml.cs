@@ -88,7 +88,7 @@ public class AdminNgoEditor(
                 .MaximumLength(1024).WithMessage("Website cannot exceed 1024 characters");
 
             RuleFor(x => x.Form.PhoneNumber)
-                .MaximumLength(11).WithMessage("Phone number cannot exceed 11 characters");
+                    .PhoneNumber().WithMessage("Phone number must be in E.164 format");
         }
     }
 }

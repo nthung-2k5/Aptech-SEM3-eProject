@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Hydro;
+using PhoneNumbers;
 
 namespace GiveAID;
 
@@ -16,5 +17,26 @@ public static class HydroValidationExtensions
         }
 
         return result.IsValid;
+    }
+    
+    public static IRuleBuilderOptions<T, string> PhoneNumber<T>(
+        this IRuleBuilder<T, string> ruleBuilder, string? defaultRegion = null)
+    {
+        return ruleBuilder.Must(phone =>
+        {
+            if (string.IsNullOrWhiteSpace(phone)) return false;
+
+            var phoneUtil = PhoneNumberUtil.GetInstance();
+            try
+            {
+                var numberProto = phoneUtil.Parse(phone, defaultRegion);
+                
+                return phoneUtil.IsValidNumber(numberProto);
+            }
+            catch (NumberParseException)
+            {
+                return false;
+            }
+        });
     }
 }

@@ -19,6 +19,7 @@
       <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
       <PackageReference Include="Hydro" Version="1.3.0" />
       <PackageReference Include="Konscious.Security.Cryptography.Argon2" Version="1.3.1" />
+      <PackageReference Include="libphonenumber-csharp" Version="9.0.34" />
       <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.9" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">

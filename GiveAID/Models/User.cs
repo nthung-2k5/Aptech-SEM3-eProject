@@ -24,9 +24,7 @@ public class User : IHasCreatedAt
     [MaxLength(255, ErrorMessage = "Address cannot exceed 255 characters.")]
     public string Address { get; set; } = string.Empty;
     
-    // Must be a Vietnamese valid phone number
-    [RegularExpression(@"^(?:\+84|0)(?:3[2-9]|5[2|5|6|8|9]|7[0|6-9]|8[1-9]|9[0-4|6-9])[0-9]{7}$", ErrorMessage = "The phone number is not valid.")]
-    [MaxLength(10)]
+    [MaxLength(20)]
     public string PhoneNumber { get; set; } = string.Empty;
     
     [MaxLength(50)]

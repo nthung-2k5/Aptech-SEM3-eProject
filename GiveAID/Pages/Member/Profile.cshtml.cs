@@ -91,11 +91,11 @@ public class ProfileModel(AppDbContext context, IValidator<ProfileModel.InputMod
 
             RuleFor(x => x.PhoneNumber)
                 .NotEmpty().WithMessage("Phone number is required")
-                .Matches(@"^(?:\+84|0)(?:3[2-9]|5[2|5|6|8|9]|7[0|6-9]|8[1-9]|9[0-4|6-9])[0-9]{7}$")
-                .WithMessage("The phone number is not valid.");
+                .PhoneNumber().WithMessage("Phone number must be in E.164 format");
 
             RuleFor(x => x.DateOfBirth)
-                .NotEmpty().WithMessage("Date of birth is required");
+                .NotEmpty().WithMessage("Date of birth is required")
+                .LessThan(DateOnly.FromDateTime(DateTime.Today)).WithMessage("Date of birth must be in the past");
 
             RuleFor(x => x.Address)
                 .MaximumLength(255).WithMessage("Address cannot exceed 255 characters");
