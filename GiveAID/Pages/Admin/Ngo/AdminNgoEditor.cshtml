@@ -6,24 +6,29 @@
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Name <span
                     class="text-red-500">*</span></label>
-            <input type="text" asp-for="Form.Name" required class="input w-full"/>
+            <input type="text" asp-for="Form.Name" bind required class="input w-full"/>
+            <span asp-validation-for="Form.Name"></span>
         </div>
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Phone Number</label>
-            <input type="text" asp-for="Form.PhoneNumber" placeholder="Phone number" class="input w-full"/>
+            <input type="text" asp-for="Form.PhoneNumber" bind placeholder="Phone number" class="input w-full"/>
+            <span asp-validation-for="Form.PhoneNumber"></span>
         </div>
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Address</label>
-            <input type="text" asp-for="Form.Address" placeholder="Location / Address" class="input w-full"/>
+            <input type="text" asp-for="Form.Address" bind placeholder="Location / Address" class="input w-full"/>
+            <span asp-validation-for="Form.Address"></span>
         </div>
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Website</label>
-            <input type="url" asp-for="Form.Website" placeholder="https://example.org" class="input w-full"/>
+            <input type="url" asp-for="Form.Website" bind placeholder="https://example.org" class="input w-full"/>
+            <span asp-validation-for="Form.Website"></span>
         </div>
         <div class="md:col-span-2">
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Description</label>
-            <textarea asp-for="Form.Description" rows="3" placeholder="Describe the NGO's mission and focus areas..."
+            <textarea asp-for="Form.Description" bind rows="3" placeholder="Describe the NGO's mission and focus areas..."
                       class="textarea w-full"></textarea>
+            <span asp-validation-for="Form.Description"></span>
         </div>
         <div class="md:col-span-2">
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Corporate Partners</label>

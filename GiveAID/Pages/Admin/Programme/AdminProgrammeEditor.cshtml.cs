@@ -1,3 +1,4 @@
+using FluentValidation;
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
 using Hydro;
@@ -8,7 +9,8 @@ namespace GiveAID.Pages.Admin.Programme;
 public class AdminProgrammeEditor(
     IProgrammeService programmeService,
     INgoService ngoService,
-    IDonationCauseService causeService) : HydroComponent
+    IDonationCauseService causeService,
+    IValidator<AdminProgrammeEditor> validator) : HydroComponent
 {
     public Guid? Id { get; set; }
 
@@ -57,6 +59,8 @@ public class AdminProgrammeEditor(
 
     public async Task Save()
     {
+        if (!this.Validate(validator)) { return; }
+
         var saveDto = new ProgrammeSaveDto(
             Form.NgoId,
             Form.CauseId,
@@ -72,6 +76,42 @@ public class AdminProgrammeEditor(
         if (Id.HasValue && Id.Value != Guid.Empty) { await programmeService.UpdateProgrammeAsync(Id.Value, saveDto); }
         else { await programmeService.CreateProgrammeAsync(saveDto); }
 
-        Redirect(Url.Page("/Admin/Programme"));
+        Redirect(Url.Page("/Admin/Programme/Index"));
+    }
+
+    public class Validator : AbstractValidator<AdminProgrammeEditor>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Form.Name)
+                .NotEmpty().WithMessage("Programme name is required")
+                .MaximumLength(255).WithMessage("Name cannot exceed 255 characters");
+
+            RuleFor(x => x.Form.NgoId)
+                .NotEqual(Guid.Empty).WithMessage("Please select an NGO");
+
+            RuleFor(x => x.Form.CauseId)
+                .NotEqual(Guid.Empty).WithMessage("Please select a cause");
+
+            RuleFor(x => x.Form.Description)
+                .NotEmpty().WithMessage("Description is required");
+
+            RuleFor(x => x.Form.ImageUrl)
+                .NotEmpty().WithMessage("Image URL is required")
+                .MaximumLength(2048).WithMessage("Image URL cannot exceed 2048 characters");
+
+            RuleFor(x => x.Form.Location)
+                .MaximumLength(255).WithMessage("Location cannot exceed 255 characters");
+
+            RuleFor(x => x.Form.EndTime)
+                .GreaterThan(x => x.Form.StartTime)
+                .When(x => x.Form.EndTime.HasValue)
+                .WithMessage("End time must be after start time");
+
+            RuleFor(x => x.Form.MaxDonation)
+                .GreaterThan(0)
+                .When(x => x.Form.MaxDonation.HasValue)
+                .WithMessage("Max donation must be a positive value");
+        }
     }
 }

@@ -26,22 +26,22 @@ else
                 <div class="col-span-2">
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Name</label>
                     <input type="text" asp-for="Name" bind placeholder="Jane Doe" class="input w-full"/>
-                    <span class="validation-message" asp-validation-for="Name"></span>
+                    <span asp-validation-for="Name"></span>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Email Address</label>
                     <input type="email" asp-for="Email" bind placeholder="jane@example.com" class="input w-full"/>
-                    <span class="validation-message" asp-validation-for="Email"></span>
+                    <span asp-validation-for="Email"></span>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Phone Number</label>
                     <input type="tel" asp-for="Phone" bind placeholder="9876543210" class="input w-full"/>
-                    <span class="validation-message" asp-validation-for="Phone"></span>
+                    <span asp-validation-for="Phone"></span>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Date of Birth</label>
                     <input type="date" asp-for="DateOfBirth" bind class="input w-full"/>
-                    <span class="validation-message" asp-validation-for="DateOfBirth"></span>
+                    <span asp-validation-for="DateOfBirth"></span>
                 </div>
             </div>
         </div>
@@ -61,11 +61,13 @@ else
                         <option>Retired</option>
                         <option>Other</option>
                     </select>
+                    <span asp-validation-for="Occupation"></span>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5">Address</label>
                     <input type="text" asp-for="Address" bind placeholder="Mumbai"
                            class="input w-full"/>
+                    <span asp-validation-for="Address"></span>
                 </div>
             </div>
         </div>
@@ -77,13 +79,13 @@ else
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Password</label>
                     <input type="password" asp-for="Password" bind placeholder="Min 6 characters"
                            class="input w-full"/>
-                    <span class="validation-message" asp-validation-for="Password"></span>
+                    <span asp-validation-for="Password"></span>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Confirm Password</label>
                     <input type="password" asp-for="ConfirmPassword" bind placeholder="Re-enter password"
                            class="input w-full"/>
-                    <span class="validation-message" asp-validation-for="ConfirmPassword"></span>
+                    <span asp-validation-for="ConfirmPassword"></span>
                 </div>
             </div>
         </div>
@@ -96,7 +98,7 @@ else
                     <span class="text-[#1A5C6B] underline cursor-pointer">Privacy Policy</span>
                 </label>
             </div>
-            <span class="validation-message" asp-validation-for="Agree"></span>
+            <span asp-validation-for="Agree"></span>
         </div>
 
         <button type="submit" class="btn btn-primary btn-lg btn-block">

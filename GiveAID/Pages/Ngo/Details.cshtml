@@ -1,4 +1,4 @@
-﻿@page "{id:guid}"
+@page "{id:guid}"
 @model DetailsModel
 @{
     ViewData["Title"] = Model.Ngo?.Name ?? "NGO Details";
@@ -80,28 +80,21 @@
                         <p class="text-sm opacity-80 mb-6">Support @Model.Ngo.Name by making a direct contribution.</p>
 
                         <form method="post" asp-page-handler="Donate" asp-route-id="@Model.Ngo.Id">
-                            <div class="form-control w-full mb-4">
-                                <label class="label">
-                                    <span class="label-text font-semibold">Donation Amount</span>
-                                </label>
-                                <input type="number" asp-for="Amount" min="1" step="0.01"
-                                       class="input input-bordered w-full" placeholder="e.g. 50" required/>
-                            </div>
-
                             <div class="form-control w-full mb-6">
                                 <label class="label">
                                     <span class="label-text font-semibold">Select a Cause (Optional)</span>
                                 </label>
-                                <select asp-for="SelectedCauseId" class="select select-bordered w-full">
+                                <select asp-for="SelectedCauseId" bind class="select select-bordered w-full">
                                     <option value="">-- General Donation --</option>
                                     @foreach (var cause in Model.Causes)
                                     {
                                         <option value="@cause.Id">@cause.Name</option>
                                     }
                                 </select>
+                                <span asp-validation-for="SelectedCauseId"></span>
                             </div>
 
-                            <button type="submit" class="btn btn-primary w-full shadow-lg">Donate Now</button>
+                            <button type="submit" class="btn btn-primary btn-lg w-full">Donate Now</button>
                         </form>
                     </div>
                 </div>

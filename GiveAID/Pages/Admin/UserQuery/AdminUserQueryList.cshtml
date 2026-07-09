@@ -114,11 +114,12 @@
                         {
                             @* Editable reply form *@
                             <form on:submit="@(() => Model.Reply())" class="space-y-3">
-                                <textarea asp-for="ReplyText"
+                                <textarea asp-for="ReplyText" bind
                                           rows="6"
                                           placeholder="Type your reply to @sel.UserName..."
                                           required
                                           class="w-full border border-[#E3DDD3] rounded-xl px-4 py-3 text-sm text-[#1C1A17] focus:outline-none focus:ring-2 focus:ring-[#1A5C6B] resize-none leading-relaxed"></textarea>
+                                <span asp-validation-for="ReplyText"></span>
                                 <div class="flex justify-end">
                                     <button type="submit"
                                             class="flex items-center gap-2 px-5 py-2.5 bg-[#1A5C6B] text-white text-sm font-semibold rounded-lg hover:bg-[#154D5A] transition-colors">

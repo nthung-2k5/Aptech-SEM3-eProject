@@ -1,20 +1,22 @@
-﻿using GiveAID.Dtos;
+using FluentValidation;
+using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
 using Hydro;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GiveAID.Pages.Admin.Member;
 
-public class AdminMemberEditor(IMemberService memberService) : HydroComponent
+public class AdminMemberEditor(
+    IMemberService memberService,
+    IValidator<AdminMemberEditor> validator) : HydroComponent
 {
     public Guid? Id { get; set; }
 
-    // We bind to a SaveDto class equivalent for the form
     public class FormModel
     {
         public string FullName { get; set; } = "";
         public string Email { get; set; } = "";
-        public string? Password { get; set; } = "";
+        public string? Password { get; set; } = null;
         public string Address { get; set; } = "";
         public string PhoneNumber { get; set; } = "";
         public string Occupation { get; set; } = "";
@@ -42,6 +44,8 @@ public class AdminMemberEditor(IMemberService memberService) : HydroComponent
 
     public async Task Save()
     {
+        if (!this.Validate(validator)) { return; }
+
         if (Id.HasValue && Id.Value != Guid.Empty)
         {
             var updateDto = new MemberUpdateDto(
@@ -57,15 +61,10 @@ public class AdminMemberEditor(IMemberService memberService) : HydroComponent
         }
         else
         {
-            if (string.IsNullOrWhiteSpace(Form.Password))
-            {
-                throw new InvalidOperationException("Password is required for new members.");
-            }
-
             var createDto = new MemberCreateDto(
                 Form.FullName,
                 Form.Email,
-                Form.Password,
+                Form.Password!,
                 Form.DateOfBirth,
                 Form.Address,
                 Form.PhoneNumber,
@@ -74,6 +73,44 @@ public class AdminMemberEditor(IMemberService memberService) : HydroComponent
             await memberService.CreateMemberAsync(createDto);
         }
 
-        Redirect(Url.Page("/Admin/Member"));
+        Redirect(Url.Page("/Admin/Member/Index"));
+    }
+
+    public class Validator : AbstractValidator<AdminMemberEditor>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Form.FullName)
+                .NotEmpty().WithMessage("Full name is required")
+                .MaximumLength(100).WithMessage("Full name cannot exceed 100 characters");
+
+            RuleFor(x => x.Form.Email)
+                .NotEmpty().WithMessage("Email is required")
+                .EmailAddress().WithMessage("Enter a valid email address")
+                .MaximumLength(255).WithMessage("Email cannot exceed 255 characters");
+
+            RuleFor(x => x.Form.PhoneNumber)
+                .NotEmpty().WithMessage("Phone number is required")
+                .MaximumLength(10).WithMessage("Phone number cannot exceed 10 characters")
+                .Matches(@"^0\d{9}$").WithMessage("Phone number must start with 0 and be 10 digits long");
+
+            RuleFor(x => x.Form.Address)
+                .MaximumLength(255).WithMessage("Address cannot exceed 255 characters");
+
+            RuleFor(x => x.Form.Occupation)
+                .MaximumLength(50).WithMessage("Occupation cannot exceed 50 characters");
+
+            RuleFor(x => x.Form.Password)
+                .MinimumLength(6).WithMessage("Password must be at least 6 characters")
+                .When(x => !string.IsNullOrWhiteSpace(x.Form.Password));
+
+            RuleFor(x => x.Form.Password)
+                .NotEmpty().WithMessage("Password is required for new members")
+                .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
+
+            RuleFor(x => x.Form.DateOfBirth)
+                .LessThan(DateOnly.FromDateTime(DateTime.Today))
+                .WithMessage("Date of birth must be in the past");
+        }
     }
 }

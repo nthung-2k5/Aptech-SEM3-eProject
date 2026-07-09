@@ -1,3 +1,4 @@
+using FluentValidation;
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
 using Hydro;
@@ -5,7 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GiveAID.Pages.Admin.Ngo;
 
-public class AdminNgoEditor(INgoService ngoService, IPartnerService partnerService) : HydroComponent
+public class AdminNgoEditor(
+    INgoService ngoService,
+    IPartnerService partnerService,
+    IValidator<AdminNgoEditor> validator) : HydroComponent
 {
     public Guid? Id { get; set; }
 
@@ -49,6 +53,8 @@ public class AdminNgoEditor(INgoService ngoService, IPartnerService partnerServi
 
     public async Task Save()
     {
+        if (!this.Validate(validator)) { return; }
+
         var saveDto = new NgoSaveDto(
             Form.Name,
             Form.Description,
@@ -60,6 +66,29 @@ public class AdminNgoEditor(INgoService ngoService, IPartnerService partnerServi
         if (Id.HasValue && Id.Value != Guid.Empty) { await ngoService.UpdateNgoAsync(Id.Value, saveDto); }
         else { await ngoService.CreateNgoAsync(saveDto); }
 
-        Redirect(Url.Page("/Admin/Ngo"));
+        Redirect(Url.Page("/Admin/Ngo/Index"));
+    }
+
+    public class Validator : AbstractValidator<AdminNgoEditor>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Form.Name)
+                .NotEmpty().WithMessage("NGO name is required")
+                .MaximumLength(255).WithMessage("Name cannot exceed 255 characters");
+
+            RuleFor(x => x.Form.Description)
+                .NotEmpty().WithMessage("Description is required");
+
+            RuleFor(x => x.Form.Address)
+                .NotEmpty().WithMessage("Address is required")
+                .MaximumLength(255).WithMessage("Address cannot exceed 255 characters");
+
+            RuleFor(x => x.Form.Website)
+                .MaximumLength(1024).WithMessage("Website cannot exceed 1024 characters");
+
+            RuleFor(x => x.Form.PhoneNumber)
+                .MaximumLength(11).WithMessage("Phone number cannot exceed 11 characters");
+        }
     }
 }
