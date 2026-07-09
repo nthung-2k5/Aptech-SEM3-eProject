@@ -1,0 +1,14 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Secure Payment";
+}
+
+<div>
+    <hero-component title="Make a Donation"
+                    subtitle="Your contribution helps us fund welfare programmes for those in need"/>
+
+    <div class="max-w-7xl mx-auto px-6 py-12">
+        <donate-form user-id="@Model.UserId" ngo-id="@Model.NgoId" cause-id="@Model.CauseId" programme-id="@Model.ProgrammeId" />
+    </div>
+</div>

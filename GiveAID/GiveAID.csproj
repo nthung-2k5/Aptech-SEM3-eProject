@@ -48,6 +48,10 @@
       <_ContentIncludedByDefault Remove="Pages\Admin\Gallery\Index.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\icons\" />
+    </ItemGroup>
+
     <PropertyGroup Label="Tailwind.Hosting.Build Props">
         <TailwindInputCssFile>wwwroot/css/site.css</TailwindInputCssFile>
     </PropertyGroup>
