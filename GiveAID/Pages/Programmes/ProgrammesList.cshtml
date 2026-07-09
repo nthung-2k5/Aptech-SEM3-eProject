@@ -1,4 +1,3 @@
-@using GiveAID.Services
 @using GiveAID.Services.Abstractions
 @model ProgrammesList
 
@@ -7,7 +6,7 @@
 
 <div class="flex flex-col lg:flex-row gap-8">
     <!-- Sidebar (Left) -->
-    <aside class="w-full lg:w-1/4">
+    <aside class="w-full lg:w-72">
         <div class="bg-white p-6 rounded-xl shadow-sm border border-[#E3DDD3] space-y-6">
             <div>
                 <label class="block font-semibold mb-2 text-[#1C1A17]">Search</label>
@@ -16,6 +15,7 @@
                     <input type="text" asp-for="SearchTerm" bind:keydown.debounce.500ms
                            on:input="@(() => Model.Search())"
                            placeholder="Search programmes..."/>
+                    <span asp-validation-for="SearchTerm"></span>
                 </label>
             </div>
             <div>
@@ -28,6 +28,7 @@
                         <option value="@cause.Id.ToString()">@cause.Name</option>
                     }
                 </select>
+                <span asp-validation-for="CauseId"></span>
             </div>
             <div>
                 <label class="block font-semibold mb-2 text-[#1C1A17]">Filter by NGO</label>
@@ -39,6 +40,7 @@
                         <option value="@ngo.Id.ToString()">@ngo.Name</option>
                     }
                 </select>
+                <span asp-validation-for="NgoId"></span>
             </div>
             <button on:click="@(() => Model.ClearFilters())" class="btn btn-outline btn-primary btn-block">Clear
                 Filters
@@ -60,7 +62,7 @@
         </div>
 
         <!-- Cards Grid -->
-        <div class="grid md:grid-cols-2 gap-6 flex-grow">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow">
             @foreach (var p in Model.Programmes)
             {
                 var timeRemaining = p.EndDate - DateTimeOffset.Now;
@@ -86,14 +88,14 @@
                         <h3 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1C1A17] mb-2 group-hover:text-[#C97C2E] transition-colors">@p.Name</h3>
                         <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
                             <i class="ph ph-buildings"></i>
-                            <span>@p.Ngo</span>
+                            <span>@p.NgoName</span>
                         </div>
                         <div class="mt-auto">
                             <div class="flex justify-between text-sm mb-2 text-gray-600 font-medium">
-                                <span>$@p.RaisedAmount.ToString("N0") raised</span>
+                                <span>@p.RaisedAmount.ToUsCurrencyString() raised</span>
                                 @if (p.TargetAmount.HasValue)
                                 {
-                                    <span>of $@p.TargetAmount.Value.ToString("N0")</span>
+                                    <span>of @p.TargetAmount.Value.ToUsCurrencyString()</span>
                                 }
                             </div>
                             @if (p.TargetAmount.HasValue)

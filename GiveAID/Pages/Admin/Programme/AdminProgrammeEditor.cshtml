@@ -1,0 +1,96 @@
+@using GiveAID.Services.Abstractions
+@model AdminProgrammeEditor
+
+<form on:submit="@(() => Model.Save())" class="bg-white border border-[#E3DDD3] rounded-xl p-6 space-y-6">
+    <h4 class="font-bold text-[#1C1A17]">
+        @(Model.Id.HasValue ? "Edit Programme" : "Add Programme")
+    </h4>
+
+    @* Core details *@
+    <div class="grid md:grid-cols-2 gap-4">
+        <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Programme Name <span class="text-red-500">*</span></label>
+            <input type="text" asp-for="Form.Name" bind required placeholder="e.g. Clean Water Initiative" class="input w-full"/>
+            <span asp-validation-for="Form.Name"></span>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">NGO <span class="text-red-500">*</span></label>
+            <select asp-for="Form.NgoId" bind required class="select w-full">
+                <option value="" disabled selected>— Select NGO —</option>
+                @foreach (var n in Model.AvailableNgos)
+                {
+                    <option value="@n.Id">@n.Name</option>
+                }
+            </select>
+            <span asp-validation-for="Form.NgoId"></span>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Cause <span class="text-red-500">*</span></label>
+            <select asp-for="Form.CauseId" bind required class="select w-full">
+                <option value="" disabled selected>— Select Cause —</option>
+                @foreach (var c in Model.AvailableCauses)
+                {
+                    <option value="@c.Id">@c.Name</option>
+                }
+            </select>
+            <span asp-validation-for="Form.CauseId"></span>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Location</label>
+            <input type="text" asp-for="Form.Location" bind placeholder="City, Country or region" class="input w-full"/>
+            <span asp-validation-for="Form.Location"></span>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Image URL</label>
+            <input type="url" asp-for="Form.ImageUrl" bind placeholder="https://example.com/image.jpg" class="input w-full"/>
+            <span asp-validation-for="Form.ImageUrl"></span>
+        </div>
+
+        <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Description <span class="text-red-500">*</span></label>
+            <textarea asp-for="Form.Description" bind rows="4" required placeholder="Describe the programme's goals and impact..." class="textarea w-full"></textarea>
+            <span asp-validation-for="Form.Description"></span>
+        </div>
+    </div>
+
+    @* Dates & Funding *@
+    <div>
+        <div class="text-xs font-bold uppercase tracking-widest text-[#6B6459] mb-3">Schedule & Funding</div>
+        <div class="grid md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Start Date <span class="text-red-500">*</span></label>
+                <input type="datetime-local" asp-for="Form.StartTime" bind required class="input w-full"/>
+                <span asp-validation-for="Form.StartTime"></span>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">End Date <span class="text-xs text-[#6B6459] font-normal">(optional)</span></label>
+                <input type="datetime-local" asp-for="Form.EndTime" bind class="input w-full"/>
+                <span asp-validation-for="Form.EndTime"></span>
+            </div>
+            <div>
+                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Donation Target ($) <span class="text-xs text-[#6B6459] font-normal">(optional)</span></label>
+                <input type="number" asp-for="Form.MaxDonation" bind min="0" step="0.01" placeholder="e.g. 50000" class="input w-full"/>
+                <span asp-validation-for="Form.MaxDonation"></span>
+            </div>
+        </div>
+    </div>
+
+    @* Image preview *@
+    @if (!string.IsNullOrEmpty(Model.Form.ImageUrl))
+    {
+        <div>
+            <div class="text-xs font-bold uppercase tracking-widest text-[#6B6459] mb-2">Image Preview</div>
+            <img src="@Model.Form.ImageUrl" alt="Programme image preview"
+                 class="w-full max-h-48 object-cover rounded-xl border border-[#E3DDD3]"/>
+        </div>
+    }
+    
+    <div class="flex justify-end gap-2">
+        <a asp-page="/Admin/Programme/Index" class="btn btn-soft">Cancel</a>
+        <button type="submit" class="btn btn-secondary">Save Programme</button>
+    </div>
+</form>

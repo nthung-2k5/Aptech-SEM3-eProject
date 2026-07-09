@@ -1,0 +1,7 @@
+@page "{id:guid?}"
+@model EditorModel
+@{
+    ViewData["Title"] = Model.Id.HasValue ? "Edit Programme" : "Create Programme";
+}
+
+<admin-programme-editor id="@Model.Id"/>

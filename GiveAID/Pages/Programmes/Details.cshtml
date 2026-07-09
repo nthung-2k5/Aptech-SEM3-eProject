@@ -32,7 +32,7 @@
                     <div class="flex items-center gap-6 text-white/90">
                         <div class="flex items-center gap-2">
                             <i class="ph ph-buildings text-xl"></i>
-                            <span class="text-lg">@p.Ngo</span>
+                            <span class="text-lg">@p.NgoName</span>
                         </div>
                         @if (timeText != null)
                         {
@@ -59,15 +59,15 @@
 
                     <div class="bg-white p-8 rounded-2xl shadow-sm border border-[#E3DDD3]">
                         <h2 class="text-2xl font-bold font-['Playfair_Display',serif] mb-6">About the Organizer</h2>
-                        <div class="flex items-start gap-4">
+                        <a asp-page="/Ngo/Details" asp-route-id="@p.NgoId" asp-page-info class="flex items-start gap-4">
                             <div class="size-16 bg-[#1A5C6B]/10 rounded-full flex items-center justify-center shrink-0">
                                 <i class="ph ph-bank text-3xl text-[#1A5C6B]"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold mb-2">@p.Ngo</h3>
-                                @* <p class="text-gray-600 leading-relaxed">@p.OrganizerInfo</p> *@
+                                <h3 class="text-xl font-bold mb-2">@p.NgoName</h3>
+                                <p class="text-gray-600 leading-relaxed">@p.NgoDescription</p>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 </div>
 
@@ -77,11 +77,11 @@
                         <div class="mb-8">
                             <div class="flex justify-between items-end mb-2">
                                 <span
-                                    class="text-3xl font-bold text-[#1A5C6B] font-['Playfair_Display',serif]">$@p.RaisedAmount.ToString("N0")</span>
+                                    class="text-3xl font-bold text-[#1A5C6B] font-['Playfair_Display',serif]">@p.RaisedAmount.ToUsCurrencyString()</span>
                                 @if (p.TargetAmount.HasValue)
                                 {
                                     <span
-                                        class="text-gray-500 mb-1">raised of $@p.TargetAmount.Value.ToString("N0")</span>
+                                        class="text-gray-500 mb-1">raised of @p.TargetAmount.Value.ToUsCurrencyString()</span>
                                 }
                             </div>
 
@@ -104,7 +104,7 @@
                             </div>
                         </div>
 
-                        <a href="/Donate/Index?programmeId=@p.Id" class="btn btn-secondary btn-block btn-xl">
+                        <a asp-page="/Donate/Index" asp-route-programmeId="@p.Id" class="btn btn-secondary btn-block btn-xl">
                             Donate Now
                         </a>
 

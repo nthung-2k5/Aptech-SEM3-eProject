@@ -79,20 +79,22 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Caption</label>
-                                <input type="text" asp-for="Form.Caption" required
+                                <input type="text" asp-for="Form.Caption" bind required
                                        class="input w-full"/>
+                                <span asp-validation-for="Form.Caption"></span>
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Associated
                                     Programme</label>
-                                <select asp-for="Form.AssociatedProgrammeId"
+                                <select asp-for="Form.AssociatedProgrammeId" bind
                                         class="select w-full">
                                     <option value="" disabled selected>-- Select Programme --</option>
                                     @foreach (var prog in Model.Programmes)
                                     {
-                                        <option value="@prog.Id">@prog.Name (@prog.Ngo)</option>
+                                        <option value="@prog.Id">@prog.Name (@prog.NgoName)</option>
                                     }
                                 </select>
+                                <span asp-validation-for="Form.AssociatedProgrammeId"></span>
                             </div>
                         </div>
 
@@ -100,9 +102,10 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Image File</label>
-                                <input type="file" asp-for="Form.ImageFile" accept="image/*"
+                                <input type="file" asp-for="Form.ImageFile" bind accept="image/*"
                                        onchange="document.getElementById('imgPreview').src = window.URL.createObjectURL(this.files[0])"
                                        class="file-input w-full"/>
+                                <span asp-validation-for="Form.ImageFile"></span>
                             </div>
                             <div
                                 class="mt-4 border border-[#E3DDD3] rounded-xl overflow-hidden aspect-[4/3] bg-gray-50 flex items-center justify-center">

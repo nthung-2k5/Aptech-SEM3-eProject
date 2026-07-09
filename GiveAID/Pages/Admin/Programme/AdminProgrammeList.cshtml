@@ -1,0 +1,84 @@
+@model AdminProgrammeList
+
+<div class="bg-white rounded-xl border border-[#E3DDD3] overflow-hidden">
+    <div class="p-6 border-b border-[#E3DDD3] flex justify-between items-center">
+        <h3 class="text-[#1C1A17]">Welfare Programmes</h3>
+        <a asp-page="/Admin/Programme/Editor" class="btn btn-primary">
+            <i class="ph ph-plus"></i> Add Programme
+        </a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="w-full table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>NGO</th>
+                <th>Cause</th>
+                <th>Raised / Target</th>
+                <th>Period</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var p in Model.Programmes)
+            {
+                var now = DateTimeOffset.UtcNow;
+                string statusLabel = p.EndDate.HasValue && p.EndDate < now ? "Ended"
+                    : p.StartDate > now ? "Upcoming"
+                    : "Active";
+                
+                string statusCss = statusLabel switch
+                {
+                    "Active" => "bg-emerald-100 text-emerald-700",
+                    "Upcoming" => "bg-blue-100 text-blue-700",
+                    _ => "bg-gray-100 text-gray-600"
+                };
+
+                <tr>
+                    <th>@p.Name</th>
+                    <td>@p.NgoName</td>
+                    <td>
+                        <span class="bg-[#1A5C6B]/10 text-[#1A5C6B] text-xs font-semibold px-2 py-0.5 rounded-full">@p.Cause</span>
+                    </td>
+                    <td>
+                        <span class="text-[#1A5C6B] font-semibold">@p.RaisedAmount.ToUsCurrencyString()</span>
+                        @if (p.TargetAmount.HasValue)
+                        {
+                            <span class="text-[#6B6459]"> / @p.TargetAmount.Value.ToUsCurrencyString()</span>
+                        }
+                        else
+                        {
+                            <span class="text-[#6B6459]"> / —</span>
+                        }
+                    </td>
+                    <td>
+                        @p.StartDate.Date.ToShortDateString()<br/>
+                        @(p.EndDate.HasValue ? "→ " + p.EndDate.Value.Date.ToShortDateString() : "→ ongoing")
+                    </td>
+                    <td>
+                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full @statusCss">@statusLabel</span>
+                    </td>
+                    <td>
+                        <div class="flex gap-2">
+                            <a href="/Admin/Programme/Editor/@p.Id" class="edit-button" title="Edit">
+                                <i class="ph ph-pencil-simple"></i>
+                            </a>
+                            <button on:click="@(() => Model.Delete(p.Id))" class="delete-button"
+                                    title="Delete">
+                                <i class="ph ph-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (Model.Programmes.Length == 0)
+        {
+            <div class="p-8 text-center text-[#6B6459] text-sm">
+                No programmes found. Click "Add Programme" to create one.
+            </div>
+        }
+    </div>
+</div>

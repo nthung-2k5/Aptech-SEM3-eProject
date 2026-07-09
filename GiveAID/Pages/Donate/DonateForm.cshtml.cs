@@ -1,0 +1,130 @@
+using FluentValidation;
+using GiveAID.Dtos;
+using GiveAID.Services.Abstractions;
+using Hydro;
+
+namespace GiveAID.Pages.Donate;
+
+public class DonateForm(
+    INgoService ngoService,
+    IProgrammeService programmeService,
+    IDonationCauseService donationCauseService,
+    IPaymentService paymentService,
+    IDonationService donationService,
+    IMemberService memberService,
+    IValidator<DonateForm> validator
+) : HydroComponent
+{
+    public Guid? NgoId { get; set; }
+    public Guid? CauseId { get; set; }
+    public Guid? ProgrammeId { get; set; }
+    public Guid UserId { get; set; }
+    
+    public string UserFullName { get; set; } = string.Empty;
+    public string UserEmail { get; set; } = string.Empty;
+    public string UserPhone { get; set; } = string.Empty;
+
+    public decimal Amount { get; set; } = 10;
+    public string CardNumber { get; set; } = string.Empty;
+    public string CardHolderName { get; set; } = string.Empty;
+    public string ExpiryDate { get; set; } = string.Empty;
+    public string CVV { get; set; } = string.Empty;
+
+    public string TargetDescription { get; set; } = "General Donation";
+
+    public override async Task MountAsync()
+    {
+        await LoadTargetDescriptionAsync();
+        
+        if (UserId != Guid.Empty)
+        {
+            var user = await memberService.GetMemberByIdAsync(UserId);
+            if (user != null)
+            {
+                UserFullName = user.FullName;
+                UserEmail = user.Email;
+                UserPhone = user.PhoneNumber;
+            }
+        }
+    }
+
+    public async Task Submit()
+    {
+        if (!this.Validate(validator)) { return; }
+
+        // Process payment
+        var paymentRequest = new PaymentRequestDto(Amount, CardNumber, CardHolderName, ExpiryDate, CVV, "CreditCard");
+        var transaction = await paymentService.ProcessPaymentAsync(paymentRequest);
+
+        DonationTarget target;
+
+        if (ProgrammeId.HasValue && ProgrammeId.Value != Guid.Empty)
+        {
+            target = new DonateForProgrammeTarget(ProgrammeId.Value);
+        }
+        else if (NgoId.HasValue && NgoId.Value != Guid.Empty)
+        {
+            target = new DonateForNgoTarget(NgoId.Value, CauseId ?? Guid.Empty);
+        }
+        else
+        {
+            ModelState.AddModelError("", "No donation target selected.");
+            return;
+        }
+
+        var donationSave = new DonationSaveDto(UserId, target, Amount, transaction.TransactionId);
+        await donationService.CreateDonationAsync(donationSave);
+
+        Location($"/Donate/Success?transactionId={transaction.TransactionId}");
+    }
+
+    private async Task LoadTargetDescriptionAsync()
+    {
+        if (ProgrammeId.HasValue && ProgrammeId.Value != Guid.Empty)
+        {
+            var prog = await programmeService.GetProgrammeByIdAsync(ProgrammeId.Value);
+            TargetDescription = prog != null ? $"Programme: {prog.Name}" : "Unknown Programme";
+        }
+        else if (NgoId.HasValue && NgoId.Value != Guid.Empty)
+        {
+            var ngo = await ngoService.GetNgoByIdAsync(NgoId.Value);
+            string ngoName = ngo != null ? ngo.Name : "Unknown NGO";
+
+            if (CauseId.HasValue && CauseId.Value != Guid.Empty)
+            {
+                var cause = await donationCauseService.GetDonationCauseByIdAsync(CauseId.Value);
+                string causeName = cause != null ? cause.Name : "Unknown Cause";
+                TargetDescription = $"{ngoName} - {causeName}";
+            }
+            else
+            {
+                TargetDescription = ngoName;
+            }
+        }
+    }
+
+    public class Validator : AbstractValidator<DonateForm>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Amount)
+                .GreaterThanOrEqualTo(1).WithMessage("Amount must be at least 1");
+
+            RuleFor(x => x.CardNumber)
+                .NotEmpty().WithMessage("Card number is required")
+                .Must(v => !string.IsNullOrWhiteSpace(v) && v.Replace(" ", "").Length == 16)
+                .WithMessage("Enter a valid 16-digit card number");
+
+            RuleFor(x => x.CardHolderName)
+                .NotEmpty().WithMessage("Cardholder name is required");
+
+            RuleFor(x => x.ExpiryDate)
+                .NotEmpty().WithMessage("Expiry date is required")
+                .Matches(@"^\d{2}/\d{2}$").WithMessage("Use MM/YY format");
+
+            RuleFor(x => x.CVV)
+                .NotEmpty().WithMessage("CVV is required")
+                .Matches(@"^\d{3,4}$").WithMessage("CVV must be 3–4 digits");
+        }
+    }
+}

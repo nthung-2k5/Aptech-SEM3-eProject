@@ -1,0 +1,95 @@
+@model UserInfoModal
+
+@{
+    var m = Model.Member;
+}
+
+<dialog class="modal @(Model.IsOpen ? "modal-open" : "")">
+    @* Modal card *@
+    <div class="modal-box p-0 overflow-hidden max-w-md shadow-2xl">
+        
+        @* Header *@
+        <div class="bg-primary text-primary-content px-6 py-5 flex items-center justify-between">
+            <div>
+                <div class="text-primary-content/80 text-xs font-bold uppercase tracking-widest mb-0.5">
+                    <i class="ph ph-user-circle mr-1"></i>Member Profile
+                </div>
+                <h2 id="uim-title" class="font-['Playfair_Display',serif] text-xl font-bold">@m?.FullName</h2>
+            </div>
+        </div>
+
+        @* Avatar + Member ID strip *@
+        <div class="bg-base-200 px-6 py-3 flex items-center gap-3 border-b border-base-300">
+            <div class="avatar placeholder">
+                <div class="bg-primary/20 text-primary rounded-full w-10 grid place-items-center">
+                    <i class="ph ph-user text-lg"></i>
+                </div>
+            </div>
+            <div>
+                <div class="text-xs text-base-content/70">Member ID</div>
+                <div class="text-xs font-mono select-all">@m?.Id</div>
+            </div>
+        </div>
+
+        @* Info rows *@
+        <div class="divide-y divide-base-200 px-6">
+            
+            <div class="py-3.5 flex items-center gap-3">
+                <i class="ph ph-envelope text-primary mt-0.5 shrink-0"></i>
+                <div>
+                    <div class="text-xs text-base-content/70 mb-0.5">Email</div>
+                    <div class="text-sm font-medium">@m?.Email</div>
+                </div>
+            </div>
+
+            <div class="py-3.5 flex items-center gap-3">
+                <i class="ph ph-phone text-primary mt-0.5 shrink-0"></i>
+                <div>
+                    <div class="text-xs text-base-content/70 mb-0.5">Phone Number</div>
+                    <div class="text-sm font-medium">
+                        @(string.IsNullOrEmpty(m?.PhoneNumber) ? "—" : m.PhoneNumber)
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-3.5 flex items-center gap-3">
+                <i class="ph ph-cake text-primary mt-0.5 shrink-0"></i>
+                <div>
+                    <div class="text-xs text-base-content/70 mb-0.5">Date of Birth</div>
+                    <div class="text-sm font-medium">@m?.DateOfBirth.ToString("MMMM dd, yyyy")</div>
+                </div>
+            </div>
+
+            <div class="py-3.5 flex items-center gap-3">
+                <i class="ph ph-map-pin text-primary mt-0.5 shrink-0"></i>
+                <div>
+                    <div class="text-xs text-base-content/70 mb-0.5">Address</div>
+                    <div class="text-sm font-medium">
+                        @(string.IsNullOrEmpty(m?.Address) ? "—" : m.Address)
+                    </div>
+                </div>
+            </div>
+
+            <div class="py-3.5 flex items-center gap-3">
+                <i class="ph ph-briefcase text-primary mt-0.5 shrink-0"></i>
+                <div>
+                    <div class="text-xs text-base-content/70 mb-0.5">Occupation</div>
+                    <div class="text-sm font-medium">
+                        @(string.IsNullOrEmpty(m?.Occupation) ? "—" : m.Occupation)
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        @* Footer actions *@
+        <div class="modal-action bg-base-200 m-0 px-6 py-4 border-t border-base-300">
+            <button on:click="@Model.Close" class="btn btn-outline btn-sm btn-primary">
+                Close
+            </button>
+        </div>
+    </div>
+
+    @* Dark overlay — click to close *@
+    <div class="modal-backdrop bg-neutral/40 backdrop-blur-sm" on:click="@Model.Close"></div>
+</dialog>

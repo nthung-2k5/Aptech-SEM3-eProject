@@ -1,3 +1,4 @@
+using FluentValidation;
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
 using Hydro;
@@ -7,7 +8,8 @@ namespace GiveAID.Pages.Gallery;
 public class GalleryBoard(
     IGalleryImageService galleryService,
     IProgrammeService programmeService,
-    IWebHostEnvironment env
+    IWebHostEnvironment env,
+    IValidator<GalleryBoard> validator
 ) : HydroComponent
 {
     public GalleryImageDto[] Images { get; set; } = [];
@@ -66,6 +68,8 @@ public class GalleryBoard(
 
     public async Task Save()
     {
+        if (!this.Validate(validator)) { return; }
+
         var imageUri = new Uri("http://localhost/images/gallery/default.jpg");
 
         if (EditingId.HasValue)
@@ -103,5 +107,19 @@ public class GalleryBoard(
     {
         await galleryService.DeleteImageAsync(id);
         await LoadData();
+    }
+
+    public class Validator : AbstractValidator<GalleryBoard>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Form.Caption)
+                .NotEmpty().WithMessage("Caption is required")
+                .MaximumLength(255).WithMessage("Caption cannot exceed 255 characters");
+
+            RuleFor(x => x.Form.ImageFile)
+                .NotNull().WithMessage("Please select an image file")
+                .When(x => !x.EditingId.HasValue);
+        }
     }
 }

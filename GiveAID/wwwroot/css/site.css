@@ -35,10 +35,10 @@
   --color-error: oklch(71% 0.194 13.428);
   --color-error-content: oklch(27% 0.105 12.094);
   --radius-selector: 0.5rem;
-  --radius-field: 0.25rem;
+  --radius-field: 0.5rem;
   --radius-box: 0.5rem;
   --size-selector: 0.25rem;
-  --size-field: 0.25rem;
+  --size-field: 0.21875rem;
   --border: 1px;
   --depth: 1;
   --noise: 0;
@@ -334,4 +334,36 @@ span.validation-message {
 label.required::after {
     content: "*";
     @apply text-error ml-1;
+}
+
+#admin table.table {
+    thead {
+        @apply bg-[#F6F1E9];
+
+        > tr > th {
+            @apply text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3;
+        }
+    }
+
+    tbody {
+        tr {
+            @apply border-t border-[#E3DDD3] hover:bg-[#F6F1E9];
+            
+            th {
+                @apply px-5 py-3.5 text-sm font-semibold text-[#1C1A17];
+            }
+
+            td {
+                @apply px-5 py-3.5 text-sm text-[#6B6459];
+
+                .edit-button {
+                    @apply text-blue-500 hover:text-blue-700 size-4;
+                }
+
+                .delete-button {
+                    @apply text-red-500 hover:text-red-700 size-4;
+                }
+            }
+        }
+    }
 }

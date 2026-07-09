@@ -2,44 +2,28 @@
 
 <div class="bg-white rounded-xl border border-[#E3DDD3] overflow-hidden">
     <div class="p-6 border-b border-[#E3DDD3] flex justify-between items-center">
-        <h3 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1C1A17]">Corporate Partners</h3>
-        <a href="/Admin/Partner/Editor"
-           class="flex items-center gap-2 px-4 py-2 bg-[#1A5C6B] text-white text-sm font-semibold rounded-lg hover:bg-[#154D5A] no-underline">
+        <h3 class="text-[#1C1A17]">Corporate Partners</h3>
+        <a asp-page="/Admin/Partner/Editor" class="btn btn-primary">
             <i class="ph ph-plus"></i> Add Partner
         </a>
     </div>
     <div class="overflow-x-auto">
-        <table class="w-full">
-            <thead class="bg-[#F6F1E9]">
+        <table class="w-full table">
+            <thead>
             <tr>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Logo</th>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Name</th>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Description
-                </th>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Website</th>
-                <th class="text-left text-xs font-bold text-[#6B6459] uppercase tracking-wide px-5 py-3">Actions</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Website</th>
+                <th>Actions</th>
             </tr>
             </thead>
             <tbody>
             @foreach (var p in Model.Partners)
             {
-                <tr class="border-t border-[#E3DDD3] hover:bg-[#F6F1E9]">
-                    <td class="px-5 py-3.5">
-                        @if (!string.IsNullOrEmpty(p.LogoUrl))
-                        {
-                            <img src="@p.LogoUrl" alt="@p.Name logo"
-                                 class="w-10 h-10 rounded object-contain bg-[#F6F1E9]"/>
-                        }
-                        else
-                        {
-                            <div class="w-10 h-10 rounded bg-[#F6F1E9] flex items-center justify-center text-[#6B6459]">
-                                <i class="ph ph-buildings text-lg"></i>
-                            </div>
-                        }
-                    </td>
-                    <td class="px-5 py-3.5 text-sm font-semibold text-[#1C1A17]">@p.Name</td>
-                    <td class="px-5 py-3.5 text-sm text-[#6B6459] max-w-xs truncate">@p.Description</td>
-                    <td class="px-5 py-3.5 text-sm">
+                <tr>
+                    <th>@p.Name</th>
+                    <td class="max-w-xs truncate">@p.Description</td>
+                    <td>
                         @if (!string.IsNullOrEmpty(p.WebsiteLink))
                         {
                             <a href="@p.WebsiteLink" target="_blank" class="text-[#1A5C6B] hover:underline text-sm">
@@ -48,18 +32,23 @@
                         }
                         else { <span class="text-[#6B6459]">—</span> }
                     </td>
-                    <td class="px-5 py-3.5 text-sm flex gap-2">
-                        <a href="/Admin/Partner/Editor/@p.Id" class="text-blue-500 hover:text-blue-700" title="Edit"><i
-                                class="ph ph-pencil-simple"></i></a>
-                        <button on:click="@(() => Model.Delete(p.Id))" class="text-red-500 hover:text-red-700"
-                                title="Delete"><i class="ph ph-trash"></i></button>
+                    <td>
+                        <div class="flex gap-2">
+                            <a asp-page="/Admin/Partner/Editor" asp-route-id="@p.Id" class="edit-button" title="Edit">
+                                <i
+                                    class="ph ph-pencil-simple"></i></a>
+                            <button on:click="@(() => Model.Delete(p.Id))" class="delete-button"
+                                    title="Delete"><i class="ph ph-trash"></i></button>
+                        </div>
                     </td>
                 </tr>
             }
             </tbody>
         </table>
-        @if (Model.Partners.Length == 0) { <div class="p-8 text-center text-[#6B6459] text-sm">No partners found. Click
-            "Add Partner" to create one.
-        </div> }
+        @if (Model.Partners.Length == 0) {
+            <div class="p-8 text-center text-[#6B6459] text-sm">
+                No partners found. Click "Add Partner" to create one.
+            </div>
+        }
     </div>
 </div>

@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using FluentValidation;
 using GiveAID.Models;
 using GiveAID.Services;
 using GiveAID.Services.Abstractions;
@@ -6,22 +6,21 @@ using Hydro;
 
 namespace GiveAID.Pages.Login;
 
-public class LoginForm(IAuthService authService) : HydroComponent
+public class LoginForm(
+    IAuthService authService,
+    IValidator<LoginForm> validator) : HydroComponent
 {
-    [Required(ErrorMessage = "Email is required")]
-    [EmailAddress(ErrorMessage = "Invalid email address")]
     public string Email { get; set; }
-
-    [Required(ErrorMessage = "Password is required")]
     public string Password { get; set; }
-
     public bool RememberMe { get; set; }
 
-    public bool HasError { get; set; }
+    public string? ErrorMessage { get; set; }
 
     public async Task Submit()
     {
-        if (!Validate()) { return; }
+        ErrorMessage = null;
+        
+        if (!this.Validate(validator)) { return; }
 
         try
         {
@@ -38,6 +37,23 @@ public class LoginForm(IAuthService authService) : HydroComponent
 
             Redirect(result.Role == UserRole.Admin ? "/Admin" : "/");
         }
-        catch (LoginException ex) { HasError = true; }
+        catch (LoginException ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+    }
+
+    public class Validator : AbstractValidator<LoginForm>
+    {
+        public Validator()
+        {
+            RuleFor(x => x.Email)
+                .NotEmpty().WithMessage("Email is required")
+                .EmailAddress().WithMessage("Invalid email address")
+                .MaximumLength(255).WithMessage("Email cannot exceed 255 characters");
+
+            RuleFor(x => x.Password)
+                .NotEmpty().WithMessage("Password is required");
+        }
     }
 }
