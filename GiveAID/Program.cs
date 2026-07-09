@@ -1,11 +1,14 @@
+using System.Globalization;
 using System.Text;
 using EntityFramework.Exceptions.SqlServer;
+using FluentValidation;
 using GiveAID.Data;
 using GiveAID.Models;
 using GiveAID.Services;
 using GiveAID.Services.Abstractions;
 using Hydro.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
@@ -19,6 +22,8 @@ builder.Services.AddRazorPages(options =>
 });
 
 builder.Services.AddHydro();
+
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -97,9 +102,21 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+var enforcedCulture = new CultureInfo("en-US");
+
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(enforcedCulture),
+    SupportedCultures = [enforcedCulture],
+    SupportedUICultures = [enforcedCulture]
+};
+
+localizationOptions.RequestCultureProviders.Clear();
+
 app.UseHttpsRedirection();
 
 app.UseRouting();
+app.UseRequestLocalization(localizationOptions);
 
 app.UseAuthentication();
 app.UseAuthorization();
