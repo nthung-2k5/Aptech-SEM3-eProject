@@ -2,11 +2,38 @@
 @model AdminDonationList
 
 <div class="bg-white rounded-xl border border-[#E3DDD3] overflow-hidden">
-    <div class="p-6 border-b border-[#E3DDD3] flex justify-between items-center">
-        <h3 class="text-[#1C1A17]">Donation Records</h3>
+    <div class="p-6 border-b border-[#E3DDD3]">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <h3 class="text-[#1C1A17]">Donation Records</h3>
+            <span class="badge badge-ghost text-sm">@Model.TotalCount total</span>
+        </div>
+
+        <div class="flex flex-wrap gap-3 items-end">
+            <div>
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">From</label>
+                <input type="date" asp-for="DateFrom" bind
+                       on:change="@(() => Model.Search())"
+                       class="input input-bordered input-sm" />
+            </div>
+            <div>
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">To</label>
+                <input type="date" asp-for="DateTo" bind
+                       on:change="@(() => Model.Search())"
+                       class="input input-bordered input-sm" />
+            </div>
+            <div>
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Status</label>
+                <select asp-for="StatusFilter" bind on:change="@(() => Model.Search())" class="select select-bordered select-sm">
+                    <option value="">All Statuses</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Void">Void</option>
+                </select>
+            </div>
+        </div>
     </div>
+
     <div class="overflow-x-auto">
-        <table class="w-full table">
+        <table class="table w-full">
             <thead>
             <tr>
                 <th>Donor</th>
@@ -33,11 +60,10 @@
                             if (d.Target.TryPickT0(out var ngo, out var prog))
                             {
                                 <span class="font-medium text-[#1C1A17]">@ngo.Ngo.Name</span>
-                        
+
                                 if (ngo.Cause.HasValue)
                                 {
-                                    <span
-                                        class="ml-1 bg-[#1A5C6B]/10 text-[#1A5C6B] text-xs font-semibold px-2 py-0.5 rounded-full">@ngo.Cause.Value.Name</span>
+                                    <span class="ml-1 badge badge-ghost text-xs">@ngo.Cause.Value.Name</span>
                                 }
                             }
                             else
@@ -49,25 +75,23 @@
                         }
                     </td>
                     <td class="font-medium">@d.Amount.ToUsCurrencyString()</td>
-                    <td class="px-5 py-3.5 text-sm">
+                    <td>
                         @if (d.Status == DonationStatus.Completed)
                         {
-                            <span
-                                class="bg-emerald-100 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-full">Completed</span>
+                            <span class="badge badge-success badge-soft">Completed</span>
                         }
                         else
                         {
-                            <span
-                                class="bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-1 rounded-full">Void</span>
+                            <span class="badge badge-error badge-soft">Void</span>
                         }
                     </td>
-                    <td class="px-5 py-3.5 text-sm text-[#6B6459]">@d.DonationDate.ToString("g")</td>
-                    <td class="px-5 py-3.5">
+                    <td class="text-sm text-[#6B6459]">@d.DonationDate.ToString("g")</td>
+                    <td>
                         @if (d.Status == DonationStatus.Completed)
                         {
-                            <button on:click="@(() => Model.Void(d.Id))" class="btn btn-outline btn-error btn-sm"
+                            <button on:click="@(() => Model.Void(d.Id))" class="btn btn-outline btn-error btn-xs"
                                     title="Void this donation">
-                                <i class="ph ph-x-circle"></i>Void
+                                <i class="ph ph-x-circle"></i> Void
                             </button>
                         }
                         else { <span class="text-[#6B6459] text-xs">—</span> }
@@ -80,6 +104,39 @@
         {
             <div class="p-8 text-center text-[#6B6459] text-sm">
                 No donation records found.
+            </div>
+        }
+    </div>
+    
+    <div class="flex items-center justify-between px-6 py-4 border-t border-[#E3DDD3]">
+        <span class="text-sm text-[#6B6459]">
+            @if (Model.TotalPages > 1)
+            {
+                <text>Page @Model.PageNumber of @Model.TotalPages</text>
+            }
+            <text> &ndash; @Model.TotalCount record(s)</text>
+        </span>
+        @if (Model.TotalPages > 1)
+        {
+            <div class="join">
+                <button class="join-item btn btn-sm"
+                        on:click="@(() => Model.GoToPage(Model.PageNumber - 1))"
+                        disabled="@(!Model.HasPreviousPage)">
+                    <i class="ph ph-caret-left"></i>
+                </button>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    int p = i;
+                    <button class="join-item btn btn-sm @(p == Model.PageNumber ? "btn-active" : "")"
+                            on:click="@(() => Model.GoToPage(p))">
+                        @p
+                    </button>
+                }
+                <button class="join-item btn btn-sm"
+                        on:click="@(() => Model.GoToPage(Model.PageNumber + 1))"
+                        disabled="@(!Model.HasNextPage)">
+                    <i class="ph ph-caret-right"></i>
+                </button>
             </div>
         }
     </div>

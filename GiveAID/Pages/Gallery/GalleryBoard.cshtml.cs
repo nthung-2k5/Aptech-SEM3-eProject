@@ -100,7 +100,17 @@ public class GalleryBoard(
             string base64Data = PreviewImageSource!.Split(',')[1];
             byte[] bytes = Convert.FromBase64String(base64Data);
             
-            imageUri = await imageService.UploadImageAsync("gallery", $"{Guid.NewGuid()}{Form.NewImageExtension}", bytes);
+            if (EditingId.HasValue && EditingId.Value != Guid.Empty)
+            {
+                await imageService.UpdateImageAsync(new Uri(imageUri), bytes);
+            }
+            else
+            {
+                imageUri = await imageService.UploadImageAsync(
+                    "gallery",
+                    $"{Guid.NewGuid()}{Form.NewImageExtension}",
+                    bytes);
+            }
         }
 
         var saveDto = new GalleryImageSaveDto(imageUri, Form.Caption, Form.AssociatedProgrammeId);

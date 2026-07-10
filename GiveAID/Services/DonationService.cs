@@ -9,6 +9,37 @@ namespace GiveAID.Services;
 
 public class DonationService(AppDbContext dbContext) : IDonationService
 {
+    public async Task<PagedResult<DonationDto>> GetDonationsPagedAsync(DonationQueryParameters query, CancellationToken ct = default)
+    {
+        var q = dbContext.Donations.Include(d => d.User).Include(d => d.Ngo).Include(d => d.Cause)
+                .Include(d => d.Programme).AsQueryable();
+
+        if (query.DateFrom.HasValue)
+        {
+            var from = query.DateFrom.Value.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc);
+            q = q.Where(d => d.CreatedAt >= from);
+        }
+
+        if (query.DateTo.HasValue)
+        {
+            // inclusive: end of the selected day
+            var to = query.DateTo.Value.ToDateTime(TimeOnly.MaxValue, DateTimeKind.Utc);
+            q = q.Where(d => d.CreatedAt <= to);
+        }
+
+        if (query.Status.HasValue)
+        {
+            q = q.Where(d => d.Status == query.Status.Value);
+        }
+
+        var totalCount = await q.CountAsync(ct);
+        var items = await q.OrderByDescending(d => d.CreatedAt)
+                .Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
+                .ProjectToDto().ToArrayAsync(ct);
+
+        return new PagedResult<DonationDto>(items, totalCount, query.PageNumber, query.PageSize);
+    }
+
     public async Task<DonationDto[]> GetAllDonationsAsync(CancellationToken ct = default)
     {
         var donations = dbContext.Donations.Include(d => d.User).Include(d => d.Ngo).Include(d => d.Cause)

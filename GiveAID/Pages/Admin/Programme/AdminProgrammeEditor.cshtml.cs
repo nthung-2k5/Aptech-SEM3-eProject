@@ -86,8 +86,18 @@ public class AdminProgrammeEditor(
         {
             string base64Data = PreviewImageSource!.Split(',')[1];
             byte[] bytes = Convert.FromBase64String(base64Data);
-            
-            Form.ImageUrl = await imageService.UploadImageAsync("programmes", $"{Guid.NewGuid()}{Form.NewImageExtension}", bytes);
+
+            if (Id.HasValue && Id.Value != Guid.Empty)
+            {
+                await imageService.UpdateImageAsync(new Uri(Form.ImageUrl), bytes);
+            }
+            else
+            {
+                Form.ImageUrl = await imageService.UploadImageAsync(
+                    "programmes",
+                    $"{Guid.NewGuid()}{Form.NewImageExtension}",
+                    bytes);
+            }
         }
 
         var saveDto = new ProgrammeSaveDto(

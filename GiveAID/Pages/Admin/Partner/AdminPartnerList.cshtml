@@ -1,14 +1,32 @@
 @model AdminPartnerList
 
 <div class="bg-white rounded-xl border border-[#E3DDD3] overflow-hidden">
-    <div class="p-6 border-b border-[#E3DDD3] flex justify-between items-center">
-        <h3 class="text-[#1C1A17]">Corporate Partners</h3>
-        <a asp-page="/Admin/Partner/Editor" class="btn btn-primary">
-            <i class="ph ph-plus"></i> Add Partner
-        </a>
+    <div class="p-6 border-b border-[#E3DDD3]">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div class="flex items-center gap-3">
+                <h3 class="text-[#1C1A17]">Corporate Partners</h3>
+                <span class="badge badge-ghost text-sm">@Model.TotalCount total</span>
+            </div>
+            <a asp-page="/Admin/Partner/Editor" class="btn btn-primary btn-sm">
+                <i class="ph ph-plus"></i> Add Partner
+            </a>
+        </div>
+
+        <div class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Search by Name</label>
+                <label class="input input-bordered input-sm flex items-center gap-2 w-full">
+                    <i class="ph ph-magnifying-glass text-[#6B6459]"></i>
+                    <input type="text" asp-for="SearchTerm" bind:keydown.debounce.300ms
+                           on:input="@(() => Model.Search())"
+                           placeholder="Partner name…" />
+                </label>
+            </div>
+        </div>
     </div>
+
     <div class="overflow-x-auto">
-        <table class="w-full table">
+        <table class="table w-full">
             <thead>
             <tr>
                 <th>Name</th>
@@ -24,18 +42,18 @@
                     <td>
                         @if (!string.IsNullOrEmpty(p.WebsiteLink))
                         {
-                            <a href="@p.WebsiteLink" target="_blank" class="text-[#1A5C6B] hover:underline text-sm">
+                            <a href="@p.WebsiteLink" target="_blank" class="link link-hover text-[#1A5C6B] text-sm">
                                 <i class="ph ph-link mr-1"></i>Visit
                             </a>
                         }
                         else { <span class="text-[#6B6459]">—</span> }
                     </td>
                     <td>
-                        <div class="flex gap-2">
-                            <a asp-page="/Admin/Partner/Editor" asp-route-id="@p.Id" class="edit-button" title="Edit">
-                                <i
-                                    class="ph ph-pencil-simple"></i></a>
-                            <button on:click="@(() => Model.Delete(p.Id))" class="delete-button"
+                        <div class="flex gap-1">
+                            <a asp-page="/Admin/Partner/Editor" asp-route-id="@p.Id" class="btn btn-ghost btn-xs" title="Edit">
+                                <i class="ph ph-pencil-simple"></i>
+                            </a>
+                            <button on:click="@(() => Model.Delete(p.Id))" class="btn btn-ghost btn-xs text-error"
                                     title="Delete"><i class="ph ph-trash"></i></button>
                         </div>
                     </td>
@@ -43,9 +61,43 @@
             }
             </tbody>
         </table>
-        @if (Model.Partners.Length == 0) {
+        @if (Model.Partners.Length == 0)
+        {
             <div class="p-8 text-center text-[#6B6459] text-sm">
                 No partners found. Click "Add Partner" to create one.
+            </div>
+        }
+    </div>
+    
+    <div class="flex items-center justify-between px-6 py-4 border-t border-[#E3DDD3]">
+        <span class="text-sm text-[#6B6459]">
+            @if (Model.TotalPages > 1)
+            {
+                <text>Page @Model.PageNumber of @Model.TotalPages &ndash; </text>
+            }
+            @Model.TotalCount record(s)
+        </span>
+        @if (Model.TotalPages > 1)
+        {
+            <div class="join">
+                <button class="join-item btn btn-sm"
+                        on:click="@(() => Model.GoToPage(Model.PageNumber - 1))"
+                        disabled="@(!Model.HasPreviousPage)">
+                    <i class="ph ph-caret-left"></i>
+                </button>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    int p = i;
+                    <button class="join-item btn btn-sm @(p == Model.PageNumber ? "btn-active" : "")"
+                            on:click="@(() => Model.GoToPage(p))">
+                        p
+                    </button>
+                }
+                <button class="join-item btn btn-sm"
+                        on:click="@(() => Model.GoToPage(Model.PageNumber + 1))"
+                        disabled="@(!Model.HasNextPage)">
+                    <i class="ph ph-caret-right"></i>
+                </button>
             </div>
         }
     </div>

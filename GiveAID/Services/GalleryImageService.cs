@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Services;
 
-public class GalleryImageService(AppDbContext dbContext) : IGalleryImageService
+public class GalleryImageService(AppDbContext dbContext, IImageService imageService) : IGalleryImageService
 {
     public async Task<GalleryImageDto[]> GetAllImagesAsync(CancellationToken ct = default)
     {
@@ -94,6 +94,10 @@ public class GalleryImageService(AppDbContext dbContext) : IGalleryImageService
 
     public async Task<bool> DeleteImageAsync(Guid id, CancellationToken ct = default)
     {
+        string? imageUrl = await dbContext.GalleryImages.AsNoTracking().Where(i => i.ImageId == id).Select(i => i.ImageUrl).FirstOrDefaultAsync(ct);
+
+        if (!string.IsNullOrEmpty(imageUrl)) { await imageService.DeleteImageAsync(new Uri(imageUrl)); }
+
         // Hard delete — GalleryImage has no IsDeleted field
         return await dbContext.GalleryImages.Where(i => i.ImageId == id).ExecuteDeleteAsync(ct) > 0;
     }

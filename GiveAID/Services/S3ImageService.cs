@@ -114,4 +114,41 @@ public class S3ImageService : IImageService
 
         return $"http://127.0.0.1:9000/{bucketName}/{uniqueFileName}";
     }
+    
+    private static string ExtractObjectKey(Uri imageUrl)
+    {
+        string[] segments = imageUrl.Segments;
+
+        return segments.Length < 3 ? throw new ArgumentException("Invalid local S3 URL structure.") : imageUrl.LocalPath[(segments[0].Length + segments[1].Length)..];
+    }
+    
+    public async Task UpdateImageAsync(Uri imageUrl, byte[] fileBytes)
+    {
+        string objectKey = ExtractObjectKey(imageUrl);
+
+        using var newMemoryStream = new MemoryStream(fileBytes);
+
+        var uploadRequest = new TransferUtilityUploadRequest
+        {
+            InputStream = newMemoryStream,
+            Key = objectKey,
+            BucketName = bucketName
+        };
+
+        var fileTransferUtility = new TransferUtility(s3Client);
+        await fileTransferUtility.UploadAsync(uploadRequest);
+    }
+
+    public Task DeleteImageAsync(Uri imageUrl)
+    {
+        string objectKey = ExtractObjectKey(imageUrl);
+
+        var deleteRequest = new DeleteObjectRequest
+        {
+            BucketName = bucketName,
+            Key = objectKey
+        };
+        
+        return s3Client.DeleteObjectAsync(deleteRequest);
+    }
 }

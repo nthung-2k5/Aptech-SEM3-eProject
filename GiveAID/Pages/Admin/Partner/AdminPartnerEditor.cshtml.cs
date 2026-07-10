@@ -69,7 +69,17 @@ public class AdminPartnerEditor(
             string base64Data = PreviewImageSource!.Split(',')[1];
             byte[] bytes = Convert.FromBase64String(base64Data);
             
-            Form.LogoUrl = await imageService.UploadImageAsync("partners", $"{Guid.NewGuid()}{Form.NewImageExtension}", bytes);
+            if (Id.HasValue && Id.Value != Guid.Empty)
+            {
+                await imageService.UpdateImageAsync(new Uri(Form.LogoUrl), bytes);
+            }
+            else
+            {
+                Form.LogoUrl = await imageService.UploadImageAsync(
+                    "partners",
+                    $"{Guid.NewGuid()}{Form.NewImageExtension}",
+                    bytes);
+            }
         }
 
         var saveDto = new PartnerSaveDto(Form.Name, Form.LogoUrl, Form.WebsiteLink);

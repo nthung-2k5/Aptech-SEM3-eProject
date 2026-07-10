@@ -9,6 +9,23 @@ namespace GiveAID.Services;
 
 public class NgoService(AppDbContext dbContext) : INgoService
 {
+    public async Task<PagedResult<NgoSummaryDto>> GetNgosPagedAsync(NgoQueryParameters query, CancellationToken ct = default)
+    {
+        var q = dbContext.ActiveNgos.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+        {
+            q = q.Where(n => n.Name.Contains(query.SearchTerm) || n.Description.Contains(query.SearchTerm));
+        }
+
+        var totalCount = await q.CountAsync(ct);
+        var items = await q.OrderByDescending(n => n.CreatedAt)
+                .Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
+                .ProjectToSummaryDto().ToArrayAsync(ct);
+
+        return new PagedResult<NgoSummaryDto>(items, totalCount, query.PageNumber, query.PageSize);
+    }
+
     public async Task<NgoSummaryDto[]> GetAllNgosAsync(CancellationToken ct = default)
     {
         return await dbContext.ActiveNgos.AsNoTracking().OrderByDescending(n => n.CreatedAt).ProjectToSummaryDto()
