@@ -62,7 +62,7 @@
         </div>
 
         <!-- Cards Grid -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 flex-grow">
+        <div class="grid lg:grid-cols-2 xl:grid-cols-3 gap-6 flex-grow">
             @foreach (var p in Model.Programmes)
             {
                 var timeRemaining = p.EndDate - DateTimeOffset.Now;
@@ -79,7 +79,7 @@
                    class="block bg-white border border-[#E3DDD3] rounded-xl overflow-hidden hover:shadow-lg transition-all group no-underline text-inherit flex flex-col">
                     <div class="h-48 overflow-hidden relative">
                         <img src="@p.ImageUrl" alt="@p.Name"
-                             class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                             class="w-full h-full object-cover aspect-[4/3] group-hover:scale-105 transition-transform duration-500"/>
                         <div class="absolute top-3 left-3 badge badge-primary font-semibold">
                             @p.Cause
                         </div>
