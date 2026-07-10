@@ -104,9 +104,29 @@
                             </div>
                         </div>
 
-                        <a asp-page="/Donate/Index" asp-route-programmeId="@p.Id" class="btn btn-secondary btn-block btn-xl">
-                            Donate Now
-                        </a>
+                        @{
+                            bool isEnded = p.EndDate.HasValue && p.EndDate.Value <= DateTimeOffset.Now;
+                            bool isQuotaReached = p.TargetAmount.HasValue && p.RaisedAmount >= p.TargetAmount.Value;
+                        }
+
+                        @if (isEnded)
+                        {
+                            <button class="btn btn-secondary btn-block btn-xl" disabled>
+                                The programme has ended. Thank you for your support!
+                            </button>
+                        }
+                        else if (isQuotaReached)
+                        {
+                            <button class="btn btn-secondary btn-block btn-xl" disabled>
+                                The donation target has been reached. Thank you for your support!
+                            </button>
+                        }
+                        else
+                        {
+                            <a asp-page="/Donate/Index" asp-route-programmeId="@p.Id" class="btn btn-secondary btn-block btn-xl">
+                                Donate Now
+                            </a>
+                        }
 
                         <div class="text-center text-sm text-gray-500 mt-6 flex items-center justify-center gap-2">
                             <i class="ph ph-shield-check text-[#1A5C6B] text-lg"></i>
