@@ -19,7 +19,6 @@ public class AdminPartnerEditor(
         public string Name { get; set; } = "";
         /// <summary>Either typed manually or populated when a file is uploaded via BindAsync.</summary>
         public string LogoUrl { get; set; } = "";
-        public string Description { get; set; } = "";
         public string WebsiteLink { get; set; } = "";
         public string? NewImageExtension { get; set; }
     }
@@ -44,7 +43,6 @@ public class AdminPartnerEditor(
                 {
                     Name = p.Name,
                     LogoUrl = p.LogoUrl,
-                    Description = p.Description,
                     WebsiteLink = p.WebsiteLink
                 };
                 PreviewImageSource = p.LogoUrl;

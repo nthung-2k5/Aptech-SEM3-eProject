@@ -18,14 +18,14 @@ public class PartnerService(AppDbContext dbContext) : IPartnerService
     public async Task<PartnerDto[]> GetAllPartnerDtosAsync(CancellationToken ct = default)
     {
         return await dbContext.CorporatePartners.AsNoTracking().OrderBy(p => p.Name)
-                .Select(p => new PartnerDto(p.PartnerId, p.Name, p.LogoUrl, p.Description, p.WebsiteLink))
+                .Select(p => new PartnerDto(p.PartnerId, p.Name, p.LogoUrl, p.WebsiteLink))
                 .ToArrayAsync(ct);
     }
 
     public async Task<PartnerDto?> GetPartnerByIdAsync(Guid id, CancellationToken ct = default)
     {
         return await dbContext.CorporatePartners.AsNoTracking().Where(p => p.PartnerId == id)
-                .Select(p => new PartnerDto(p.PartnerId, p.Name, p.LogoUrl, p.Description, p.WebsiteLink))
+                .Select(p => new PartnerDto(p.PartnerId, p.Name, p.LogoUrl, p.WebsiteLink))
                 .FirstOrDefaultAsync(ct);
     }
 
@@ -49,7 +49,6 @@ public class PartnerService(AppDbContext dbContext) : IPartnerService
         {
             int result = await dbContext.CorporatePartners.Where(p => p.PartnerId == id).ExecuteUpdateAsync(
                 s => s.SetProperty(p => p.Name, dto.Name).SetProperty(p => p.LogoUrl, dto.LogoUrl)
-                        .SetProperty(p => p.Description, dto.Description)
                         .SetProperty(p => p.WebsiteLink, dto.WebsiteLink),
                 ct);
 

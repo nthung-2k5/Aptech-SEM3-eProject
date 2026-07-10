@@ -7,9 +7,7 @@ public record NgoSaveDto(string Name, string Description, string? Address, strin
 
 public record NgoSummaryDto(Guid Id, string Name, string Description);
 
-public record NgoPartnerDto(Guid PartnerId, string PartnerName);
-
-public record NgoDto(Guid Id, string Name, string Description, string? Address, string? PhoneNumber, string? Website, NgoPartnerDto[] Partners)
+public record NgoDto(Guid Id, string Name, string Description, string? Address, string? PhoneNumber, string? Website, PartnerDto[] Partners)
         : NgoSummaryDto(Id, Name, Description);
 
 public static class NgoMapper
@@ -17,7 +15,7 @@ public static class NgoMapper
     extension(Ngo ngo)
     {
         public NgoDto ToDto() =>
-            new(ngo.NgoId, ngo.Name, ngo.Description, ngo.Address, ngo.PhoneNumber, ngo.Website, ngo.NgoPartners.Select(p => new NgoPartnerDto(p.PartnerId, p.Partner.Name)).ToArray());
+            new(ngo.NgoId, ngo.Name, ngo.Description, ngo.Address, ngo.PhoneNumber, ngo.Website, ngo.NgoPartners.Select(p => p.Partner.ToDto()).ToArray());
 
         public NgoSaveDto ToSaveDto() =>
             new(ngo.Name, ngo.Description, ngo.Address, ngo.PhoneNumber, ngo.Website, ngo.NgoPartners.Select(p => p.PartnerId).ToArray());
@@ -31,7 +29,7 @@ public static class NgoMapper
         public IQueryable<NgoDto> ProjectToDto() =>
                 ngos.Include(n => n.NgoPartners)
                         .ThenInclude(p => p.Partner)
-                        .Select(n => new NgoDto(n.NgoId, n.Name, n.Description, n.Address, n.PhoneNumber, n.Website, n.NgoPartners.Select(p => new NgoPartnerDto(p.PartnerId, p.Partner.Name)).ToArray()));
+                        .Select(n => new NgoDto(n.NgoId, n.Name, n.Description, n.Address, n.PhoneNumber, n.Website, n.NgoPartners.Select(p => p.Partner.ToDto()).ToArray()));
     }
 
     public static Ngo ToEntity(this NgoSaveDto dto) => new()

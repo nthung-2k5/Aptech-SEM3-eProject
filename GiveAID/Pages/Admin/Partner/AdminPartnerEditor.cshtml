@@ -30,12 +30,6 @@
                 </div>
             }
         </div>
-        <div class="md:col-span-2">
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Description</label>
-            <textarea asp-for="Form.Description" bind rows="3" placeholder="Describe the partner organization..."
-                      class="textarea w-full"></textarea>
-            <span asp-validation-for="Form.Description"></span>
-        </div>
     </div>
     <div class="flex justify-end gap-2">
         <a asp-page="/Admin/Partner/Index" class="btn btn-soft">Cancel</a>
