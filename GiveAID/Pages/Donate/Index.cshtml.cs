@@ -14,9 +14,6 @@ public class IndexModel : PageModel
     public Guid? NgoId { get; set; }
 
     [BindProperty(SupportsGet = true)]
-    public Guid? CauseId { get; set; }
-
-    [BindProperty(SupportsGet = true)]
     public Guid? ProgrammeId { get; set; }
     
     [BindNever]

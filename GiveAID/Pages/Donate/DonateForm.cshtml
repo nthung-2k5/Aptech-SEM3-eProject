@@ -95,10 +95,26 @@
         <div class="card-body">
             <h2 class="card-title text-2xl font-bold border-b border-primary-content/20 pb-4 mb-4">Donation Summary</h2>
 
-            <div class="bg-primary-content/10 rounded-xl p-5 mb-6 backdrop-blur-sm">
+            <div class="bg-primary-content/10 rounded-xl p-5 mb-4 backdrop-blur-sm">
                 <div class="text-sm font-medium opacity-80 mb-1">Donating To</div>
                 <div class="font-bold text-xl leading-tight">@Model.TargetDescription</div>
             </div>
+
+            @if (Model is { NgoId: not null, Causes.Length: > 0 })
+            {
+                <div class="mb-5">
+                    <label class="block text-sm font-semibold text-primary-content/90 mb-2">
+                        <i class="ph ph-tag mr-1"></i> Select a Cause <span class="font-normal opacity-70">(optional)</span>
+                    </label>
+                    <select asp-for="CauseId" bind class="w-full select text-primary">
+                        <option value="">— General Donation —</option>
+                        @foreach (var cause in Model.Causes)
+                        {
+                            <option value="@cause.Id">@cause.Name</option>
+                        }
+                    </select>
+                </div>
+            }
 
             <div class="w-full mb-6">
                 <label class="label">
