@@ -1,0 +1,108 @@
+@page
+@model NotificationsModel
+@{
+    ViewData["Title"] = "Notifications";
+}
+
+<div class="max-w-3xl mx-auto py-10 px-4 sm:px-6">
+
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+            <div class="size-10 bg-[#1A5C6B] rounded-full flex items-center justify-center flex-shrink-0">
+                <i class="ph-fill ph-bell text-white text-lg"></i>
+            </div>
+            <div>
+                <h1 class="text-2xl font-bold text-[#1C1A17] leading-tight">Notifications</h1>
+                @if (Model.UnreadCount > 0)
+                {
+                    <p class="text-sm text-gray-500">
+                        <span class="font-semibold text-[#C97C2E]">@Model.UnreadCount</span> unread notification@(Model.UnreadCount == 1 ? "" : "s")
+                    </p>
+                }
+                else
+                {
+                    <p class="text-sm text-gray-500">All caught up!</p>
+                }
+            </div>
+        </div>
+
+        @if (Model.UnreadCount > 0)
+        {
+            <form method="post" asp-page-handler="MarkAllRead">
+                <button type="submit"
+                        class="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-[#1A5C6B] border border-[#1A5C6B] rounded-lg hover:bg-[#1A5C6B] hover:text-white transition-colors">
+                    <i class="ph ph-check-circle"></i>
+                    Mark all as read
+                </button>
+            </form>
+        }
+    </div>
+
+    <!-- Notification List -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        @if (Model.Notifications.Length == 0)
+        {
+            <!-- Empty State -->
+            <div class="flex flex-col items-center justify-center py-20 px-6 text-center">
+                <div class="size-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <i class="ph ph-bell-slash text-gray-400 text-3xl"></i>
+                </div>
+                <h2 class="text-lg font-semibold text-gray-700 mb-1">No notifications yet</h2>
+                <p class="text-gray-400 text-sm max-w-xs">
+                    You're all clear. When you receive notifications about donations, programmes, or updates, they'll appear here.
+                </p>
+            </div>
+        }
+        else
+        {
+            <ul class="divide-y divide-gray-100">
+                @foreach (var notif in Model.Notifications)
+                {
+                    <li class="@(notif.IsRead ? "" : "bg-blue-50/40")">
+                        <form method="post" asp-page-handler="MarkRead" asp-route-id="@notif.Id" class="m-0">
+                            <button type="submit"
+                                    class="w-full text-left flex items-start gap-4 px-5 py-4 hover:bg-gray-50 transition-colors group">
+                                <!-- Status dot -->
+                                <div class="mt-1.5 flex-shrink-0">
+                                    @if (!notif.IsRead)
+                                    {
+                                        <span class="inline-flex size-2.5 rounded-full bg-[#1A5C6B]"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex size-2.5 rounded-full bg-gray-200"></span>
+                                    }
+                                </div>
+
+                                <!-- Content -->
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm text-gray-800 @(notif.IsRead ? "font-normal" : "font-medium") leading-relaxed">
+                                        @notif.Content
+                                    </p>
+                                    <span class="text-xs text-gray-400 mt-1 block">
+                                        <i class="ph ph-clock mr-1"></i>@notif.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy · HH:mm")
+                                    </span>
+                                </div>
+
+                                <!-- Hint on hover -->
+                                @if (!notif.IsRead)
+                                {
+                                    <span class="text-xs text-[#1A5C6B] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 self-center font-medium">
+                                        Mark read
+                                    </span>
+                                }
+                            </button>
+                        </form>
+                    </li>
+                }
+            </ul>
+
+            <!-- Footer count -->
+            <div class="px-5 py-3 border-t border-gray-100 bg-gray-50 text-xs text-gray-400 text-right">
+                Showing @Model.Notifications.Length notification@(Model.Notifications.Length == 1 ? "" : "s")
+            </div>
+        }
+    </div>
+
+</div>
