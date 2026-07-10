@@ -102,24 +102,21 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Image File</label>
-                                <input type="file" asp-for="Form.ImageFile" bind accept="image/*"
-                                       onchange="document.getElementById('imgPreview').src = window.URL.createObjectURL(this.files[0])"
+                                <input type="file" asp-for="ImageFile" bind accept="image/*"
                                        class="file-input w-full"/>
-                                <span asp-validation-for="Form.ImageFile"></span>
+                                <span asp-validation-for="PreviewImageSource"></span>
                             </div>
                             <div
                                 class="mt-4 border border-[#E3DDD3] rounded-xl overflow-hidden aspect-[4/3] bg-gray-50 flex items-center justify-center">
-                                <img id="imgPreview" src="@(Model.PreviewImageUrl ?? "")" alt="Image Preview"
-                                     class="w-full h-full object-cover @(string.IsNullOrEmpty(Model.PreviewImageUrl) ? "hidden" : "")"
+                                <img id="imgPreview" src="@(Model.PreviewImageSource ?? "")" alt="Image Preview"
+                                     class="w-full h-full object-cover @(string.IsNullOrEmpty(Model.PreviewImageSource) ? "hidden" : "")"
                                      onload="this.classList.remove('hidden')"/>
                             </div>
                         </div>
                     </div>
                     <div class="modal-action">
-                        <button type="submit"
-                                class="btn btn-primary bg-[#1A5C6B] border-none text-white hover:bg-[#154D5A]">Save
-                        </button>
                         <button type="button" on:click="@(() => Model.CloseModal())" class="btn">Close</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
                     </div>
                 </form>
             </div>

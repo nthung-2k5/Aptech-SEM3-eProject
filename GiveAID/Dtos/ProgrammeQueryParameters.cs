@@ -8,6 +8,7 @@ public class ProgrammeQueryParameters
     // Filter
     public Guid? NgoId { get; set; }
     public Guid? CauseId { get; set; }
+    public string? StatusFilter { get; set; } // "Active", "Upcoming", "Ended"
 
     // Pagination
     private const int MaxPageSize = 50;
@@ -16,6 +17,6 @@ public class ProgrammeQueryParameters
     public int PageSize
     {
         get;
-        set => field = value > MaxPageSize ? MaxPageSize : value;
-    }
+        set => field = value > MaxPageSize ? MaxPageSize : value < 1 ? 10 : value;
+    } = 10;
 }

@@ -9,6 +9,41 @@ namespace GiveAID.Services;
 
 public class ProgrammeService(AppDbContext context, IUserInterestService userInterestService) : IProgrammeService
 {
+    public async Task<PagedResult<ProgrammeDto>> GetAllProgrammesPagedAsync(ProgrammeQueryParameters query,
+                                                                            CancellationToken ct = default)
+    {
+        IQueryable<WelfareProgramme> q = context.ActiveWelfareProgrammes.AsNoTracking().Include(p => p.Ngo)
+                .Include(p => p.Cause).Include(p => p.Donations);
+
+        if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+        {
+            q = q.Where(p => p.Name.Contains(query.SearchTerm) || p.Description.Contains(query.SearchTerm));
+        }
+
+        if (query.NgoId != null) { q = q.Where(p => p.Ngo.NgoId == query.NgoId); }
+
+        if (query.CauseId != null) { q = q.Where(p => p.Cause.CauseId == query.CauseId); }
+
+        if (!string.IsNullOrWhiteSpace(query.StatusFilter))
+        {
+            var now = DateTimeOffset.UtcNow;
+            q = query.StatusFilter switch
+            {
+                "Active" => q.Where(p => p.StartTime <= now && (!p.EndTime.HasValue || p.EndTime > now)),
+                "Upcoming" => q.Where(p => p.StartTime > now),
+                "Ended" => q.Where(p => p.EndTime.HasValue && p.EndTime < now),
+                _ => q
+            };
+        }
+
+        var totalCount = await q.CountAsync(ct);
+        var items = await q.OrderByDescending(p => p.StartTime)
+                .Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
+                .ProjectToDto().ToArrayAsync(ct);
+
+        return new PagedResult<ProgrammeDto>(items, totalCount, query.PageNumber, query.PageSize);
+    }
+
     public async Task<ProgrammeDto[]> GetAvailableProgrammesAsync(ProgrammeQueryParameters? query,
                                                                   CancellationToken ct = default)
     {

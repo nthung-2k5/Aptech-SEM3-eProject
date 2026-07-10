@@ -2,13 +2,14 @@ using FluentValidation;
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
 using Hydro;
+using Hydro.Utils;
 
 namespace GiveAID.Pages.Gallery;
 
 public class GalleryBoard(
     IGalleryImageService galleryService,
     IProgrammeService programmeService,
-    IWebHostEnvironment env,
+    IImageService imageService,
     IValidator<GalleryBoard> validator
 ) : HydroComponent
 {
@@ -18,14 +19,17 @@ public class GalleryBoard(
 
     public bool IsModalOpen { get; set; }
     public Guid? EditingId { get; set; }
-    public string? PreviewImageUrl { get; set; }
+    public string? PreviewImageSource { get; set; }
 
     public class FormModel
     {
         public string Caption { get; set; } = "";
         public Guid? AssociatedProgrammeId { get; set; }
-        public IFormFile? ImageFile { get; set; }
+        public string? NewImageExtension { get; set; }
     }
+        
+    [Transient]
+    public IFormFile? ImageFile { get; set; }
 
     public FormModel Form { get; set; } = new();
 
@@ -38,12 +42,23 @@ public class GalleryBoard(
     }
 
     public void SetFilter(string filter) { Filter = filter; }
+    
+    public override async Task BindAsync(PropertyPath property, object value)
+    {
+        if (property.Name == nameof(ImageFile))
+        {
+            var image = (IFormFile)value;
+            PreviewImageSource = await image.ToDataUrlAsync();
+            Form.NewImageExtension = Path.GetExtension(image.FileName);
+        }
+    }
 
     public void OpenCreateModal()
     {
         EditingId = null;
         Form = new FormModel();
-        PreviewImageUrl = null;
+        ImageFile = null;
+        PreviewImageSource = null;
         IsModalOpen = true;
     }
 
@@ -51,6 +66,7 @@ public class GalleryBoard(
     {
         EditingId = id;
         var image = await galleryService.GetImageByIdAsync(id);
+        ImageFile = null;
 
         if (image != null)
         {
@@ -59,7 +75,7 @@ public class GalleryBoard(
                 Caption = image.Caption,
                 AssociatedProgrammeId = image.AssociatedProgramme?.Id
             };
-            PreviewImageUrl = image.ImageUri.ToString();
+            PreviewImageSource = image.ImageUri.ToString();
             IsModalOpen = true;
         }
     }
@@ -70,28 +86,31 @@ public class GalleryBoard(
     {
         if (!this.Validate(validator)) { return; }
 
-        var imageUri = new Uri("http://localhost/images/gallery/default.jpg");
-
+        string imageUri = "";
+        
         if (EditingId.HasValue)
         {
             var existing = await galleryService.GetImageByIdAsync(EditingId.Value);
 
-            if (existing != null) { imageUri = existing.ImageUri; }
+            if (existing != null) { imageUri = existing.ImageUri.ToString(); }
         }
 
-        if (Form.ImageFile is { Length: > 0 })
+        if (Form.NewImageExtension != null)
         {
-            string uploadsFolder = Path.Combine(env.WebRootPath, "images", "gallery");
-            Directory.CreateDirectory(uploadsFolder);
-            string uniqueFileName = Guid.NewGuid() + "_" + Form.ImageFile.FileName;
-            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            await using (var stream = new FileStream(filePath, FileMode.Create))
+            string base64Data = PreviewImageSource!.Split(',')[1];
+            byte[] bytes = Convert.FromBase64String(base64Data);
+            
+            if (EditingId.HasValue && EditingId.Value != Guid.Empty)
             {
-                await Form.ImageFile.CopyToAsync(stream);
+                await imageService.UpdateImageAsync(new Uri(imageUri), bytes);
             }
-
-            imageUri = new Uri($"/images/gallery/{uniqueFileName}", UriKind.RelativeOrAbsolute);
+            else
+            {
+                imageUri = await imageService.UploadImageAsync(
+                    "gallery",
+                    $"{Guid.NewGuid()}{Form.NewImageExtension}",
+                    bytes);
+            }
         }
 
         var saveDto = new GalleryImageSaveDto(imageUri, Form.Caption, Form.AssociatedProgrammeId);
@@ -117,9 +136,8 @@ public class GalleryBoard(
                 .NotEmpty().WithMessage("Caption is required")
                 .MaximumLength(255).WithMessage("Caption cannot exceed 255 characters");
 
-            RuleFor(x => x.Form.ImageFile)
-                .NotNull().WithMessage("Please select an image file")
-                .When(x => !x.EditingId.HasValue);
+            RuleFor(x => x.PreviewImageSource)
+                .NotEmpty().WithMessage("Image file is required");
         }
     }
 }

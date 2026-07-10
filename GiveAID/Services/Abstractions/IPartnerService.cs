@@ -4,6 +4,7 @@ namespace GiveAID.Services.Abstractions;
 
 public interface IPartnerService
 {
+    Task<PagedResult<PartnerDto>> GetPartnersPagedAsync(PartnerQueryParameters query, CancellationToken ct = default);
     Task<PartnerSummaryDto[]> GetAllPartnersAsync(CancellationToken ct = default);
     Task<PartnerDto[]> GetAllPartnerDtosAsync(CancellationToken ct = default);
     Task<PartnerDto?> GetPartnerByIdAsync(Guid id, CancellationToken ct = default);

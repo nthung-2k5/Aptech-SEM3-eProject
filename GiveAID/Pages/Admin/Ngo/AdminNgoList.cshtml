@@ -1,12 +1,30 @@
 @model AdminNgoList
 
 <div class="space-y-5">
-    <div class="flex justify-between items-center bg-white p-6 rounded-xl border border-[#E3DDD3]">
-        <h3 class="text-[#1C1A17]">Associated NGOs</h3>
-        <a asp-page="/Admin/Ngo/Editor" class="btn btn-primary">
-            <i class="ph ph-plus"></i> Add NGO
-        </a>
+    <div class="bg-white p-6 rounded-xl border border-[#E3DDD3]">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div class="flex items-center gap-3">
+                <h3 class="text-[#1C1A17]">Associated NGOs</h3>
+                <span class="badge badge-ghost text-sm">@Model.TotalCount total</span>
+            </div>
+            <a asp-page="/Admin/Ngo/Editor" class="btn btn-primary btn-sm">
+                <i class="ph ph-plus"></i> Add NGO
+            </a>
+        </div>
+
+        <div class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Search by Name or Description</label>
+                <label class="input input-bordered input-sm flex items-center gap-2 w-full">
+                    <i class="ph ph-magnifying-glass text-[#6B6459]"></i>
+                    <input type="text" asp-for="SearchTerm" bind:keydown.debounce.300ms
+                           on:input="@(() => Model.Search())"
+                           placeholder="Name or description…" />
+                </label>
+            </div>
+        </div>
     </div>
+
     <div class="grid md:grid-cols-2 gap-4">
         @foreach (var n in Model.Ngos)
         {
@@ -16,20 +34,49 @@
                         <h4 class="font-['Playfair_Display',serif] font-bold text-[#1C1A17]">@n.Name</h4>
                         <p class="text-sm text-[#C97C2E] line-clamp-2">@n.Description</p>
                     </div>
-                    <div class="flex gap-2 shrink-0">
-                        <a href="/Admin/Ngo/Editor/@n.Id" class="p-2 text-[#6B6459] hover:text-blue-500" title="Edit"><i
-                                class="ph ph-pencil-simple w-4 h-4"></i></a>
-                        <button on:click="@(() => Model.Delete(n.Id))" class="p-2 text-[#6B6459] hover:text-red-500"
-                                title="Delete"><i class="ph ph-trash w-4 h-4"></i></button>
+                    <div class="flex gap-1 shrink-0">
+                        <a href="/Admin/Ngo/Editor/@n.Id" class="btn btn-ghost btn-xs" title="Edit">
+                            <i class="ph ph-pencil-simple"></i>
+                        </a>
+                        <button on:click="@(() => Model.Delete(n.Id))" class="btn btn-ghost btn-xs text-error"
+                                title="Delete"><i class="ph ph-trash"></i></button>
                     </div>
                 </div>
             </div>
         }
     </div>
+
     @if (Model.Ngos.Length == 0)
     {
         <div class="bg-white border border-[#E3DDD3] rounded-xl p-8 text-center text-[#6B6459] text-sm">
             No NGOs found. Click "Add NGO" to create one.
+        </div>
+    }
+    
+    @if (Model.TotalPages > 1)
+    {
+        <div class="bg-white border border-[#E3DDD3] rounded-xl flex items-center justify-between px-6 py-4">
+            <span class="text-sm text-[#6B6459]">Page @Model.PageNumber of @Model.TotalPages</span>
+            <div class="join">
+                <button class="join-item btn btn-sm"
+                        on:click="@(() => Model.GoToPage(Model.PageNumber - 1))"
+                        disabled="@(!Model.HasPreviousPage)">
+                    <i class="ph ph-caret-left"></i>
+                </button>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    int p = i;
+                    <button class="join-item btn btn-sm @(p == Model.PageNumber ? "btn-active" : "")"
+                            on:click="@(() => Model.GoToPage(p))">
+                        p
+                    </button>
+                }
+                <button class="join-item btn btn-sm"
+                        on:click="@(() => Model.GoToPage(Model.PageNumber + 1))"
+                        disabled="@(!Model.HasNextPage)">
+                    <i class="ph ph-caret-right"></i>
+                </button>
+            </div>
         </div>
     }
 </div>

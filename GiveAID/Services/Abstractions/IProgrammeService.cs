@@ -4,6 +4,7 @@ namespace GiveAID.Services.Abstractions;
 
 public interface IProgrammeService
 {
+    Task<PagedResult<ProgrammeDto>> GetAllProgrammesPagedAsync(ProgrammeQueryParameters query, CancellationToken ct = default);
     Task<ProgrammeDto[]> GetAvailableProgrammesAsync(ProgrammeQueryParameters? query, CancellationToken ct = default);
     Task<ProgrammeDto[]> GetAllProgrammesAsync(ProgrammeQueryParameters? query, CancellationToken ct = default);
     Task<ProgrammeDto?> GetProgrammeByIdAsync(Guid id, CancellationToken ct = default);

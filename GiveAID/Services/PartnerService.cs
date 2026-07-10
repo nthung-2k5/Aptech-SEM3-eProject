@@ -7,8 +7,26 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Services;
 
-public class PartnerService(AppDbContext dbContext) : IPartnerService
+public class PartnerService(AppDbContext dbContext, IImageService imageService) : IPartnerService
 {
+    public async Task<PagedResult<PartnerDto>> GetPartnersPagedAsync(PartnerQueryParameters query, CancellationToken ct = default)
+    {
+        var q = dbContext.CorporatePartners.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+        {
+            q = q.Where(p => p.Name.Contains(query.SearchTerm));
+        }
+
+        var totalCount = await q.CountAsync(ct);
+        var items = await q.OrderBy(p => p.Name)
+                .Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
+                .Select(p => new PartnerDto(p.PartnerId, p.Name, p.LogoUrl, p.WebsiteLink))
+                .ToArrayAsync(ct);
+
+        return new PagedResult<PartnerDto>(items, totalCount, query.PageNumber, query.PageSize);
+    }
+
     public async Task<PartnerSummaryDto[]> GetAllPartnersAsync(CancellationToken ct = default)
     {
         return await dbContext.CorporatePartners.AsNoTracking().OrderBy(p => p.Name)
@@ -18,14 +36,14 @@ public class PartnerService(AppDbContext dbContext) : IPartnerService
     public async Task<PartnerDto[]> GetAllPartnerDtosAsync(CancellationToken ct = default)
     {
         return await dbContext.CorporatePartners.AsNoTracking().OrderBy(p => p.Name)
-                .Select(p => new PartnerDto(p.PartnerId, p.Name, p.LogoUrl, p.Description, p.WebsiteLink))
+                .Select(p => new PartnerDto(p.PartnerId, p.Name, p.LogoUrl, p.WebsiteLink))
                 .ToArrayAsync(ct);
     }
 
     public async Task<PartnerDto?> GetPartnerByIdAsync(Guid id, CancellationToken ct = default)
     {
         return await dbContext.CorporatePartners.AsNoTracking().Where(p => p.PartnerId == id)
-                .Select(p => new PartnerDto(p.PartnerId, p.Name, p.LogoUrl, p.Description, p.WebsiteLink))
+                .Select(p => new PartnerDto(p.PartnerId, p.Name, p.LogoUrl, p.WebsiteLink))
                 .FirstOrDefaultAsync(ct);
     }
 
@@ -49,7 +67,6 @@ public class PartnerService(AppDbContext dbContext) : IPartnerService
         {
             int result = await dbContext.CorporatePartners.Where(p => p.PartnerId == id).ExecuteUpdateAsync(
                 s => s.SetProperty(p => p.Name, dto.Name).SetProperty(p => p.LogoUrl, dto.LogoUrl)
-                        .SetProperty(p => p.Description, dto.Description)
                         .SetProperty(p => p.WebsiteLink, dto.WebsiteLink),
                 ct);
 
@@ -60,6 +77,10 @@ public class PartnerService(AppDbContext dbContext) : IPartnerService
 
     public async Task DeletePartnerAsync(Guid id, CancellationToken ct = default)
     {
+        string? imageUrl = await dbContext.CorporatePartners.AsNoTracking().Where(i => i.PartnerId == id).Select(i => i.LogoUrl).FirstOrDefaultAsync(ct);
+
+        if (!string.IsNullOrEmpty(imageUrl)) { await imageService.DeleteImageAsync(new Uri(imageUrl)); }
+        
         await dbContext.CorporatePartners.Where(p => p.PartnerId == id).ExecuteDeleteAsync(ct);
     }
 }

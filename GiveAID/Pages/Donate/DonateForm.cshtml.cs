@@ -2,6 +2,7 @@ using FluentValidation;
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
 using Hydro;
+using Hydro.Utils;
 
 namespace GiveAID.Pages.Donate;
 
@@ -32,8 +33,12 @@ public class DonateForm(
 
     public string TargetDescription { get; set; } = "General Donation";
 
+    // Populated when donating to an NGO so the user can pick a cause inline
+    public DonationCauseDto[] Causes { get; set; } = [];
+
     public override async Task MountAsync()
     {
+        await LoadCausesAsync();
         await LoadTargetDescriptionAsync();
         
         if (UserId != Guid.Empty)
@@ -45,6 +50,14 @@ public class DonateForm(
                 UserEmail = user.Email;
                 UserPhone = user.PhoneNumber;
             }
+        }
+    }
+
+    public override async Task BindAsync(PropertyPath property, object value)
+    {
+        if (property.Name == nameof(CauseId))
+        {
+            await LoadTargetDescriptionAsync();
         }
     }
 
@@ -78,6 +91,14 @@ public class DonateForm(
         Location($"/Donate/Success?transactionId={transaction.TransactionId}");
     }
 
+    private async Task LoadCausesAsync()
+    {
+        if (NgoId.HasValue && NgoId.Value != Guid.Empty)
+        {
+            Causes = await donationCauseService.GetAllDonationCausesAsync();
+        }
+    }
+
     private async Task LoadTargetDescriptionAsync()
     {
         if (ProgrammeId.HasValue && ProgrammeId.Value != Guid.Empty)
@@ -94,11 +115,11 @@ public class DonateForm(
             {
                 var cause = await donationCauseService.GetDonationCauseByIdAsync(CauseId.Value);
                 string causeName = cause != null ? cause.Name : "Unknown Cause";
-                TargetDescription = $"{ngoName} - {causeName}";
+                TargetDescription = $"{ngoName} — {causeName}";
             }
             else
             {
-                TargetDescription = ngoName;
+                TargetDescription = $"{ngoName} — General";
             }
         }
     }

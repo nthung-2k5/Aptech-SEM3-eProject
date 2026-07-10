@@ -153,7 +153,6 @@ public static class DbSeeder
                 {
                     PartnerId   = Guid.CreateVersion7(),
                     Name        = "Tech Corp",
-                    Description = "A leading technology company supporting digital education.",
                     LogoUrl     = "https://placehold.co/150x150?text=TechCorp",
                     WebsiteLink = "https://techcorp.example.com"
                 },
@@ -161,7 +160,6 @@ public static class DbSeeder
                 {
                     PartnerId   = Guid.CreateVersion7(),
                     Name        = "Global Bank",
-                    Description = "Financial institution committed to community development.",
                     LogoUrl     = "https://placehold.co/150x150?text=GlobalBank",
                     WebsiteLink = "https://globalbank.example.com"
                 },
@@ -169,7 +167,6 @@ public static class DbSeeder
                 {
                     PartnerId   = Guid.CreateVersion7(),
                     Name        = "EcoVentures",
-                    Description = "Sustainable investment firm focused on green initiatives.",
                     LogoUrl     = "https://placehold.co/150x150?text=EcoVentures",
                     WebsiteLink = "https://ecoventures.example.com"
                 }

@@ -5,7 +5,7 @@ namespace GiveAID.Dtos;
 
 public record GalleryImageSaveDto(
     [property: Required(ErrorMessage = "Image URI is required.")]
-    Uri ImageUri,
+    string ImageUri,
 
     [property: MaxLength(255, ErrorMessage = "Caption cannot exceed 255 characters.")]
     string? Caption,

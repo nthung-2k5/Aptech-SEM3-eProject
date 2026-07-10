@@ -1,7 +1,7 @@
 @using GiveAID.Services.Abstractions
 @model AdminProgrammeEditor
 
-<form on:submit="@(() => Model.Save())" class="bg-white border border-[#E3DDD3] rounded-xl p-6 space-y-6">
+<form on:submit="@(() => Model.Save())" enctype="multipart/form-data" class="bg-white border border-[#E3DDD3] rounded-xl p-6 space-y-6">
     <h4 class="font-bold text-[#1C1A17]">
         @(Model.Id.HasValue ? "Edit Programme" : "Add Programme")
     </h4>
@@ -45,9 +45,9 @@
         </div>
 
         <div>
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Image URL</label>
-            <input type="url" asp-for="Form.ImageUrl" bind placeholder="https://example.com/image.jpg" class="input w-full"/>
-            <span asp-validation-for="Form.ImageUrl"></span>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Image <span class="text-red-500">*</span></label>
+            <input type="file" asp-for="ImageFile" bind accept="image/*" class="file-input w-full"/>
+            <span asp-validation-for="ImageFile"></span>
         </div>
 
         <div class="md:col-span-2">
@@ -80,11 +80,11 @@
     </div>
 
     @* Image preview *@
-    @if (!string.IsNullOrEmpty(Model.Form.ImageUrl))
+    @if (!string.IsNullOrEmpty(Model.PreviewImageSource))
     {
         <div>
             <div class="text-xs font-bold uppercase tracking-widest text-[#6B6459] mb-2">Image Preview</div>
-            <img src="@Model.Form.ImageUrl" alt="Programme image preview"
+            <img src="@Model.PreviewImageSource" alt="Programme image preview"
                  class="w-full max-h-48 object-cover rounded-xl border border-[#E3DDD3]"/>
         </div>
     }

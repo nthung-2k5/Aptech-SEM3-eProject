@@ -1,0 +1,65 @@
+@model ContactForm
+
+@if (Model.IsSuccess)
+{
+    <div class="bg-white rounded-2xl border border-[#E3DDD3] p-12 text-center shadow-sm">
+        <div class="size-20 bg-[#1A5C6B]/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="ph ph-check text-xl text-[#1A5C6B]"></i>
+        </div>
+        <h3 class="font-['Playfair_Display',serif] text-2xl font-bold text-[#1C1A17] mb-3">Message Sent
+            Successfully!</h3>
+        <p class="text-[#6B6459] mb-8">Thank you for reaching out. Our team will get back to you within 24-48 hours.</p>
+        <button on:click="@(() => Model.Reset())"
+                class="inline-block bg-[#1A5C6B] hover:bg-[#154D5A] border-none text-white font-['Source_Sans_3'] rounded-lg px-8 py-3.5 font-semibold transition-colors">
+            Send Another Message
+        </button>
+    </div>
+}
+else
+{
+    <form on:submit="@(() => Model.Submit())"
+          class="bg-white rounded-2xl border border-[#E3DDD3] p-8 shadow-sm space-y-6">
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5">Full Name</label>
+            <input type="text" asp-for="FullName" bind readonly
+                   class="input input-bordered w-full font-['Source_Sans_3'] focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            <span class="text-red-500 text-xs mt-1 block" hydro-error="FullName"></span>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5">Email Address</label>
+            <input type="email" asp-for="Email" bind readonly
+                   class="input input-bordered w-full font-['Source_Sans_3'] focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            <span class="text-red-500 text-xs mt-1 block" hydro-error="Email"></span>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5">Subject</label>
+            <input type="text" asp-for="Subject" bind placeholder="Enter subject"
+                   class="input input-bordered w-full font-['Source_Sans_3'] focus:outline-none focus:ring-2 focus:ring-[#1A5C6B]"/>
+            <span class="text-red-500 text-xs mt-1 block" hydro-error="Subject"></span>
+        </div>
+
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5">Your Message</label>
+            <textarea asp-for="Message" bind rows="5" placeholder="How can we help you?"
+                      class="textarea textarea-bordered w-full font-['Source_Sans_3'] focus:outline-none focus:ring-2 focus:ring-[#1A5C6B] resize-none"></textarea>
+            <span class="text-red-500 text-xs mt-1 block" hydro-error="Message"></span>
+        </div>
+
+        @if (Model.IsMember)
+        {
+            <button type="submit"
+                    class="btn btn-block h-auto py-4 bg-[#1A5C6B] hover:bg-[#154D5A] border-none text-white font-bold text-lg font-['Source_Sans_3'] flex items-center justify-center transition-colors">
+                Send Message <i class="ph ph-paper-plane-tilt ml-2"></i>
+            </button>
+        }
+        else
+        {
+            <button type="button" disabled
+                    class="btn btn-block h-auto py-4 text-lg font-['Source_Sans_3'] font-bold flex items-center justify-center">
+                You must be a member to send <i class="ph ph-lock ml-2"></i>
+            </button>
+        }
+    </form>
+}

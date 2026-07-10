@@ -4,22 +4,20 @@ using GiveAID.Models;
 
 namespace GiveAID.Dtos;
 
-public record PartnerSaveDto(string Name, string LogoUrl, string Description, string WebsiteLink);
+public record PartnerSaveDto(string Name, string LogoUrl, string WebsiteLink);
 
 public record PartnerSummaryDto(Guid Id, string Name, string LogoUrl);
 
-public record PartnerDto(Guid Id, string Name, string LogoUrl, string Description, string WebsiteLink)
+public record PartnerDto(Guid Id, string Name, string LogoUrl, string WebsiteLink)
         : PartnerSummaryDto(Id, Name, LogoUrl);
 
 public static class PartnerMapper
 {
     extension(CorporatePartner partner)
     {
-            public PartnerDto ToDto() =>
-                            new(partner.PartnerId, partner.Name, partner.LogoUrl, partner.Description, partner.WebsiteLink);
+            public PartnerDto ToDto() => new(partner.PartnerId, partner.Name, partner.LogoUrl, partner.WebsiteLink);
 
-            public PartnerSaveDto ToSaveDto() =>
-                            new(partner.Name, partner.LogoUrl, partner.Description, partner.WebsiteLink);
+            public PartnerSaveDto ToSaveDto() => new(partner.Name, partner.LogoUrl, partner.WebsiteLink);
     }
     
     public static IQueryable<PartnerSummaryDto> ProjectToSummaryDto(this IQueryable<CorporatePartner> partners) =>
@@ -29,7 +27,6 @@ public static class PartnerMapper
     {
         Name = dto.Name,
         LogoUrl = dto.LogoUrl,
-        Description = dto.Description,
         WebsiteLink = dto.WebsiteLink
     };
 }

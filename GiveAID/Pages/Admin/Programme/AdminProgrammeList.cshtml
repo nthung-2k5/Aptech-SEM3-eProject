@@ -1,14 +1,61 @@
 @model AdminProgrammeList
 
 <div class="bg-white rounded-xl border border-[#E3DDD3] overflow-hidden">
-    <div class="p-6 border-b border-[#E3DDD3] flex justify-between items-center">
-        <h3 class="text-[#1C1A17]">Welfare Programmes</h3>
-        <a asp-page="/Admin/Programme/Editor" class="btn btn-primary">
-            <i class="ph ph-plus"></i> Add Programme
-        </a>
+    <div class="p-6 border-b border-[#E3DDD3]">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div class="flex items-center gap-3">
+                <h3 class="text-[#1C1A17]">Welfare Programmes</h3>
+                <span class="badge badge-ghost text-sm">@Model.TotalCount total</span>
+            </div>
+            <a asp-page="/Admin/Programme/Editor" class="btn btn-primary btn-sm">
+                <i class="ph ph-plus"></i> Add Programme
+            </a>
+        </div>
+        
+        <div class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[180px]">
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Search</label>
+                <label class="input input-bordered input-sm flex items-center gap-2 w-full">
+                    <i class="ph ph-magnifying-glass text-[#6B6459]"></i>
+                    <input type="text" asp-for="SearchTerm" bind:keydown.debounce.300ms
+                           on:input="@(() => Model.Search())"
+                           placeholder="Name or description…" />
+                </label>
+            </div>
+            <div>
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">NGO</label>
+                <select asp-for="NgoId" bind on:change="@(() => Model.Search())" class="select select-bordered select-sm">
+                    <option value="">All NGOs</option>
+                    @foreach (var ngo in Model.AvailableNgos)
+                    {
+                        <option value="@ngo.Id.ToString()">@ngo.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Cause</label>
+                <select asp-for="CauseId" bind on:change="@(() => Model.Search())" class="select select-bordered select-sm">
+                    <option value="">All Causes</option>
+                    @foreach (var cause in Model.AvailableCauses)
+                    {
+                        <option value="@cause.Id.ToString()">@cause.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Status</label>
+                <select asp-for="StatusFilter" bind on:change="@(() => Model.Search())" class="select select-bordered select-sm">
+                    <option value="">All Statuses</option>
+                    <option value="Active">Active</option>
+                    <option value="Upcoming">Upcoming</option>
+                    <option value="Ended">Ended</option>
+                </select>
+            </div>
+        </div>
     </div>
+
     <div class="overflow-x-auto">
-        <table class="w-full table">
+        <table class="table w-full">
             <thead>
             <tr>
                 <th>Name</th>
@@ -27,19 +74,19 @@
                 string statusLabel = p.EndDate.HasValue && p.EndDate < now ? "Ended"
                     : p.StartDate > now ? "Upcoming"
                     : "Active";
-                
-                string statusCss = statusLabel switch
+
+                string badgeCss = statusLabel switch
                 {
-                    "Active" => "bg-emerald-100 text-emerald-700",
-                    "Upcoming" => "bg-blue-100 text-blue-700",
-                    _ => "bg-gray-100 text-gray-600"
+                    "Active" => "badge-success badge-soft",
+                    "Upcoming" => "badge-info badge-soft",
+                    _ => "badge-ghost"
                 };
 
                 <tr>
                     <th>@p.Name</th>
                     <td>@p.NgoName</td>
                     <td>
-                        <span class="bg-[#1A5C6B]/10 text-[#1A5C6B] text-xs font-semibold px-2 py-0.5 rounded-full">@p.Cause</span>
+                        <span class="badge badge-outline text-xs" style="color:#1A5C6B; border-color:#1A5C6B40">@p.Cause</span>
                     </td>
                     <td>
                         <span class="text-[#1A5C6B] font-semibold">@p.RaisedAmount.ToUsCurrencyString()</span>
@@ -52,19 +99,19 @@
                             <span class="text-[#6B6459]"> / —</span>
                         }
                     </td>
-                    <td>
+                    <td class="text-sm text-[#6B6459]">
                         @p.StartDate.Date.ToShortDateString()<br/>
                         @(p.EndDate.HasValue ? "→ " + p.EndDate.Value.Date.ToShortDateString() : "→ ongoing")
                     </td>
                     <td>
-                        <span class="text-xs font-semibold px-2.5 py-1 rounded-full @statusCss">@statusLabel</span>
+                        <span class="badge @badgeCss">@statusLabel</span>
                     </td>
                     <td>
-                        <div class="flex gap-2">
-                            <a href="/Admin/Programme/Editor/@p.Id" class="edit-button" title="Edit">
+                        <div class="flex gap-1">
+                            <a href="/Admin/Programme/Editor/@p.Id" class="btn btn-ghost btn-xs" title="Edit">
                                 <i class="ph ph-pencil-simple"></i>
                             </a>
-                            <button on:click="@(() => Model.Delete(p.Id))" class="delete-button"
+                            <button on:click="@(() => Model.Delete(p.Id))" class="btn btn-ghost btn-xs text-error"
                                     title="Delete">
                                 <i class="ph ph-trash"></i>
                             </button>
@@ -78,6 +125,39 @@
         {
             <div class="p-8 text-center text-[#6B6459] text-sm">
                 No programmes found. Click "Add Programme" to create one.
+            </div>
+        }
+    </div>
+    
+    <div class="flex items-center justify-between px-6 py-4 border-t border-[#E3DDD3]">
+        <span class="text-sm text-[#6B6459]">
+            @if (Model.TotalPages > 1)
+            {
+                <text>Page @Model.PageNumber of @Model.TotalPages &ndash; </text>
+            }
+            @Model.TotalCount record(s)
+        </span>
+        @if (Model.TotalPages > 1)
+        {
+            <div class="join">
+                <button class="join-item btn btn-sm"
+                        on:click="@(() => Model.GoToPage(Model.PageNumber - 1))"
+                        disabled="@(!Model.HasPreviousPage)">
+                    <i class="ph ph-caret-left"></i>
+                </button>
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    int p = i;
+                    <button class="join-item btn btn-sm @(p == Model.PageNumber ? "btn-active" : "")"
+                            on:click="@(() => Model.GoToPage(p))">
+                        p
+                    </button>
+                }
+                <button class="join-item btn btn-sm"
+                        on:click="@(() => Model.GoToPage(Model.PageNumber + 1))"
+                        disabled="@(!Model.HasNextPage)">
+                    <i class="ph ph-caret-right"></i>
+                </button>
             </div>
         }
     </div>

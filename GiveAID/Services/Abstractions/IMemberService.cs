@@ -4,6 +4,8 @@ namespace GiveAID.Services.Abstractions;
 
 public interface IMemberService
 {
+    Task<PagedResult<MemberDto>> GetMembersPagedAsync(MemberQueryParameters query, CancellationToken ct = default);
+
     Task<MemberSummaryDto[]> GetAllMembersAsync(string? searchTerm, int page = 1, int pageSize = 10,
                                                 CancellationToken ct = default);
 

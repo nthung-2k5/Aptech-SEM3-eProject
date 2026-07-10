@@ -8,6 +8,23 @@ namespace GiveAID.Services;
 
 public class MemberService(AppDbContext dbContext, IPasswordService passwordService) : IMemberService
 {
+    public async Task<PagedResult<MemberDto>> GetMembersPagedAsync(MemberQueryParameters query, CancellationToken ct = default)
+    {
+        var q = dbContext.ActiveMembers.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+        {
+            q = q.Where(m => m.FullName.Contains(query.SearchTerm) || m.Email.Contains(query.SearchTerm));
+        }
+
+        var totalCount = await q.CountAsync(ct);
+        var items = await q.OrderByDescending(m => m.CreatedAt)
+                .Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
+                .ProjectToDto().ToArrayAsync(ct);
+
+        return new PagedResult<MemberDto>(items, totalCount, query.PageNumber, query.PageSize);
+    }
+
     public async Task<MemberSummaryDto[]> GetAllMembersAsync(string? searchTerm, int page = 1, int pageSize = 10,
                                                              CancellationToken ct = default)
     {
