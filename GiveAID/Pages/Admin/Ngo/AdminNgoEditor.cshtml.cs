@@ -40,7 +40,7 @@ public class AdminNgoEditor(
                 {
                     Name = n.Name, Description = n.Description,
                     Address = n.Address ?? "", Website = n.Website ?? "", PhoneNumber = n.PhoneNumber ?? "",
-                    SelectedPartnerIds = n.Partners.Select(p => p.PartnerId).ToList()
+                    SelectedPartnerIds = n.Partners.Select(p => p.Id).ToList()
                 };
             }
         }

@@ -2,6 +2,7 @@ using FluentValidation;
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
 using Hydro;
+using Hydro.Utils;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GiveAID.Pages.Admin.Programme;
@@ -10,6 +11,7 @@ public class AdminProgrammeEditor(
     IProgrammeService programmeService,
     INgoService ngoService,
     IDonationCauseService causeService,
+    IImageService imageService,
     IValidator<AdminProgrammeEditor> validator) : HydroComponent
 {
     public Guid? Id { get; set; }
@@ -20,16 +22,24 @@ public class AdminProgrammeEditor(
         public Guid NgoId { get; set; }
         public Guid CauseId { get; set; }
         public string Description { get; set; } = "";
+        /// <summary>Either typed manually or populated by BindAsync when a file is selected.</summary>
         public string ImageUrl { get; set; } = "";
         public string? Location { get; set; }
         public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset? EndTime { get; set; }
         public decimal? MaxDonation { get; set; }
+        public string? NewImageExtension { get; set; }
     }
 
     public FormModel Form { get; set; } = new();
     public NgoSummaryDto[] AvailableNgos { get; set; } = [];
     public DonationCauseDto[] AvailableCauses { get; set; } = [];
+
+    /// <summary>Preview data-URL shown below the file picker. Set in BindAsync; not persisted in Hydro state.</summary>
+    public string? PreviewImageSource { get; set; }
+
+    [Transient]
+    public IFormFile? ImageFile { get; set; }
 
     public override async Task MountAsync()
     {
@@ -53,13 +63,32 @@ public class AdminProgrammeEditor(
                     EndTime = p.EndTime,
                     MaxDonation = p.MaxDonation
                 };
+                PreviewImageSource = p.ImageUrl;
             }
+        }
+    }
+
+    public override async Task BindAsync(PropertyPath property, object value)
+    {
+        if (property.Name == nameof(ImageFile))
+        {
+            var image = (IFormFile)value;
+            PreviewImageSource = await image.ToDataUrlAsync();
+            Form.NewImageExtension = Path.GetExtension(image.FileName);
         }
     }
 
     public async Task Save()
     {
         if (!this.Validate(validator)) { return; }
+
+        if (Form.NewImageExtension != null)
+        {
+            string base64Data = PreviewImageSource!.Split(',')[1];
+            byte[] bytes = Convert.FromBase64String(base64Data);
+            
+            Form.ImageUrl = await imageService.UploadImageAsync("programmes", $"{Guid.NewGuid()}{Form.NewImageExtension}", bytes);
+        }
 
         var saveDto = new ProgrammeSaveDto(
             Form.NgoId,
@@ -96,9 +125,9 @@ public class AdminProgrammeEditor(
             RuleFor(x => x.Form.Description)
                 .NotEmpty().WithMessage("Description is required");
 
-            RuleFor(x => x.Form.ImageUrl)
-                .NotEmpty().WithMessage("Image URL is required")
-                .MaximumLength(2048).WithMessage("Image URL cannot exceed 2048 characters");
+            RuleFor(x => x.ImageFile)
+                .NotNull().WithMessage("Image file is required")
+                .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
 
             RuleFor(x => x.Form.Location)
                 .MaximumLength(255).WithMessage("Location cannot exceed 255 characters");

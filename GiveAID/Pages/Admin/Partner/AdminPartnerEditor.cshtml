@@ -1,6 +1,6 @@
 @model AdminPartnerEditor
 
-<form on:submit="@(() => Model.Save())" class="bg-white border border-[#E3DDD3] rounded-xl p-6">
+<form on:submit="@(() => Model.Save())" enctype="multipart/form-data" class="bg-white border border-[#E3DDD3] rounded-xl p-6">
     <h4 class="font-bold text-[#1C1A17] mb-4">@(Model.Id.HasValue ? "Edit Partner" : "Add Partner")</h4>
     <div class="grid md:grid-cols-2 gap-4 mb-4">
         <div>
@@ -10,9 +10,10 @@
             <span asp-validation-for="Form.Name"></span>
         </div>
         <div>
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Logo URL</label>
-            <input type="url" asp-for="Form.LogoUrl" bind placeholder="https://example.com/logo.png" required class="input w-full"/>
-            <span asp-validation-for="Form.LogoUrl"></span>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Logo <span
+                    class="text-red-500">*</span></label>
+            <input type="file" asp-for="ImageFile" bind accept="image/*" class="file-input w-full"/>
+            <span asp-validation-for="ImageFile"></span>
         </div>
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Website Link</label>
@@ -20,12 +21,12 @@
             <span asp-validation-for="Form.WebsiteLink"></span>
         </div>
         <div>
-            @if (!string.IsNullOrEmpty(Model.Form.LogoUrl))
+            @if (!string.IsNullOrEmpty(Model.PreviewImageSource))
             {
                 <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Logo Preview</label>
                 <div
                     class="border border-[#E3DDD3] rounded-lg p-3 bg-[#F6F1E9] flex items-center justify-center h-[42px]">
-                    <img src="@Model.Form.LogoUrl" alt="Logo preview" class="max-h-full max-w-full object-contain"/>
+                    <img src="@Model.PreviewImageSource" alt="Logo preview" class="max-h-full max-w-full object-contain"/>
                 </div>
             }
         </div>
