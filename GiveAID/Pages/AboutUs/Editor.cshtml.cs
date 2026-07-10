@@ -30,7 +30,7 @@ public class EditorModel(IAboutUsSubpageService aboutUsService) : PageModel
     public async Task<IActionResult> OnPostAsync(string? originalSlug, string slug, string title, string content,
                                                  CancellationToken ct)
     {
-        var page = new AboutUsSubpageDto(title, slug, content);
+        var page = new AboutUsSubpageDto(slug, title, content);
 
         if (!string.IsNullOrEmpty(originalSlug)) { await aboutUsService.UpdateSubpageAsync(page, ct); }
         else { await aboutUsService.AddSubpageAsync(page, ct); }
