@@ -1,5 +1,9 @@
+using GiveAID.Data;
+using GiveAID.Services.Abstractions;
+
 
 namespace GiveAID.Services;
+
 
 public class QueryService : IQueryService
 {

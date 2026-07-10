@@ -1,14 +1,24 @@
+using System.Net;
+using System.Net.Mail;
+using Microsoft.Extensions.Configuration;
 using GiveAID.Services.Abstractions;
-
-
 
 namespace GiveAID.Services;
 
 public class EmailService : IEmailService
 {
-   public async Task<bool> SendEmailAsync(string receiverEmail, string subject, string body, CancellationToken ct = default)
+    private readonly IConfiguration _configuration;
+
+    // Inject IConfiguration via the constructor
+    public EmailService(IConfiguration configuration)
     {
-        var smtpSection = configuration.GetSection("Smtp");
+        _configuration = configuration;
+    }
+
+    public async Task<bool> SendEmailAsync(string receiverEmail, string subject, string body, CancellationToken ct = default)
+    {
+        // Use the injected _configuration field here
+        var smtpSection = _configuration.GetSection("Smtp");
 
         var host = smtpSection["Host"];
         var port = smtpSection.GetValue("Port", 587);
