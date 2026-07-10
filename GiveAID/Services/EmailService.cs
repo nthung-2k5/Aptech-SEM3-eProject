@@ -1,66 +1,59 @@
-using System.Net;
-using System.Net.Mail;
-using Microsoft.Extensions.Configuration;
 using GiveAID.Services.Abstractions;
+using MailKit.Net.Smtp;
+using MailKit.Security;
+using MimeKit;
+using MimeKit.Text;
 
 namespace GiveAID.Services;
 
 public class EmailService : IEmailService
 {
-    private readonly IConfiguration _configuration;
-
-    // Inject IConfiguration via the constructor
     public EmailService(IConfiguration configuration)
     {
-        _configuration = configuration;
-    }
+        var smtpSection = configuration.GetSection("Smtp");
 
-    public async Task<bool> SendEmailAsync(string receiverEmail, string subject, string body, CancellationToken ct = default)
-    {
-        // Use the injected _configuration field here
-        var smtpSection = _configuration.GetSection("Smtp");
-
-        var host = smtpSection["Host"];
-        var port = smtpSection.GetValue("Port", 587);
-        var username = smtpSection["Username"];
-        var password = smtpSection["Password"];
-        var senderEmail = smtpSection["SenderEmail"] ?? username;
-        var senderName = smtpSection["SenderName"] ?? "Give-AID";
-        var enableSsl = smtpSection.GetValue("EnableSsl", true);
+        host = smtpSection["Host"]!;
+        port = smtpSection.GetValue("Port", 587);
+        username = smtpSection["Username"]!;
+        password = smtpSection["Password"]!;
+        senderEmail = smtpSection["SenderEmail"] ?? username;
+        senderName = smtpSection["SenderName"] ?? "Give-AID";
+        enableSsl = smtpSection.GetValue("EnableSsl", true);
 
         if (string.IsNullOrWhiteSpace(host) || string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password) || string.IsNullOrWhiteSpace(senderEmail))
         {
             throw new InvalidOperationException("SMTP settings are missing. Configure the Smtp section in appsettings.json.");
         }
+    }
+    
+    private readonly string host;
+    private readonly int port;
+    private readonly string username;
+    private readonly string password;
+    private readonly string senderEmail;
+    private readonly string senderName;
+    private readonly bool enableSsl;
 
-        using var message = new MailMessage
+    public async Task<bool> SendEmailAsync(string receiverEmail, string subject, string body, CancellationToken ct = default)
+    {
+        var message = new MimeMessage();
+        message.From.Add(new MailboxAddress(senderName, senderEmail));
+        message.To.Add(MailboxAddress.Parse(receiverEmail));
+        message.Subject = subject;
+
+        message.Body = new TextPart(TextFormat.Html)
         {
-            From = new MailAddress(senderEmail, senderName),
-            Subject = subject,
-            Body = body,
-            IsBodyHtml = true
+            Text = body
         };
 
-        message.To.Add(receiverEmail);
+        using var client = new SmtpClient();
 
-        using var client = new SmtpClient(host, port)
-        {
-            EnableSsl = enableSsl,
-            Credentials = new NetworkCredential(username, password)
-        };
+        var secureSocketOptions = enableSsl ? SecureSocketOptions.StartTls : SecureSocketOptions.Auto;
+        await client.ConnectAsync(host, port, secureSocketOptions, ct);
+        await client.AuthenticateAsync(username, password, ct);
+        await client.SendAsync(message, ct);
+        await client.DisconnectAsync(true, ct);
 
-        try
-        {
-            using (ct.Register(client.Dispose))
-            {
-                await client.SendMailAsync(message);
-            }
-
-            return true;
-        }
-        catch
-        {
-            return false;
-        }
+        return true;
     }
 }

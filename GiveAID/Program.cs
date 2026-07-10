@@ -70,6 +70,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddSingleton<IImageService, S3ImageService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddScoped<IAboutUsSubpageService, AboutUsSubpageService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
