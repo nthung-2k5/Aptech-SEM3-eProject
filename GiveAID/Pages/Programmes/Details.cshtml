@@ -8,6 +8,21 @@
 {
     var p = Model.Programme;
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="toast toast-top toast-end z-50 mt-16">
+            <div class="alert alert-success text-white">
+                <span>@TempData["SuccessMessage"]</span>
+            </div>
+        </div>
+        <script>
+            setTimeout(() => {
+                var t = document.querySelector('.toast');
+                if (t) t.remove();
+            }, 3000);
+        </script>
+    }
+
     var timeRemaining = p.EndDate - DateTimeOffset.Now;
     bool isStarted = p.StartDate <= DateTimeOffset.Now;
     string? timeText = null;
@@ -127,6 +142,11 @@
                                 Donate Now
                             </a>
                         }
+                        
+                        <button class="btn btn-outline btn-block mt-4" onclick="inviteModal.showModal()">
+                            <i class="ph ph-envelope-simple text-xl"></i>
+                            Invite Friends
+                        </button>
 
                         <div class="text-center text-sm text-gray-500 mt-6 flex items-center justify-center gap-2">
                             <i class="ph ph-shield-check text-[#1A5C6B] text-lg"></i>
@@ -137,4 +157,47 @@
             </div>
         </div>
     </div>
+
+    <dialog id="inviteModal" class="modal">
+        <div class="modal-box">
+            <form method="dialog">
+                <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+            </form>
+            <h3 class="font-bold text-2xl mb-6 font-['Playfair_Display',serif]">Invite a Friend</h3>
+            
+            <form method="post" asp-page-handler="Invite">
+                <div class="form-control w-full mb-4">
+                    <label class="label"><span class="label-text font-bold">Friend's Email</span></label>
+                    <input type="email" asp-for="InviteForm.FriendEmail" class="input input-bordered w-full" placeholder="friend@example.com" required />
+                    <span asp-validation-for="InviteForm.FriendEmail" class="text-error text-sm mt-1"></span>
+                </div>
+                
+                <div class="form-control w-full mb-4">
+                    <label class="label"><span class="label-text font-bold">Subject</span></label>
+                    <input type="text" asp-for="InviteForm.Subject" class="input input-bordered w-full" required />
+                    <span asp-validation-for="InviteForm.Subject" class="text-error text-sm mt-1"></span>
+                </div>
+                
+                <div class="form-control w-full mb-6">
+                    <label class="label"><span class="label-text font-bold">Message</span></label>
+                    <textarea asp-for="InviteForm.Body" class="textarea textarea-bordered h-48 w-full" required></textarea>
+                    <span asp-validation-for="InviteForm.Body" class="text-error text-sm mt-1"></span>
+                </div>
+                
+                <button type="submit" class="btn btn-secondary w-full">Send Invitation</button>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
+
+    @if (!ModelState.IsValid)
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('inviteModal').showModal();
+            });
+        </script>
+    }
 }
