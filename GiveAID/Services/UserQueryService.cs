@@ -29,8 +29,19 @@ public class UserQueryService(AppDbContext dbContext) : IUserQueryService
             .ToArrayAsync(ct);
     }
 
-    public Task<bool> CreateQueryAsync(UserQueryCreateDto query, CancellationToken ct = default)
-        => throw new NotImplementedException();
+    public async Task<bool> CreateQueryAsync(UserQueryCreateDto query, CancellationToken ct = default)
+    {
+        var entity = new UserQuery
+        {
+            UserId = query.UserId,
+            Subject = query.Subject,
+            MessageText = query.MessageText
+        };
+
+        dbContext.UserQueries.Add(entity);
+        int rows = await dbContext.SaveChangesAsync(ct);
+        return rows > 0;
+    }
 
     public async Task<bool> ReplyQueryAsync(Guid id, string replyText, CancellationToken ct = default)
     {
