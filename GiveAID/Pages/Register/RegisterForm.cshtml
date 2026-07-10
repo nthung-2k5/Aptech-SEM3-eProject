@@ -35,7 +35,7 @@ else
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Phone Number</label>
-                    <input type="tel" asp-for="Phone" bind placeholder="9876543210" class="input w-full"/>
+                    <input type="text" asp-for="Phone" bind placeholder="9876543210" class="input w-full"/>
                     <span asp-validation-for="Phone"></span>
                 </div>
                 <div>
@@ -52,15 +52,16 @@ else
             <div class="grid md:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Occupation</label>
-                    <select asp-for="Occupation" bind class="select w-full">
-                        <option value="" disabled selected>Select occupation</option>
-                        <option>Student</option>
-                        <option>Self-employed</option>
-                        <option>Salaried</option>
-                        <option>Business Owner</option>
-                        <option>Retired</option>
-                        <option>Other</option>
-                    </select>
+                    @* <select asp-for="Occupation" bind class="select w-full"> *@
+                    @*     <option value="" disabled selected>Select occupation</option> *@
+                    @*     <option>Student</option> *@
+                    @*     <option>Self-employed</option> *@
+                    @*     <option>Salaried</option> *@
+                    @*     <option>Business Owner</option> *@
+                    @*     <option>Retired</option> *@
+                    @*     <option>Other</option> *@
+                    @* </select> *@
+                    <input type="text" asp-for="Occupation" bind class="input w-full"/>
                     <span asp-validation-for="Occupation"></span>
                 </div>
                 <div>
@@ -78,13 +79,13 @@ else
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Password</label>
                     <input type="password" asp-for="Password" bind placeholder="Min 6 characters"
-                           class="input w-full"/>
+                           class="input w-full" value="@Model.Password"/>
                     <span asp-validation-for="Password"></span>
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1.5 required">Confirm Password</label>
                     <input type="password" asp-for="ConfirmPassword" bind placeholder="Re-enter password"
-                           class="input w-full"/>
+                           class="input w-full" value="@Model.ConfirmPassword"/>
                     <span asp-validation-for="ConfirmPassword"></span>
                 </div>
             </div>

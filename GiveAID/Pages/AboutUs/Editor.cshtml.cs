@@ -32,9 +32,26 @@ public class EditorModel(IAboutUsSubpageService aboutUsService) : PageModel
     {
         var page = new AboutUsSubpageDto(slug, title, content);
 
-        if (!string.IsNullOrEmpty(originalSlug)) { await aboutUsService.UpdateSubpageAsync(page, ct); }
-        else { await aboutUsService.AddSubpageAsync(page, ct); }
+        try
+        {
+            if (!string.IsNullOrEmpty(originalSlug)) { await aboutUsService.UpdateSubpageAsync(page, ct); }
+            else { await aboutUsService.AddSubpageAsync(page, ct); }
 
-        return RedirectToPage("/AboutUs/Index", new { slug });
+            return RedirectToPage("/AboutUs/Index", new { slug });
+        }
+        catch (Exceptions.DuplicateException ex)
+        {
+            ModelState.AddModelError(ex.FieldName, ex.Message);
+            IsEditMode = !string.IsNullOrEmpty(originalSlug);
+            CurrentPage = page;
+            return Page();
+        }
+        catch (Exceptions.MissingForeignEntityException ex)
+        {
+            ModelState.AddModelError(ex.ReferenceField, ex.Message);
+            IsEditMode = !string.IsNullOrEmpty(originalSlug);
+            CurrentPage = page;
+            return Page();
+        }
     }
 }

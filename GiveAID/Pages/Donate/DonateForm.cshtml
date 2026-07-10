@@ -74,7 +74,7 @@
                     </label>
                     <label class="input w-full">
                         <i class="ph ph-lock-key text-lg opacity-70"></i>
-                        <input type="password" asp-for="CVV" bind class="grow" placeholder="123" required pattern="\d{3,4}"/>
+                        <input type="password" asp-for="CVV" bind class="grow" placeholder="123" required pattern="\d{3,4}" value="@Model.CVV"/>
                     </label>
                     <span asp-validation-for="CVV" class="text-error text-xs mt-1 font-medium"></span>
                 </div>

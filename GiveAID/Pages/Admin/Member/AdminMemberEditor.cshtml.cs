@@ -46,34 +46,45 @@ public class AdminMemberEditor(
     {
         if (!this.Validate(validator)) { return; }
 
-        if (Id.HasValue && Id.Value != Guid.Empty)
+        try
         {
-            var updateDto = new MemberUpdateDto(
-                Form.FullName,
-                Form.Email,
-                Form.Password,
-                Form.DateOfBirth,
-                Form.Address,
-                Form.PhoneNumber,
-                Form.Occupation);
+            if (Id.HasValue && Id.Value != Guid.Empty)
+            {
+                var updateDto = new MemberUpdateDto(
+                    Form.FullName,
+                    Form.Email,
+                    Form.Password,
+                    Form.DateOfBirth,
+                    Form.Address,
+                    Form.PhoneNumber,
+                    Form.Occupation);
 
-            await memberService.UpdateMemberAsync(Id.Value, updateDto);
+                await memberService.UpdateMemberAsync(Id.Value, updateDto);
+            }
+            else
+            {
+                var createDto = new MemberCreateDto(
+                    Form.FullName,
+                    Form.Email,
+                    Form.Password!,
+                    Form.DateOfBirth,
+                    Form.Address,
+                    Form.PhoneNumber,
+                    Form.Occupation);
+
+                await memberService.CreateMemberAsync(createDto);
+            }
+
+            Redirect(Url.Page("/Admin/Member/Index"));
         }
-        else
+        catch (Exceptions.DuplicateException ex)
         {
-            var createDto = new MemberCreateDto(
-                Form.FullName,
-                Form.Email,
-                Form.Password!,
-                Form.DateOfBirth,
-                Form.Address,
-                Form.PhoneNumber,
-                Form.Occupation);
-
-            await memberService.CreateMemberAsync(createDto);
+            ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message);
         }
-
-        Redirect(Url.Page("/Admin/Member/Index"));
+        catch (Exceptions.MissingForeignEntityException ex)
+        {
+            ModelState.AddModelError($"Form.{ex.ReferenceField}", ex.Message);
+        }
     }
 
     public class Validator : AbstractValidator<AdminMemberEditor>

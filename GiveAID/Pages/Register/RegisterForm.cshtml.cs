@@ -1,5 +1,6 @@
 using FluentValidation;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
 
@@ -7,6 +8,7 @@ namespace GiveAID.Pages.Register;
 
 public class RegisterForm(
     IMemberService memberService,
+    IAuthService authService,
     IValidator<RegisterForm> validator) : HydroComponent
 {
     public string Name { get; set; }
@@ -34,16 +36,32 @@ public class RegisterForm(
             Phone,
             Occupation ?? string.Empty);
 
-        await memberService.CreateMemberAsync(user);
+        try
+        {
+            await memberService.CreateMemberAsync(user);
+            IsSuccess = true;
+            
+            var result = await authService.LoginAsync(Email, Password);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddHours(24)
+            };
 
-        // if (result.Success)
-        // {
-        //     IsSuccess = true; 
-        // }
-        // else
-        // {
-        //     // Optionally handle registration errors here (e.g. email already registered)
-        // }
+            HttpContext.Response.Cookies.Append("jwt_token", result.Token, cookieOptions);
+
+            Redirect("/");
+        }
+        catch (DuplicateException ex)
+        {
+            ModelState.AddModelError(ex.FieldName, ex.Message);
+        }
+        catch (MissingForeignEntityException ex)
+        {
+            ModelState.AddModelError(ex.ReferenceField, ex.Message);
+        }
     }
 
     public class Validator : AbstractValidator<RegisterForm>
@@ -61,7 +79,7 @@ public class RegisterForm(
 
             RuleFor(x => x.Phone)
                 .NotEmpty().WithMessage("Phone number is required")
-                .Matches(@"^\d{10}$").WithMessage("Enter 10-digit phone number");
+                .PhoneNumber().WithMessage("Phone number must be in E.164 format");
 
             RuleFor(x => x.DateOfBirth)
                 .NotEmpty().WithMessage("Date of Birth is required");

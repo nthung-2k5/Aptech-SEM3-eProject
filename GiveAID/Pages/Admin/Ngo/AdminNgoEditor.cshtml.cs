@@ -63,10 +63,21 @@ public class AdminNgoEditor(
             Form.Website,
             Form.SelectedPartnerIds.ToArray());
 
-        if (Id.HasValue && Id.Value != Guid.Empty) { await ngoService.UpdateNgoAsync(Id.Value, saveDto); }
-        else { await ngoService.CreateNgoAsync(saveDto); }
+        try
+        {
+            if (Id.HasValue && Id.Value != Guid.Empty) { await ngoService.UpdateNgoAsync(Id.Value, saveDto); }
+            else { await ngoService.CreateNgoAsync(saveDto); }
 
-        Redirect(Url.Page("/Admin/Ngo/Index"));
+            Redirect(Url.Page("/Admin/Ngo/Index"));
+        }
+        catch (Exceptions.DuplicateException ex)
+        {
+            ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message);
+        }
+        catch (Exceptions.MissingForeignEntityException ex)
+        {
+            ModelState.AddModelError($"Form.{ex.ReferenceField}", ex.Message);
+        }
     }
 
     public class Validator : AbstractValidator<AdminNgoEditor>

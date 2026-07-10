@@ -112,10 +112,21 @@ public class AdminProgrammeEditor(
             Form.Location
         );
 
-        if (Id.HasValue && Id.Value != Guid.Empty) { await programmeService.UpdateProgrammeAsync(Id.Value, saveDto); }
-        else { await programmeService.CreateProgrammeAsync(saveDto); }
+        try
+        {
+            if (Id.HasValue && Id.Value != Guid.Empty) { await programmeService.UpdateProgrammeAsync(Id.Value, saveDto); }
+            else { await programmeService.CreateProgrammeAsync(saveDto); }
 
-        Redirect(Url.Page("/Admin/Programme/Index"));
+            Redirect(Url.Page("/Admin/Programme/Index"));
+        }
+        catch (Exceptions.DuplicateException ex)
+        {
+            ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message);
+        }
+        catch (Exceptions.MissingForeignEntityException ex)
+        {
+            ModelState.AddModelError($"Form.{ex.ReferenceField}", ex.Message);
+        }
     }
 
     public class Validator : AbstractValidator<AdminProgrammeEditor>

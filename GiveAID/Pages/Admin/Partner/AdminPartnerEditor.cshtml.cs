@@ -84,10 +84,21 @@ public class AdminPartnerEditor(
 
         var saveDto = new PartnerSaveDto(Form.Name, Form.LogoUrl, Form.WebsiteLink);
 
-        if (Id.HasValue && Id.Value != Guid.Empty) { await partnerService.UpdatePartnerAsync(Id.Value, saveDto); }
-        else { await partnerService.CreatePartnerAsync(saveDto); }
+        try
+        {
+            if (Id.HasValue && Id.Value != Guid.Empty) { await partnerService.UpdatePartnerAsync(Id.Value, saveDto); }
+            else { await partnerService.CreatePartnerAsync(saveDto); }
 
-        Redirect(Url.Page("/Admin/Partner/Index"));
+            Redirect(Url.Page("/Admin/Partner/Index"));
+        }
+        catch (Exceptions.DuplicateException ex)
+        {
+            ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message);
+        }
+        catch (Exceptions.MissingForeignEntityException ex)
+        {
+            ModelState.AddModelError($"Form.{ex.ReferenceField}", ex.Message);
+        }
     }
 
     public class Validator : AbstractValidator<AdminPartnerEditor>

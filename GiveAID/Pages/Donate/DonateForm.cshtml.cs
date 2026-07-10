@@ -86,9 +86,20 @@ public class DonateForm(
         }
 
         var donationSave = new DonationSaveDto(UserId, target, Amount, transaction.TransactionId);
-        await donationService.CreateDonationAsync(donationSave);
-
-        Location($"/Donate/Success?transactionId={transaction.TransactionId}");
+        
+        try
+        {
+            await donationService.CreateDonationAsync(donationSave);
+            Location($"/Donate/Success?transactionId={transaction.TransactionId}");
+        }
+        catch (Exceptions.DuplicateException ex)
+        {
+            ModelState.AddModelError(ex.FieldName, ex.Message);
+        }
+        catch (Exceptions.MissingForeignEntityException ex)
+        {
+            ModelState.AddModelError(ex.ReferenceField, ex.Message);
+        }
     }
 
     private async Task LoadCausesAsync()

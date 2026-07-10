@@ -20,7 +20,7 @@
                 @if (!Model.Id.HasValue) { <span class="text-red-500">*</span> }
                 else { <span class="text-xs text-[#6B6459] font-normal">(leave blank to keep current)</span> }
             </label>
-            <input type="password" asp-for="Form.Password" bind autocomplete="new-password" class="input w-full"/>
+            <input type="password" asp-for="Form.Password" bind autocomplete="new-password" class="input w-full" value="@Model.Form.Password"/>
             <span asp-validation-for="Form.Password"></span>
         </div>
         <div>

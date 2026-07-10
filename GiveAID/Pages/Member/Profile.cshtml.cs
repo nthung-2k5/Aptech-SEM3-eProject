@@ -89,10 +89,6 @@ public class ProfileModel(AppDbContext context, IValidator<ProfileModel.InputMod
                 .NotEmpty().WithMessage("Full name is required")
                 .MaximumLength(100).WithMessage("Full name cannot exceed 100 characters");
 
-            RuleFor(x => x.PhoneNumber)
-                .NotEmpty().WithMessage("Phone number is required")
-                .PhoneNumber().WithMessage("Phone number must be in E.164 format");
-
             RuleFor(x => x.DateOfBirth)
                 .NotEmpty().WithMessage("Date of birth is required")
                 .LessThan(DateOnly.FromDateTime(DateTime.Today)).WithMessage("Date of birth must be in the past");
