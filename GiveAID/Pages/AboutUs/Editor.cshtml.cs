@@ -1,4 +1,5 @@
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Models;
 using GiveAID.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
@@ -39,16 +40,18 @@ public class EditorModel(IAboutUsSubpageService aboutUsService) : PageModel
 
             return RedirectToPage("/AboutUs/Index", new { slug });
         }
-        catch (Exceptions.DuplicateException ex)
+        catch (DuplicateException ex)
         {
-            ModelState.AddModelError(ex.FieldName, ex.Message);
-            IsEditMode = !string.IsNullOrEmpty(originalSlug);
-            CurrentPage = page;
-            return Page();
-        }
-        catch (Exceptions.MissingForeignEntityException ex)
-        {
-            ModelState.AddModelError(ex.ReferenceField, ex.Message);
+            switch (ex.FieldName)
+            {
+                case nameof(AboutUsSubpageDto.Title):
+                    ModelState.AddModelError(nameof(title), ex.Message);
+                    break;
+                default:
+                    ModelState.AddModelError(ex.FieldName, ex.Message);
+                    break;
+            }
+            
             IsEditMode = !string.IsNullOrEmpty(originalSlug);
             CurrentPage = page;
             return Page();

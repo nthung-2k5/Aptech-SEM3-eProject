@@ -1,5 +1,6 @@
 using FluentValidation;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
 using Hydro.Utils;
@@ -119,13 +120,20 @@ public class AdminProgrammeEditor(
 
             Redirect(Url.Page("/Admin/Programme/Index"));
         }
-        catch (Exceptions.DuplicateException ex)
+        catch (MissingForeignEntityException ex)
         {
-            ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message);
-        }
-        catch (Exceptions.MissingForeignEntityException ex)
-        {
-            ModelState.AddModelError($"Form.{ex.ReferenceField}", ex.Message);
+            switch (ex.ReferenceField)
+            {
+                case nameof(ProgrammeSaveDto.NgoId):
+                    ModelState.AddModelError($"Form.{ex.ReferenceField}", "Selected NGO does not exist");
+                    break;
+                case nameof(ProgrammeSaveDto.CauseId):
+                    ModelState.AddModelError($"Form.{ex.ReferenceField}", "Selected cause does not exist");
+                    break;
+                default:
+                    ModelState.AddModelError($"Form.{ex.ReferenceField}", ex.Message);
+                    break;
+            }
         }
     }
 

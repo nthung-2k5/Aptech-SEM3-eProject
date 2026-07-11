@@ -14,10 +14,10 @@ public class MemberService(AppDbContext dbContext, IPasswordService passwordServ
 
         if (!string.IsNullOrWhiteSpace(query.SearchTerm))
         {
-            q = q.Where(m => m.FullName.Contains(query.SearchTerm) || m.Email.Contains(query.SearchTerm));
+            q = q.Where(m => m.FullName.Contains(query.SearchTerm) || m.Email.Contains(query.SearchTerm) || m.PhoneNumber.Contains(query.SearchTerm));
         }
 
-        var totalCount = await q.CountAsync(ct);
+        int totalCount = await q.CountAsync(ct);
         var items = await q.OrderByDescending(m => m.CreatedAt)
                 .Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
                 .ProjectToDto().ToArrayAsync(ct);
@@ -32,7 +32,7 @@ public class MemberService(AppDbContext dbContext, IPasswordService passwordServ
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
-            query = query.Where(m => m.FullName.Contains(searchTerm) || m.Email.Contains(searchTerm));
+            query = query.Where(m => m.FullName.Contains(searchTerm) || m.Email.Contains(searchTerm) || m.PhoneNumber.Contains(searchTerm));
         }
 
         var items = await query.OrderByDescending(m => m.CreatedAt).Skip((page - 1) * pageSize).Take(pageSize)
@@ -85,12 +85,12 @@ public class MemberService(AppDbContext dbContext, IPasswordService passwordServ
 
         if (user == null || user.IsDeleted) { throw new NotFoundException(); }
 
-        if (await dbContext.Users.AnyAsync(u => u.Email == dto.Email || u.UserId != id, ct))
+        if (await dbContext.Users.AnyAsync(u => u.Email == dto.Email && u.UserId != id, ct))
         {
             throw new DuplicateException(nameof(dto.Email));
         }
 
-        if (await dbContext.Users.AnyAsync(u => u.PhoneNumber == dto.PhoneNumber || u.UserId != id, ct))
+        if (await dbContext.Users.AnyAsync(u => u.PhoneNumber == dto.PhoneNumber && u.UserId != id, ct))
         {
             throw new DuplicateException(nameof(dto.PhoneNumber));
         }

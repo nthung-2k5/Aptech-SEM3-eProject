@@ -1,5 +1,6 @@
 using FluentValidation;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
 using Microsoft.AspNetCore.Mvc;
@@ -70,13 +71,13 @@ public class AdminNgoEditor(
 
             Redirect(Url.Page("/Admin/Ngo/Index"));
         }
-        catch (Exceptions.DuplicateException ex)
+        catch (DuplicateException ex)
         {
-            ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message);
-        }
-        catch (Exceptions.MissingForeignEntityException ex)
-        {
-            ModelState.AddModelError($"Form.{ex.ReferenceField}", ex.Message);
+            if (ex.FieldName == nameof(NgoSaveDto.Name))
+            {
+                ModelState.AddModelError($"Form.{nameof(Form.Name)}", "An NGO with this name already exists");
+            }
+            else { ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message); }
         }
     }
 

@@ -1,5 +1,6 @@
 using FluentValidation;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
 using Microsoft.AspNetCore.Mvc;
@@ -77,13 +78,20 @@ public class AdminMemberEditor(
 
             Redirect(Url.Page("/Admin/Member/Index"));
         }
-        catch (Exceptions.DuplicateException ex)
+        catch (DuplicateException ex)
         {
-            ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message);
-        }
-        catch (Exceptions.MissingForeignEntityException ex)
-        {
-            ModelState.AddModelError($"Form.{ex.ReferenceField}", ex.Message);
+            switch (ex.FieldName)
+            {
+                case nameof(FormModel.Email):
+                    ModelState.AddModelError($"Form.{nameof(FormModel.Email)}", "An account with this email already exists.");
+                    break;
+                case nameof(FormModel.PhoneNumber):
+                    ModelState.AddModelError($"Form.{nameof(FormModel.PhoneNumber)}", "An account with this phone number already exists.");
+                    break;
+                default:
+                    ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message);
+                    break;
+            }
         }
     }
 
@@ -119,6 +127,7 @@ public class AdminMemberEditor(
                 .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
 
             RuleFor(x => x.Form.DateOfBirth)
+                .NotEmpty().WithMessage("Date of birth is required")
                 .LessThan(DateOnly.FromDateTime(DateTime.Today))
                 .WithMessage("Date of birth must be in the past");
         }

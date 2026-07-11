@@ -1,5 +1,6 @@
 using FluentValidation;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
 using Hydro.Utils;
@@ -91,13 +92,13 @@ public class AdminPartnerEditor(
 
             Redirect(Url.Page("/Admin/Partner/Index"));
         }
-        catch (Exceptions.DuplicateException ex)
+        catch (DuplicateException ex)
         {
-            ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message);
-        }
-        catch (Exceptions.MissingForeignEntityException ex)
-        {
-            ModelState.AddModelError($"Form.{ex.ReferenceField}", ex.Message);
+            if (ex.FieldName == nameof(PartnerSaveDto.Name))
+            {
+                ModelState.AddModelError($"Form.{nameof(Form.Name)}", "A partner with this name already exists");
+            }
+            else { ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message); }
         }
     }
 

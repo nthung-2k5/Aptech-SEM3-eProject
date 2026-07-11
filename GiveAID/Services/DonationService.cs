@@ -32,6 +32,21 @@ public class DonationService(AppDbContext dbContext) : IDonationService
             q = q.Where(d => d.Status == query.Status.Value);
         }
 
+        if (query.ProgrammeId.HasValue)
+        {
+            q = q.Where(d => d.ProgrammeId == query.ProgrammeId.Value);
+        }
+
+        if (query.NgoId.HasValue)
+        {
+            q = q.Where(d => d.NgoId == query.NgoId.Value);
+        }
+
+        if (query.CauseId.HasValue)
+        {
+            q = q.Where(d => d.CauseId == query.CauseId.Value);
+        }
+
         var totalCount = await q.CountAsync(ct);
         var items = await q.OrderByDescending(d => d.CreatedAt)
                 .Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
