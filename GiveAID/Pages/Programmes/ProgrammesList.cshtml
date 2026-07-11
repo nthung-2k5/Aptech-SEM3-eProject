@@ -42,6 +42,7 @@
                 </select>
                 <span asp-validation-for="NgoId"></span>
             </div>
+
             <button on:click="@(() => Model.ClearFilters())" class="btn btn-outline btn-primary btn-block">Clear
                 Filters
             </button>
@@ -51,19 +52,30 @@
     <!-- Main Content (Right) -->
     <div class="w-full lg:w-3/4 flex flex-col">
         <!-- Top Bar -->
-        <div class="flex justify-between items-center mb-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
             <h2 class="text-xl font-bold font-['Playfair_Display',serif] text-[#1C1A17]">
-                @if (Model.Programmes.Length > 0)
+                @if (Model.Programmes.TotalCount > 0)
                 {
-                    <text>Found @Model.Programmes.Length Programmes</text>
+                    <text>Found @Model.Programmes.TotalCount Programmes</text>
                 }
                 else { <text>No programmes found.</text> }
             </h2>
+            <div class="flex items-center gap-2">
+                <label class="text-sm font-semibold text-gray-600 whitespace-nowrap">Sort By:</label>
+                <select asp-for="SortOption" bind on:change="@(() => Model.Search())" class="select select-bordered select-sm">
+                    <option value="startdate_desc">Start Date (Newest first)</option>
+                    <option value="startdate_asc">Start Date (Oldest first)</option>
+                    <option value="name_asc">Name (A-Z)</option>
+                    <option value="name_desc">Name (Z-A)</option>
+                    <option value="target_desc">Target Amount (High to Low)</option>
+                    <option value="target_asc">Target Amount (Low to High)</option>
+                </select>
+            </div>
         </div>
 
         <!-- Cards Grid -->
         <div class="grid lg:grid-cols-2 xl:grid-cols-3 gap-6 flex-grow">
-            @foreach (var p in Model.Programmes)
+            @foreach (var p in Model.Programmes.Items)
             {
                 var timeRemaining = p.EndDate - DateTimeOffset.Now;
                 bool isStarted = p.StartDate <= DateTimeOffset.Now;

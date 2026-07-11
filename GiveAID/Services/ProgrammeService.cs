@@ -37,8 +37,17 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
         }
 
         var totalCount = await q.CountAsync(ct);
-        var items = await q.OrderByDescending(p => p.StartTime)
-                .Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
+
+        q = query.SortBy?.ToLower() switch
+        {
+            "name" => query.SortDescending ? q.OrderByDescending(p => p.Name) : q.OrderBy(p => p.Name),
+            "target" => query.SortDescending ? q.OrderByDescending(p => p.MaxDonation) : q.OrderBy(p => p.MaxDonation),
+            "startdate" => query.SortDescending ? q.OrderByDescending(p => p.StartTime) : q.OrderBy(p => p.StartTime),
+            "enddate" => query.SortDescending ? q.OrderByDescending(p => p.EndTime) : q.OrderBy(p => p.EndTime),
+            _ => query.SortDescending ? q.OrderByDescending(p => p.StartTime) : q.OrderBy(p => p.StartTime)
+        };
+
+        var items = await q.Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
                 .ProjectToDto().ToArrayAsync(ct);
 
         return new PagedResult<ProgrammeDto>(items, totalCount, query.PageNumber, query.PageSize);
@@ -80,6 +89,15 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
         if (parameters.NgoId != null) { query = query.Where(p => p.Ngo.NgoId == parameters.NgoId); }
 
         if (parameters.CauseId != null) { query = query.Where(p => p.Cause.CauseId == parameters.CauseId); }
+
+        query = parameters.SortBy?.ToLower() switch
+        {
+            "name" => parameters.SortDescending ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name),
+            "target" => parameters.SortDescending ? query.OrderByDescending(p => p.MaxDonation) : query.OrderBy(p => p.MaxDonation),
+            "startdate" => parameters.SortDescending ? query.OrderByDescending(p => p.StartTime) : query.OrderBy(p => p.StartTime),
+            "enddate" => parameters.SortDescending ? query.OrderByDescending(p => p.EndTime) : query.OrderBy(p => p.EndTime),
+            _ => parameters.SortDescending ? query.OrderByDescending(p => p.StartTime) : query.OrderBy(p => p.StartTime)
+        };
 
         return query.Skip((parameters.PageNumber - 1) * parameters.PageSize).Take(parameters.PageSize);
     }

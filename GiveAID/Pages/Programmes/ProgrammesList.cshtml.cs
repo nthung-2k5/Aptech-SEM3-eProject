@@ -9,10 +9,11 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
     public string SearchTerm { get; set; } = string.Empty;
     public string? CauseId { get; set; }
     public string? NgoId { get; set; }
+    public string SortOption { get; set; } = "startdate_desc";
     public int PageNumber { get; set; } = 1;
 
-    public ProgrammeDto[] Programmes { get; set; } = [];
-    public int TotalPages => (int)Math.Ceiling(Programmes.Length / 6.0);
+    public PagedResult<ProgrammeDto> Programmes { get; set; } = new();
+    public int TotalPages => Programmes.TotalPages;
 
     public override async Task MountAsync() { await LoadProgrammesAsync(); }
 
@@ -33,20 +34,27 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
         SearchTerm = string.Empty;
         CauseId = null;
         NgoId = null;
+        SortOption = "startdate_desc";
         PageNumber = 1;
         await LoadProgrammesAsync();
     }
 
     private async Task LoadProgrammesAsync()
     {
+        var sortParts = SortOption.Split('_');
+        var sortBy = sortParts.Length > 0 ? sortParts[0] : "startdate";
+        var sortDesc = sortParts.Length > 1 ? sortParts[1] == "desc" : true;
+
         var query = new ProgrammeQueryParameters
         {
             SearchTerm = SearchTerm,
             CauseId = !string.IsNullOrEmpty(CauseId) ? Guid.Parse(CauseId) : null,
             NgoId = !string.IsNullOrEmpty(NgoId) ? Guid.Parse(NgoId) : null,
+            SortBy = sortBy,
+            SortDescending = sortDesc,
             PageNumber = PageNumber,
             PageSize = 6
         };
-        Programmes = await programmeService.GetAllProgrammesAsync(query);
+        Programmes = await programmeService.GetAllProgrammesPagedAsync(query);
     }
 }

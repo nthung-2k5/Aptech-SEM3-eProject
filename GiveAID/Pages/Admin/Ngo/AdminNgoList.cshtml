@@ -68,7 +68,7 @@
                     int p = i;
                     <button class="join-item btn btn-sm @(p == Model.PageNumber ? "btn-active" : "")"
                             on:click="@(() => Model.GoToPage(p))">
-                        p
+                        @p
                     </button>
                 }
                 <button class="join-item btn btn-sm"
