@@ -1,0 +1,25 @@
+@model AdminDonationCauseEditor
+
+<form on:submit="@(() => Model.Save())" class="bg-white border border-[#E3DDD3] rounded-xl p-6">
+    @{ bool isViewMode = Context.Request.Query["mode"] == "view"; }
+    <h4 class="font-bold text-[#1C1A17] mb-4">@(isViewMode ? "View Cause" : (Model.Id.HasValue ? "Edit Cause" : "Add Cause"))</h4>
+    
+    <fieldset disabled="@isViewMode">
+        <div class="max-w-xl space-y-4 mb-6">
+        <div>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Name <span
+                    class="text-red-500">*</span></label>
+            <input type="text" asp-for="Form.Name" bind required class="input w-full"/>
+            <span asp-validation-for="Form.Name"></span>
+        </div>
+        </div>
+    </fieldset>
+    
+    <div class="flex justify-start gap-2 pt-4 border-t border-[#E3DDD3]">
+        <a asp-page="/Admin/DonationCause/Index" class="btn btn-soft">@(isViewMode ? "Back" : "Cancel")</a>
+        @if (!isViewMode)
+        {
+            <button type="submit" class="btn btn-secondary">Save Cause</button>
+        }
+    </div>
+</form>

@@ -1,0 +1,175 @@
+@using GiveAID.Models
+@model GiveAID.Pages.Admin.Components.AdminActionTables
+
+<div class="mb-8">
+  <!-- Analytics Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Chart 1: Donation & Financial Trends -->
+    <div class="card bg-base-100 shadow-sm border border-base-200">
+      <div class="p-6 pb-2">
+        <h2 class="card-title mb-3">Donation Trends</h2>
+        <div class="flex flex-wrap gap-2">
+          <span class="badge badge-lg bg-[#1A5C6B]/10 text-[#1A5C6B] border-0 font-semibold">
+            <i class="ph ph-currency-dollar mr-1"></i> $@Model.DonationTotal.ToString("N0") this year
+          </span>
+          <span class="badge badge-lg bg-[#C97C2E]/10 text-[#C97C2E] border-0 font-semibold">
+            <i class="ph ph-receipt mr-1"></i> @Model.DonationCount txns
+          </span>
+          <span class="badge badge-lg bg-[#4A8B7F]/10 text-[#4A8B7F] border-0 font-semibold">
+            <i class="ph ph-calendar mr-1"></i> $@Model.DonationThisMonth.ToString("N0") this month
+          </span>
+        </div>
+      </div>
+      <div class="card-body h-64 flex items-center justify-center pt-2">
+        <canvas id="donationTrendChart" data-chart-labels="@Model.DonationLabelsJson" data-chart-data="@Model.DonationDataJson"></canvas>
+      </div>
+    </div>
+    
+    <!-- Chart 2: Campaign Distribution by Cause -->
+    <div class="card bg-base-100 shadow-sm border border-base-200">
+      <div class="p-6 pb-2">
+        <h2 class="card-title mb-3">Campaign Causes</h2>
+        <div class="flex flex-wrap gap-2">
+          <span class="badge badge-lg bg-[#1A5C6B]/10 text-[#1A5C6B] border-0 font-semibold">
+            <i class="ph ph-flag mr-1"></i> @Model.CampaignTotal active campaigns
+          </span>
+          <span class="badge badge-lg bg-[#C97C2E]/10 text-[#C97C2E] border-0 font-semibold">
+            <i class="ph ph-tag mr-1"></i> @Model.CampaignCauseCount cause types
+          </span>
+        </div>
+      </div>
+      <div class="card-body h-64 flex items-center justify-center pt-2">
+        <canvas id="campaignDistributionChart" data-chart-labels="@Model.CampaignLabelsJson" data-chart-data="@Model.CampaignDataJson"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 3: NGO Onboarding & Partner Growth -->
+    <div class="card bg-base-100 shadow-sm border border-base-200">
+      <div class="p-6 pb-2">
+        <h2 class="card-title mb-3">NGO Growth</h2>
+        <div class="flex flex-wrap gap-2">
+          <span class="badge badge-lg bg-[#1A5C6B]/10 text-[#1A5C6B] border-0 font-semibold">
+            <i class="ph ph-globe mr-1"></i> @Model.NgoTotal total NGOs
+          </span>
+          <span class="badge badge-lg bg-[#C97C2E]/10 text-[#C97C2E] border-0 font-semibold">
+            <i class="ph ph-plus-circle mr-1"></i> @Model.NgoThisMonth joined this month
+          </span>
+        </div>
+      </div>
+      <div class="card-body h-64 flex items-center justify-center pt-2">
+        <canvas id="ngoGrowthChart" data-chart-labels="@Model.NgoLabelsJson" data-chart-data="@Model.NgoDataJson"></canvas>
+      </div>
+    </div>
+
+    <!-- Chart 4: Member/User Acquisition -->
+    <div class="card bg-base-100 shadow-sm border border-base-200">
+      <div class="p-6 pb-2">
+        <h2 class="card-title mb-3">User Acquisition</h2>
+        <div class="flex flex-wrap gap-2">
+          <span class="badge badge-lg bg-[#1A5C6B]/10 text-[#1A5C6B] border-0 font-semibold">
+            <i class="ph ph-users mr-1"></i> @Model.UserTotal total members
+          </span>
+          <span class="badge badge-lg bg-[#D4183D]/10 text-[#D4183D] border-0 font-semibold">
+            <i class="ph ph-user-plus mr-1"></i> @Model.UserThisMonth new this month
+          </span>
+        </div>
+      </div>
+      <div class="card-body h-64 flex items-center justify-center pt-2">
+        <canvas id="userAcquisitionChart" data-chart-labels="@Model.UserLabelsJson" data-chart-data="@Model.UserDataJson"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Left Side: Recent Donations -->
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body p-0">
+        <h2 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1C1A17] p-6 pb-2">Recent Donations</h2>
+        <div class="overflow-x-auto px-6 pb-4">
+          <table class="table table-zebra w-full text-sm">
+            <thead class="text-[#6B6459] text-xs font-bold uppercase tracking-wider">
+              <tr>
+                <th class="py-4">Donor</th>
+                <th class="py-4">Amount</th>
+                <th class="py-4">Programme</th>
+                <th class="py-4">Date</th>
+                <th class="py-4">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach (var donation in Model.RecentDonations)
+              {
+                  <tr class="hover:bg-[#F6F1E9]/50 transition-colors">
+                    <td class="font-semibold text-[#1C1A17]">@donation.DonorName</td>
+                    <td class="text-[#1A5C6B] font-bold">$@donation.Amount.ToString("N2")</td>
+                    <td class="text-[#6B6459]">@(donation.ProgrammeName ?? "General Fund")</td>
+                    <td class="text-[#6B6459]">@donation.CreatedAt.ToString("MMM dd, yyyy")</td>
+                    <td>
+                        @if (donation.Status == GiveAID.Models.DonationStatus.Completed)
+                        {
+                            <span class="badge badge-success badge-sm text-white">Completed</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-warning badge-sm">Void</span>
+                        }
+                    </td>
+                  </tr>
+              }
+              @if (!Model.RecentDonations.Any())
+              {
+                  <tr>
+                      <td colspan="5" class="text-center text-[#6B6459] py-4">No recent donations.</td>
+                  </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-actions justify-center p-4 border-t border-base-200">
+        <a href="/Admin/Donation" class="btn btn-ghost btn-sm">View All</a>
+      </div>
+    </div>
+
+    <!-- Right Side: Pending Queries -->
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body p-0">
+        <h2 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1C1A17] p-6 pb-2">Pending Queries</h2>
+        <div class="overflow-x-auto px-6 pb-4">
+          <table class="table w-full text-sm">
+            <thead class="text-[#6B6459] text-xs font-bold uppercase tracking-wider">
+              <tr>
+                <th class="py-4">User</th>
+                <th class="py-4">Subject</th>
+                <th class="py-4 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#E3DDD3]">
+              @foreach (var req in Model.PendingRequests)
+              {
+                  <tr class="hover:bg-[#F6F1E9]/50 transition-colors">
+                    <td class="font-semibold text-[#1C1A17]">@req.Requester</td>
+                    <td class="text-[#6B6459]">
+                        <span class="text-xs">@req.Type</span>
+                    </td>
+                    <td class="text-right">
+                        <a href="/Admin/UserQuery" class="btn btn-sm btn-outline border-[#1A5C6B] text-[#1A5C6B] hover:bg-[#1A5C6B] hover:text-white">Reply</a>
+                    </td>
+                  </tr>
+              }
+              @if (!Model.PendingRequests.Any())
+              {
+                  <tr>
+                      <td colspan="3" class="text-center text-[#6B6459] py-4">All caught up! No pending requests.</td>
+                  </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-actions justify-center p-4 border-t border-base-200">
+        <a href="/Admin/UserQuery" class="btn btn-ghost btn-sm">View All</a>
+      </div>
+    </div>
+  </div>
+</div>

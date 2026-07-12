@@ -1,0 +1,252 @@
+@model HeroSlider
+
+@{
+    int slideCount = Model.Slides.Count;
+    int totalDuration = slideCount * 5; // 5s per slide
+}
+
+<div>
+    <style>
+        .hero-slider-wrap {
+            position: relative;
+            height: 92vh;
+            overflow: hidden;
+            background-color: #1A5C6B;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Images sit at the very back */
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            animation-name: heroFade;
+            animation-duration: @(totalDuration)s;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+        }
+
+        .hero-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Slide 0 starts immediately visible using a negative delay */
+        .hero-slide-0 {
+            animation-delay: 0s;
+            opacity: 1; /* visible immediately before animation kicks in */
+        }
+
+        @@keyframes heroFade {
+            0%   { opacity: 1; }
+            @(Math.Round(100.0 / slideCount * 0.6, 1))% { opacity: 1; }
+            @(Math.Round(100.0 / slideCount * 0.85, 1))% { opacity: 0; }
+            100% { opacity: 0; }
+        }
+
+        /* The dark overlay sits above images but is semi-transparent */
+        .hero-overlay-dark {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.50);
+            z-index: 2;
+        }
+
+        /* All content sits above the overlay */
+        .hero-slider-content {
+            position: relative;
+            z-index: 3;
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Stats bar pinned to the very bottom of the section */
+        .hero-slider-stats {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 3;
+        }
+    </style>
+
+    <section class="hero-slider-wrap">
+
+        <!-- Background Images (layer 1: bottom) -->
+        @for (int i = 0; i < slideCount; i++)
+        {
+            <div class="hero-slide hero-slide-@i"
+                 style="animation-delay: @(i * 5)s;">
+                <img src="@Model.Slides[i]" alt="Hero slide @(i + 1)" />
+            </div>
+        }
+
+        <!-- Dark Overlay (layer 2) -->
+        <div class="hero-overlay-dark"></div>
+
+        <!-- Hero Content (layer 3: top) -->
+        <div class="hero-slider-content">
+            <div class="max-w-7xl mx-auto w-full px-6 pt-16 pb-28 grid md:grid-cols-2 gap-12 items-center">
+
+                <!-- Left Side Content -->
+                <div class="text-left w-full max-w-lg mx-auto md:mx-0">
+                    <div class="badge badge-outline border-[#C97C2E]/40 text-[#E8C07D] bg-[#C97C2E]/20 text-xs font-semibold uppercase tracking-widest px-4 py-4 rounded-full mb-6">
+                        <i class="ph-fill ph-heart mr-2 text-current"></i> Non-Governmental Organisation
+                    </div>
+
+                    <h1 class="font-['Playfair_Display',serif] text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6">
+                        Together We<br/>
+                        <span class="text-[#E8C07D] italic">Give. Aid.</span><br/>
+                        Transform.
+                    </h1>
+
+                    <p class="text-lg text-white/80 leading-relaxed mb-8 max-w-lg">
+                        Give-AID unites NGOs, donors, and communities to fund welfare programmes for children, women, the elderly, and the differently-abled.
+                    </p>
+
+                    <div class="flex flex-wrap gap-4">
+                        @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
+                        {
+                            <a href="/Admin" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
+                                Manage Platform <i class="ph ph-gear ml-1"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/Donate/Index" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
+                                Donate Now <i class="ph ph-arrow-right ml-1"></i>
+                            </a>
+                        }
+                        <a href="/Programmes" class="btn btn-outline text-white hover:bg-white hover:text-[#1A5C6B] border-white/30 hover:border-white px-8 h-14 rounded transition-colors font-semibold text-base">
+                            Our Programmes
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Right Side Content: Floating Card -->
+                <div class="hidden md:flex justify-end w-full">
+                    <div class="card bg-white text-neutral shadow-2xl max-w-sm w-full rounded-2xl ml-auto">
+                        <div class="card-body p-8">
+                            @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
+                            {
+                                <h3 class="font-['Playfair_Display',serif] text-2xl font-bold text-[#1C1A17] mb-1">Administration</h3>
+                                <p class="text-sm text-[#6B6459] mb-6">Oversee causes and platform activity.</p>
+                            }
+                            else
+                            {
+                                <h3 class="font-['Playfair_Display',serif] text-2xl font-bold text-[#1C1A17] mb-1">Choose Your Donation</h3>
+                                <p class="text-sm text-[#6B6459] mb-6">Every penny changes a life.</p>
+                            }
+
+                            <div class="card-actions w-full mt-2">
+                                @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
+                                {
+                                    <a href="/Admin/DonationCause" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
+                                        Manage Causes <i class="ph ph-list-dashes"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="/Programmes/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
+                                        Proceed to Donate <i class="ph ph-arrow-right"></i>
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Stats Bar (layer 3: also on top) -->
+        <div class="hero-slider-stats bg-black/30 backdrop-blur-sm w-full">
+            <div class="max-w-7xl mx-auto px-6 py-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                <div class="text-center"
+                     x-data="{ count: 0, target: @Model.TotalRaised }"
+                     x-init="
+                        let step = Math.max(1, target / 50);
+                        let interval = setInterval(() => {
+                            if (count + step >= target) {
+                                count = target;
+                                clearInterval(interval);
+                            } else {
+                                count += step;
+                            }
+                        }, 30)
+                     ">
+                    <div class="font-['Playfair_Display',serif] text-2xl font-bold text-[#E8C07D]">
+                        $<span x-text="Math.floor(count).toLocaleString('en-US')"></span>
+                    </div>
+                    <div class="text-xs text-white/60 uppercase tracking-wide">Total Raised</div>
+                </div>
+
+                <div class="text-center"
+                     x-data="{ count: 0, target: @Model.TotalPartners }"
+                     x-init="
+                        let step = Math.ceil(target / 50);
+                        let interval = setInterval(() => {
+                            if (count + step >= target) {
+                                count = target;
+                                clearInterval(interval);
+                            } else {
+                                count += step;
+                            }
+                        }, 30)
+                     ">
+                    <div class="font-['Playfair_Display',serif] text-2xl font-bold text-[#E8C07D]">
+                        <span x-text="Math.floor(count).toLocaleString('en-US')"></span>
+                    </div>
+                    <div class="text-xs text-white/60 uppercase tracking-wide">NGO &amp; Partners</div>
+                </div>
+
+                <div class="text-center"
+                     x-data="{ count: 0, target: @Model.TotalDonations }"
+                     x-init="
+                        let step = Math.ceil(target / 50);
+                        let interval = setInterval(() => {
+                            if (count + step >= target) {
+                                count = target;
+                                clearInterval(interval);
+                            } else {
+                                count += step;
+                            }
+                        }, 30)
+                     ">
+                    <div class="font-['Playfair_Display',serif] text-2xl font-bold text-[#E8C07D]">
+                        <span x-text="Math.floor(count).toLocaleString('en-US')"></span>
+                    </div>
+                    <div class="text-xs text-white/60 uppercase tracking-wide">Donations</div>
+                </div>
+
+                <div class="text-center"
+                     x-data="{ count: 0, target: @Model.TotalProgrammes }"
+                     x-init="
+                        let step = Math.ceil(target / 50);
+                        let interval = setInterval(() => {
+                            if (count + step >= target) {
+                                count = target;
+                                clearInterval(interval);
+                            } else {
+                                count += step;
+                            }
+                        }, 30)
+                     ">
+                    <div class="font-['Playfair_Display',serif] text-2xl font-bold text-[#E8C07D]">
+                        <span x-text="Math.floor(count).toLocaleString('en-US')"></span>
+                    </div>
+                    <div class="text-xs text-white/60 uppercase tracking-wide">Programmes Run</div>
+                </div>
+
+            </div>
+        </div>
+
+    </section>
+</div>

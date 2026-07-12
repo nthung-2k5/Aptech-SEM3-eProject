@@ -3,9 +3,11 @@
 <div class="bg-white rounded-xl border border-[#E3DDD3] overflow-hidden">
     <div class="p-6 border-b border-[#E3DDD3]">
         <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-            <div class="flex items-center gap-3">
-                <h3 class="text-[#1C1A17]">Welfare Programmes</h3>
-                <span class="badge badge-ghost text-sm">@Model.TotalCount total</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <h3 class="text-[#1C1A17]">Welfare Programmes</h3>
+              <span class="badge badge-lg bg-[#1A5C6B]/10 text-[#1A5C6B] border-0 font-semibold"><i class="ph ph-flag mr-1"></i> @Model.TotalCount total</span>
+              <span class="badge badge-lg bg-[#C97C2E]/10 text-[#C97C2E] border-0 font-semibold"><i class="ph ph-buildings mr-1"></i> @Model.AvailableNgos.Length NGOs</span>
+              <span class="badge badge-lg bg-[#4A8B7F]/10 text-[#4A8B7F] border-0 font-semibold"><i class="ph ph-tag mr-1"></i> @Model.AvailableCauses.Length causes</span>
             </div>
             <a asp-page="/Admin/Programme/Editor" class="btn btn-primary btn-sm">
                 <i class="ph ph-plus"></i> Add Programme
@@ -108,12 +110,15 @@
                     </td>
                     <td>
                         <div class="flex gap-1">
-                            <a href="/Admin/Programme/Editor/@p.Id" class="btn btn-ghost btn-xs" title="Edit">
-                                <i class="ph ph-pencil-simple"></i>
+                            <a href="/Admin/Programme/Editor/@p.Id?mode=view" class="btn btn-ghost btn-xs text-[#1A5C6B]" title="View details">
+                                <i class="ph ph-eye text-lg"></i>
+                            </a>
+                            <a href="/Admin/Programme/Editor/@p.Id" class="btn btn-ghost btn-xs text-[#C97C2E]" title="Edit">
+                                <i class="ph ph-pencil-simple text-lg"></i>
                             </a>
                             <button on:click="@(() => Model.Delete(p.Id))" class="btn btn-ghost btn-xs text-error"
                                     title="Delete">
-                                <i class="ph ph-trash"></i>
+                                <i class="ph ph-trash text-lg"></i>
                             </button>
                         </div>
                     </td>

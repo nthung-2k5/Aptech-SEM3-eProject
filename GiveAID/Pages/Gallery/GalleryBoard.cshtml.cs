@@ -100,7 +100,7 @@ public class GalleryBoard(
             string base64Data = PreviewImageSource!.Split(',')[1];
             byte[] bytes = Convert.FromBase64String(base64Data);
             
-            if (EditingId.HasValue && EditingId.Value != Guid.Empty)
+            if (EditingId.HasValue && EditingId.Value != Guid.Empty && imageUri.Contains("127.0.0.1:9000"))
             {
                 await imageService.UpdateImageAsync(new Uri(imageUri), bytes);
             }

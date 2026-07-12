@@ -9,6 +9,7 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
     public string SearchTerm { get; set; } = string.Empty;
     public string? CauseId { get; set; }
     public string? NgoId { get; set; }
+    public DateTime? DateFilter { get; set; }
     public int PageNumber { get; set; } = 1;
 
     public ProgrammeDto[] Programmes { get; set; } = [];
@@ -33,6 +34,7 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
         SearchTerm = string.Empty;
         CauseId = null;
         NgoId = null;
+        DateFilter = null;
         PageNumber = 1;
         await LoadProgrammesAsync();
     }
@@ -44,6 +46,7 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
             SearchTerm = SearchTerm,
             CauseId = !string.IsNullOrEmpty(CauseId) ? Guid.Parse(CauseId) : null,
             NgoId = !string.IsNullOrEmpty(NgoId) ? Guid.Parse(NgoId) : null,
+            DateFilter = DateFilter,
             PageNumber = PageNumber,
             PageSize = 6
         };

@@ -42,6 +42,14 @@
                 </select>
                 <span asp-validation-for="NgoId"></span>
             </div>
+            <div>
+                <label class="block font-semibold mb-2 text-[#1C1A17]">Filter by Date</label>
+                <label class="input w-full">
+                    <i class="ph ph-calendar-blank"></i>
+                    <input type="date" asp-for="DateFilter" bind on:change="@(() => Model.Search())" />
+                </label>
+                <span asp-validation-for="DateFilter"></span>
+            </div>
             <button on:click="@(() => Model.ClearFilters())" class="btn btn-outline btn-primary btn-block">Clear
                 Filters
             </button>
@@ -57,73 +65,100 @@
                 {
                     <text>Found @Model.Programmes.Length Programmes</text>
                 }
-                else { <text>No programmes found.</text> }
             </h2>
         </div>
 
-        <!-- Cards Grid -->
-        <div class="grid lg:grid-cols-2 xl:grid-cols-3 gap-6 flex-grow">
-            @foreach (var p in Model.Programmes)
-            {
-                var timeRemaining = p.EndDate - DateTimeOffset.Now;
-                bool isStarted = p.StartDate <= DateTimeOffset.Now;
-                string? timeText = null;
+        @if (Model.Programmes.Length == 0)
+        {
+            <div class="flex flex-col items-center justify-center bg-white border border-[#E3DDD3] rounded-2xl p-12 text-center flex-grow shadow-sm">
+                <div class="size-20 bg-[#F6F1E9] rounded-full flex items-center justify-center mb-4">
+                    <i class="ph ph-magnifying-glass text-4xl text-[#1A5C6B]"></i>
+                </div>
+                <h3 class="text-2xl font-bold font-['Playfair_Display',serif] text-[#1C1A17] mb-2">No Programmes Found</h3>
+                <p class="text-[#6B6459] mb-6 max-w-md">We couldn't find any programmes matching your current search or filters. Try adjusting your criteria.</p>
+                <button on:click="@(() => Model.ClearFilters())" class="btn bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none px-8 rounded-xl font-semibold">
+                    Clear All Filters
+                </button>
+            </div>
+        }
+        else
+        {
+            <!-- Cards Grid -->
+            <div class="grid lg:grid-cols-2 xl:grid-cols-3 gap-6 flex-grow">
+                @foreach (var p in Model.Programmes)
+                {
+                    var timeRemaining = p.EndDate - DateTimeOffset.Now;
+                    bool isStarted = p.StartDate <= DateTimeOffset.Now;
+                    string? timeText = null;
 
-                if (!isStarted) { timeText = $"Starts in {(p.StartDate - DateTimeOffset.Now).Days} days"; }
-                else if (timeRemaining.HasValue) { timeText = timeRemaining.Value.TotalDays > 0 ? $"{timeRemaining.Value.Days} days left" : "Ended"; }
+                    if (!isStarted) { timeText = $"Starts in {(p.StartDate - DateTimeOffset.Now).Days} days"; }
+                    else if (timeRemaining.HasValue) { timeText = timeRemaining.Value.TotalDays > 0 ? $"{timeRemaining.Value.Days} days left" : "Ended"; }
 
-                int progress = p.TargetAmount is > 0 ? (int)(p.RaisedAmount / p.TargetAmount.Value * 100) : 0;
-                if (progress > 100) progress = 100;
+                    int progress = p.TargetAmount is > 0 ? (int)(p.RaisedAmount / p.TargetAmount.Value * 100) : 0;
+                    if (progress > 100) progress = 100;
 
-                <a asp-page="/Programmes/Details" asp-route-id="@p.Id"
-                   class="block bg-white border border-[#E3DDD3] rounded-xl overflow-hidden hover:shadow-lg transition-all group no-underline text-inherit flex flex-col">
-                    <div class="h-48 overflow-hidden relative">
-                        <img src="@p.ImageUrl" alt="@p.Name"
-                             class="w-full h-full object-cover aspect-[4/3] group-hover:scale-105 transition-transform duration-500"/>
-                        <div class="absolute top-3 left-3 badge badge-primary font-semibold">
-                            @p.Cause
-                        </div>
-                    </div>
-                    <div class="p-5 flex-grow flex flex-col">
-                        <h3 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1C1A17] mb-2 group-hover:text-[#C97C2E] transition-colors">@p.Name</h3>
-                        <div class="flex items-center gap-2 text-sm text-gray-500 mb-4">
-                            <i class="ph ph-buildings"></i>
-                            <span>@p.NgoName</span>
-                        </div>
-                        <div class="mt-auto">
-                            <div class="flex justify-between text-sm mb-2 text-gray-600 font-medium">
-                                <span>@p.RaisedAmount.ToUsCurrencyString() raised</span>
-                                @if (p.TargetAmount.HasValue)
-                                {
-                                    <span>of @p.TargetAmount.Value.ToUsCurrencyString()</span>
-                                }
+                    <a href="/Programmes/@p.Id"
+                       class="block bg-white border border-[#E3DDD3] rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group no-underline text-inherit flex flex-col h-full">
+                        <div class="h-52 overflow-hidden relative">
+                            <img src="@p.ImageUrl" alt="@p.Name"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
+                            <!-- Gradient Overlay -->
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+                            <div class="absolute top-4 left-4 badge bg-[#C97C2E] border-none text-white font-semibold shadow-md">
+                                @p.Cause
                             </div>
-                            @if (p.TargetAmount.HasValue)
+                            @if (!string.IsNullOrEmpty(p.Location))
                             {
-                                <div class="w-full bg-gray-200 rounded-full h-2 mb-4 overflow-hidden">
-                                    <div class="bg-[#C97C2E] h-2 rounded-full" style="width: @progress%"></div>
+                                <div class="absolute bottom-4 left-4 text-white flex items-center gap-1.5 text-sm font-medium">
+                                    <i class="ph ph-map-pin-line text-lg text-white/90"></i>
+                                    @p.Location
                                 </div>
                             }
-
-                            <div class="flex items-center justify-between pt-4 border-t border-gray-100 text-sm">
-                                <div class="flex items-center gap-1 text-gray-500">
-                                    <i class="ph ph-users"></i>
-                                    <span>@p.DonationCount</span>
+                        </div>
+                        <div class="p-6 flex-grow flex flex-col">
+                            <h3 class="font-['Playfair_Display',serif] text-xl font-bold text-[#1C1A17] mb-3 group-hover:text-[#1A5C6B] transition-colors leading-snug">@p.Name</h3>
+                            <div class="flex items-center gap-2 text-sm text-[#6B6459] mb-1 font-medium">
+                                <i class="ph ph-buildings text-lg"></i>
+                                <span>@p.NgoName</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-sm text-[#6B6459] mb-6 font-medium">
+                                <i class="ph ph-calendar-blank text-lg"></i>
+                                <span>@p.StartDate.ToString("MMM dd, yyyy") @(p.EndDate.HasValue ? $"- {p.EndDate.Value.ToString("MMM dd, yyyy")}" : "(Ongoing)")</span>
+                            </div>
+                            <div class="mt-auto">
+                                <div class="flex justify-between text-sm mb-2 text-[#1C1A17] font-semibold">
+                                    <span>@p.RaisedAmount.ToUsCurrencyString() <span class="text-[#6B6459] font-normal">raised</span></span>
+                                    @if (p.TargetAmount.HasValue)
+                                    {
+                                        <span class="text-[#6B6459] font-normal">of @p.TargetAmount.Value.ToUsCurrencyString()</span>
+                                    }
                                 </div>
-                                @if (timeText != null)
+                                @if (p.TargetAmount.HasValue)
                                 {
-                                    <div
-                                        class="flex items-center gap-1 text-[#1A5C6B] font-semibold bg-blue-50 px-3 py-1 rounded-full">
-                                        <i class="ph ph-clock"></i>
-                                        <span>@timeText</span>
+                                    <div class="w-full bg-[#F6F1E9] rounded-full h-2.5 mb-5 overflow-hidden shadow-inner">
+                                        <div class="bg-[#1A5C6B] h-full rounded-full transition-all duration-1000 ease-out" style="width: @progress%"></div>
                                     </div>
                                 }
+
+                                <div class="flex items-center justify-between pt-5 border-t border-[#E3DDD3] text-sm">
+                                    <div class="flex items-center gap-1.5 text-[#6B6459] font-medium">
+                                        <i class="ph ph-users text-lg"></i>
+                                        <span>@p.DonationCount</span>
+                                    </div>
+                                    @if (timeText != null)
+                                    {
+                                        <div class="flex items-center gap-1.5 text-[#C97C2E] font-semibold bg-[#C97C2E]/10 px-3 py-1 rounded-full">
+                                            <i class="ph ph-clock text-lg"></i>
+                                            <span>@timeText</span>
+                                        </div>
+                                    }
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </a>
-            }
-        </div>
+                    </a>
+                }
+            </div>
+        }
 
         <!-- Pagination -->
         @if (Model.TotalPages > 1)
@@ -162,4 +197,19 @@
             </div>
         }
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const activeCause = localStorage.getItem('activeCause');
+            
+            if (activeCause) {
+                const causeSelect = document.getElementById('CauseId');
+                if (causeSelect) {
+                    causeSelect.value = activeCause;
+                    causeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+                localStorage.removeItem('activeCause');
+            }
+        });
+    </script>
 </div>

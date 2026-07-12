@@ -3,9 +3,10 @@
 <div class="bg-white rounded-xl border border-[#E3DDD3] overflow-hidden">
     <div class="p-6 border-b border-[#E3DDD3]">
         <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-            <div class="flex items-center gap-3">
-                <h3 class="text-[#1C1A17]">Corporate Partners</h3>
-                <span class="badge badge-ghost text-sm">@Model.TotalCount total</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <h3 class="text-[#1C1A17]">Corporate Partners</h3>
+              <span class="badge badge-lg bg-[#1A5C6B]/10 text-[#1A5C6B] border-0 font-semibold"><i class="ph ph-handshake mr-1"></i> @Model.TotalCount total</span>
+              <span class="badge badge-lg bg-[#4A8B7F]/10 text-[#4A8B7F] border-0 font-semibold"><i class="ph ph-book-open mr-1"></i> @Model.TotalPages page(s)</span>
             </div>
             <a asp-page="/Admin/Partner/Editor" class="btn btn-primary btn-sm">
                 <i class="ph ph-plus"></i> Add Partner
@@ -27,34 +28,44 @@
 
     <div class="overflow-x-auto">
         <table class="table w-full">
-            <thead>
+            <thead class="text-[#6B6459] text-xs font-bold uppercase tracking-wider bg-[#F6F1E9]/50">
             <tr>
-                <th>Name</th>
-                <th>Website</th>
-                <th>Actions</th>
+                <th class="py-4 pl-6 w-1/2">Partner Name</th>
+                <th class="py-4">Website</th>
+                <th class="py-4 pr-6 text-right w-32">Actions</th>
             </tr>
             </thead>
-            <tbody>
+            <tbody class="divide-y divide-[#E3DDD3]">
             @foreach (var p in Model.Partners)
             {
-                <tr>
-                    <th>@p.Name</th>
-                    <td>
+                <tr class="hover:bg-gray-50/50 transition-colors">
+                    <td class="py-4 pl-6">
+                        <div class="flex items-center gap-3">
+                            <div class="size-10 bg-[#1A5C6B]/10 rounded-xl flex items-center justify-center shrink-0 text-[#1A5C6B]">
+                                <i class="ph-fill ph-handshake text-xl"></i>
+                            </div>
+                            <span class="font-semibold text-[#1C1A17] text-base">@p.Name</span>
+                        </div>
+                    </td>
+                    <td class="py-4">
                         @if (!string.IsNullOrEmpty(p.WebsiteLink))
                         {
-                            <a href="@p.WebsiteLink" target="_blank" class="link link-hover text-[#1A5C6B] text-sm">
-                                <i class="ph ph-link mr-1"></i>Visit
+                            <a href="@p.WebsiteLink" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#F6F1E9] hover:bg-[#E3DDD3] text-[#1A5C6B] text-sm font-medium rounded-lg transition-colors no-underline">
+                                <i class="ph ph-link text-lg"></i> Visit Site
                             </a>
                         }
-                        else { <span class="text-[#6B6459]">—</span> }
+                        else { <span class="text-[#6B6459] text-sm italic">Not provided</span> }
                     </td>
-                    <td>
-                        <div class="flex gap-1">
-                            <a asp-page="/Admin/Partner/Editor" asp-route-id="@p.Id" class="btn btn-ghost btn-xs" title="Edit">
-                                <i class="ph ph-pencil-simple"></i>
+                    <td class="py-4 pr-6">
+                        <div class="flex items-center justify-end gap-1">
+                            <a asp-page="/Admin/Partner/Editor" asp-route-id="@p.Id" asp-route-mode="view" class="btn btn-ghost btn-sm text-[#1A5C6B] hover:bg-[#1A5C6B]/10" title="View details">
+                                <i class="ph ph-eye text-lg"></i>
                             </a>
-                            <button on:click="@(() => Model.Delete(p.Id))" class="btn btn-ghost btn-xs text-error"
-                                    title="Delete"><i class="ph ph-trash"></i></button>
+                            <a asp-page="/Admin/Partner/Editor" asp-route-id="@p.Id" class="btn btn-ghost btn-sm text-[#C97C2E] hover:bg-[#C97C2E]/10" title="Edit">
+                                <i class="ph ph-pencil-simple text-lg"></i>
+                            </a>
+                            <button on:click="@(() => Model.Delete(p.Id))" class="btn btn-ghost btn-sm text-red-500 hover:bg-red-50"
+                                    title="Delete"><i class="ph ph-trash text-lg"></i></button>
                         </div>
                     </td>
                 </tr>

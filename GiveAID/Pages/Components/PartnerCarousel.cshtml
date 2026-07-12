@@ -1,0 +1,24 @@
+@model PartnerCarousel
+
+<div class="bg-base-200 py-12 border-y border-base-300 overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6">
+        
+        <h2 class="font-['Playfair_Display',serif] text-4xl md:text-5xl font-bold text-center text-[#1C1A17] mb-12">
+            Trusted by Major Corporations & Verified NGOs
+        </h2>
+
+        <!-- Responsive Marquee / Flex Container -->
+        <div class="flex flex-wrap justify-center items-center gap-12 md:gap-24">
+            @foreach (var partner in Model.Partners)
+            {
+                <div class="w-28 md:w-36 flex justify-center group cursor-pointer">
+                    <img src="@partner.LogoUrl" 
+                         alt="@partner.Name Logo" 
+                         title="@partner.Name"
+                         class="h-10 md:h-12 object-contain transition-transform hover:scale-105 duration-300" />
+                </div>
+            }
+        </div>
+
+    </div>
+</div>

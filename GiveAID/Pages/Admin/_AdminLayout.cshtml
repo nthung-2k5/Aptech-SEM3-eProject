@@ -4,7 +4,11 @@
 
 @functions
 {
-    bool IsActive(string page) => ViewContext.RouteData.Values["Page"]?.ToString()?.StartsWith(page) == true;
+    bool IsActive(string page) 
+    {
+        var current = ViewContext.RouteData.Values["Page"]?.ToString();
+        return current == page || (current != null && current.StartsWith(page + "/"));
+    }
 }
 
 <div id="admin">
@@ -31,6 +35,10 @@
             <a asp-page="/Admin/Donation/Index"
                data-active="@IsActive("/Admin/Donation")">
                 <i class="ph ph-heart"></i>Donations
+            </a>
+            <a asp-page="/Admin/DonationCause/Index"
+               data-active="@IsActive("/Admin/DonationCause")">
+                <i class="ph ph-target"></i>Causes
             </a>
             <a asp-page="/Admin/Member/Index"
                data-active="@IsActive("/Admin/Member")">

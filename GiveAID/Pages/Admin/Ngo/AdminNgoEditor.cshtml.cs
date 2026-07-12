@@ -38,8 +38,11 @@ public class AdminNgoEditor(
             {
                 Form = new FormModel
                 {
-                    Name = n.Name, Description = n.Description,
-                    Address = n.Address ?? "", Website = n.Website ?? "", PhoneNumber = n.PhoneNumber ?? "",
+                    Name = n.Name,
+                    Description = n.Description,
+                    Address = n.Address ?? "",
+                    Website = n.Website ?? "",
+                    PhoneNumber = n.PhoneNumber ?? "",
                     SelectedPartnerIds = n.Partners.Select(p => p.Id).ToList()
                 };
             }

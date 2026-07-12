@@ -5,78 +5,130 @@
 }
 
 <div class="space-y-6">
-    <div class="grid md:grid-cols-4 gap-5">
-        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
-            <div
-                class="text-[#1A5C6B] font-['Playfair_Display',serif] text-3xl font-bold mb-1">@Model.TotalDonations</div>
-            <div class="text-sm font-semibold text-[#1C1A17]">Total Donations</div>
-            <div class="text-xs text-[#6B6459]">all time</div>
-        </div>
-        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
-            <div
-                class="text-[#C97C2E] font-['Playfair_Display',serif] text-3xl font-bold mb-1">@Model.TotalMembers</div>
-            <div class="text-sm font-semibold text-[#1C1A17]">Registered Members</div>
-            <div class="text-xs text-[#6B6459]">active users</div>
-        </div>
-        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
-            <div
-                class="text-[#4A8B7F] font-['Playfair_Display',serif] text-3xl font-bold mb-1">@Model.TotalNgos</div>
-            <div class="text-sm font-semibold text-[#1C1A17]">Partner NGOs</div>
-            <div class="text-xs text-[#6B6459]">verified</div>
-        </div>
-        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
-            <div
-                class="text-[#D4183D] font-['Playfair_Display',serif] text-3xl font-bold mb-1">@Model.OpenQueriesCount</div>
-            <div class="text-sm font-semibold text-[#1C1A17]">Open Queries</div>
-            <div class="text-xs text-[#6B6459]">pending reply</div>
-        </div>
-    </div>
-
-    <div class="grid md:grid-cols-2 gap-5">
-        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-['Playfair_Display',serif] font-bold text-[#1C1A17]">Recent Donations</h3>
-                <a asp-page="/Admin/Donation/Index"
-                   class="text-sm text-[#1A5C6B] font-semibold hover:underline">View All</a>
-            </div>
-            <div class="space-y-3">
-                @foreach (var d in Model.LatestDonations)
-                {
-                    <div
-                        class="flex items-center justify-between text-sm pb-3 border-b border-[#E3DDD3] last:border-0 last:pb-0">
-                        @* <div> *@
-                        @*     <span class="font-medium text-[#1C1A17]">@d.DonorName</span> *@
-                        @*     <span class="text-[#6B6459] ml-2">@d.CauseName</span> *@
-                        @* </div> *@
-                        <span class="font-medium text-[#1C1A17]">@d.DonorName</span>
-                        <span class="text-[#1A5C6B] font-semibold">$@d.Amount</span>
-                    </div>
-                }
-                @if (!Model.LatestDonations.Any()) { <p class="text-[#6B6459] text-sm">No donations found.</p> }
-            </div>
-        </div>
-
-        <div class="bg-white rounded-xl border border-[#E3DDD3] p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="font-['Playfair_Display',serif] font-bold text-[#1C1A17]">Pending Queries</h3>
-                <a asp-page="/Admin/UserQuery/Index"
-                   class="text-sm text-[#1A5C6B] font-semibold hover:underline">View All</a>
-            </div>
-            <div class="space-y-3">
-                @foreach (var q in Model.LatestUnansweredQueries)
-                {
-                    <div class="text-sm pb-3 border-b border-[#E3DDD3] last:border-0 last:pb-0">
-                        <span class="font-medium text-[#1C1A17]">@q.UserName: </span>
-                        <span class="text-[#6B6459]">@q.MessageText</span>
-                        <div class="text-xs text-[#C97C2E] mt-1">@q.CreatedAt.ToString("MMM dd, yyyy")</div>
-                    </div>
-                }
-                @if (!Model.LatestUnansweredQueries.Any())
-                {
-                    <p class="text-[#6B6459] text-sm">No open
-                        queries.</p>
-                }
-            </div>
-        </div>
-    </div>
+    <dashboard-metrics />
+    <admin-action-tables />
 </div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+(function initCharts() {
+    const teal   = 'rgba(26,  92, 107, 0.85)';
+    const tealBg = 'rgba(26,  92, 107, 0.12)';
+    const amber  = 'rgba(201,124, 46, 0.85)';
+    const amberBg= 'rgba(201,124, 46, 0.12)';
+    const green  = 'rgba(74, 139,127, 0.85)';
+    const red    = 'rgba(212, 24, 61, 0.85)';
+    const palette = [teal, amber, green, red,
+                     'rgba(107,100,89,0.85)', 'rgba(80,160,100,0.85)'];
+
+    function parseCanvas(id) {
+        const el = document.getElementById(id);
+        if (!el) return null;
+        return {
+            el,
+            labels: JSON.parse(el.dataset.chartLabels || '[]'),
+            data:   JSON.parse(el.dataset.chartData   || '[]')
+        };
+    }
+
+    // Chart 1 – Donation Trends (Line)
+    const d1 = parseCanvas('donationTrendChart');
+    if (d1) {
+        new Chart(d1.el, {
+            type: 'line',
+            data: {
+                labels: d1.labels,
+                datasets: [{
+                    label: 'Revenue ($)',
+                    data: d1.data,
+                    borderColor: teal,
+                    backgroundColor: tealBg,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: teal
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { callback: v => '$' + v } } }
+            }
+        });
+    }
+
+    // Chart 2 – Campaign Causes (Doughnut)
+    const d2 = parseCanvas('campaignDistributionChart');
+    if (d2) {
+        new Chart(d2.el, {
+            type: 'doughnut',
+            data: {
+                labels: d2.labels,
+                datasets: [{
+                    data: d2.data,
+                    backgroundColor: palette,
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } },
+                cutout: '60%'
+            }
+        });
+    }
+
+    // Chart 3 – NGO Growth (Bar)
+    const d3 = parseCanvas('ngoGrowthChart');
+    if (d3) {
+        new Chart(d3.el, {
+            type: 'bar',
+            data: {
+                labels: d3.labels,
+                datasets: [{
+                    label: 'New NGOs',
+                    data: d3.data,
+                    backgroundColor: amber,
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+    }
+
+    // Chart 4 – User Acquisition (Line)
+    const d4 = parseCanvas('userAcquisitionChart');
+    if (d4) {
+        new Chart(d4.el, {
+            type: 'line',
+            data: {
+                labels: d4.labels,
+                datasets: [{
+                    label: 'New Members',
+                    data: d4.data,
+                    borderColor: red,
+                    backgroundColor: 'rgba(212,24,61,0.10)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: red
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+            }
+        });
+    }
+})();
+</script>
+}

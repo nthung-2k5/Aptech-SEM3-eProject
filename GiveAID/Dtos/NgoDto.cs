@@ -25,7 +25,7 @@ public static class NgoMapper
     {
         public IQueryable<NgoSummaryDto> ProjectToSummaryDto() =>
                 ngos.Select(n => new NgoSummaryDto(n.NgoId, n.Name, n.Description));
-        
+
         public IQueryable<NgoDto> ProjectToDto() =>
                 ngos.Include(n => n.NgoPartners)
                         .ThenInclude(p => p.Partner)

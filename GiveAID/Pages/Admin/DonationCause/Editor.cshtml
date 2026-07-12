@@ -1,0 +1,9 @@
+@page "{id:guid?}"
+@model EditorModel
+
+@{
+    ViewData["Title"] = "Donation Cause Editor";
+    Layout = "_AdminLayout";
+}
+
+<admin-donation-cause-editor id="@Model.Id" />

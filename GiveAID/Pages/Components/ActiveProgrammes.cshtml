@@ -1,0 +1,80 @@
+@model ActiveProgrammes
+
+<section class="w-full bg-base-200 py-20 mt-16">
+    <div class="max-w-7xl mx-auto px-6">
+        
+        <h2 class="font-['Playfair_Display',serif] text-4xl md:text-5xl font-bold text-center text-[#1C1A17] mb-12">Urgent Causes & <span class="text-[#1A5C6B] italic">Active Programmes</span></h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            @foreach (var prog in Model.Programmes.Take(3))
+            {
+                <div class="card bg-base-100 shadow-md hover:shadow-2xl transition-all duration-300 rounded-2xl border border-base-300/50 overflow-hidden group flex flex-col">
+                    
+                    <!-- Image Section -->
+                    <figure class="relative h-48 overflow-hidden">
+                        <img src="@prog.ImageUrl" alt="@prog.Title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-in-out" />
+                        
+                        <!-- Badge Overlay -->
+                        <div class="badge badge-primary bg-[#1A5C6B] border-none text-white absolute top-4 left-4 font-semibold px-4 py-3 shadow-md">
+                            @prog.Category
+                        </div>
+                    </figure>
+
+                    <!-- Card Body -->
+                    <div class="card-body p-6 flex flex-col justify-between">
+                        <div>
+                            <!-- Organizer -->
+                            <div class="flex items-center gap-1 text-sm text-gray-500 mb-2">
+                                <span>by @prog.OrganizerName</span>
+                                <i class="ph-fill ph-check-circle text-blue-500" title="Verified Organizer"></i>
+                            </div>
+
+                            <!-- Programme Title -->
+                            <h3 class="card-title text-xl font-bold text-gray-800 line-clamp-2 leading-snug mb-4 h-[3.5rem]" title="@prog.Title">
+                                @prog.Title
+                            </h3>
+                        </div>
+
+                        <div>
+                            <!-- Progress Bar Section -->
+                            <div class="mb-5 mt-2">
+                                <!-- Using DaisyUI progress bar, customized with Tailwind arbitrary variants for color matching -->
+                                <progress class="progress progress-primary w-full [&::-webkit-progress-value]:bg-[#C97C2E] [&::-moz-progress-bar]:bg-[#C97C2E] bg-gray-200 h-2" value="@prog.ProgressPercentage" max="100"></progress>
+                                
+                                <!-- Funding Stats -->
+                                <div class="flex justify-between text-sm font-semibold mt-3 text-gray-700">
+                                    <span>Raised: $@prog.CurrentAmount.ToString("N0")</span>
+                                    <span>Goal: $@prog.TargetAmount.ToString("N0")</span>
+                                </div>
+                                <div class="text-xs text-gray-500 mt-1 flex items-center">
+                                    <i class="ph ph-users mr-1.5 text-sm"></i> @prog.DonationCount donations
+                                </div>
+                            </div>
+
+                            <!-- Card Action -->
+                            <div class="card-actions w-full mt-auto">
+                                @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
+                                {
+                                    <a href="/Programmes/@prog.Id" class="btn btn-outline w-full text-[#1A5C6B] border-[#1A5C6B] hover:bg-[#1A5C6B] hover:text-white rounded-xl h-12 text-base font-semibold transition-colors">
+                                        View Details
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="/Donate?programmeId=@prog.Id" class="btn btn-primary w-full bg-[#1A5C6B] hover:bg-[#154D5A] border-none text-white rounded-xl h-12 text-base font-semibold transition-colors">
+                                        Donate Now
+                                    </a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <a asp-page="/Programmes/Index" class="btn btn-outline border-[#1A5C6B] text-[#1A5C6B] hover:bg-[#1A5C6B] hover:text-white rounded-xl px-10 h-12 transition-all font-semibold mt-12 mx-auto flex items-center justify-center w-fit">
+            View All Programmes <i class="ph ph-arrow-right ml-2"></i>
+        </a>
+
+    </div>
+</section>

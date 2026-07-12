@@ -87,7 +87,7 @@ public class AdminProgrammeEditor(
             string base64Data = PreviewImageSource!.Split(',')[1];
             byte[] bytes = Convert.FromBase64String(base64Data);
 
-            if (Id.HasValue && Id.Value != Guid.Empty)
+            if (Id.HasValue && Id.Value != Guid.Empty && Form.ImageUrl.Contains("127.0.0.1:9000"))
             {
                 await imageService.UpdateImageAsync(new Uri(Form.ImageUrl), bytes);
             }

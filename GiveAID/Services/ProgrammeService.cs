@@ -81,6 +81,17 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
 
         if (parameters.CauseId != null) { query = query.Where(p => p.Cause.CauseId == parameters.CauseId); }
 
+        if (parameters.DateFilter.HasValue)
+        {
+            var date = parameters.DateFilter.Value.Date; // Just the date part (00:00:00)
+            var nextDate = date.AddDays(1);
+            // Programme must have started before the end of the day, and (if it has an end date) must end after the start of the day
+            query = query.Where(p => p.StartTime < nextDate && (!p.EndTime.HasValue || p.EndTime >= date));
+        }
+
+        query = query.OrderBy(p => p.EndTime.HasValue ? 0 : 1)
+                     .ThenBy(p => p.EndTime);
+
         return query.Skip((parameters.PageNumber - 1) * parameters.PageSize).Take(parameters.PageSize);
     }
 

@@ -69,7 +69,7 @@ public class AdminPartnerEditor(
             string base64Data = PreviewImageSource!.Split(',')[1];
             byte[] bytes = Convert.FromBase64String(base64Data);
             
-            if (Id.HasValue && Id.Value != Guid.Empty)
+            if (Id.HasValue && Id.Value != Guid.Empty && Form.LogoUrl.Contains("127.0.0.1:9000"))
             {
                 await imageService.UpdateImageAsync(new Uri(Form.LogoUrl), bytes);
             }

@@ -8,102 +8,55 @@ public static class DbSeeder
 {
     public static async Task SeedAsync(AppDbContext context, IPasswordService passwordService)
     {
+        var now = DateTimeOffset.UtcNow;
+
         // ─────────────────────────────────────────────────────────────────────
-        // 1. Seed Users
+        // 1. USERS
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.Users.AnyAsync())
         {
+            var adminHash = passwordService.HashPassword("Admin@123");
+            var memberHash = passwordService.HashPassword("Member@123");
+
             var users = new List<User>
             {
-                new()
-                {
-                    UserId      = Guid.CreateVersion7(),
-                    FullName    = "Admin User",
-                    Email       = "admin@giveaid.com",
-                    PasswordHash = passwordService.HashPassword("Admin@123"),
-                    DateOfBirth = new DateOnly(1980, 1, 1),
-                    Address     = "123 Admin St, City, Country",
-                    PhoneNumber = "0987654321",
-                    Occupation  = "Administrator",
-                    Role        = UserRole.Admin,
-                    IsDeleted   = false
-                },
-                new()
-                {
-                    UserId      = Guid.CreateVersion7(),
-                    FullName    = "John Doe",
-                    Email       = "john@example.com",
-                    PasswordHash = passwordService.HashPassword("Member@123"),
-                    DateOfBirth = new DateOnly(1990, 5, 15),
-                    Address     = "456 Member Ave, City, Country",
-                    PhoneNumber = "0912345678",
-                    Occupation  = "Software Engineer",
-                    Role        = UserRole.Member,
-                    IsDeleted   = false
-                },
-                new()
-                {
-                    UserId      = Guid.CreateVersion7(),
-                    FullName    = "Jane Smith",
-                    Email       = "jane@example.com",
-                    PasswordHash = passwordService.HashPassword("Member@123"),
-                    DateOfBirth = new DateOnly(1995, 8, 20),
-                    Address     = "789 User Blvd, City, Country",
-                    PhoneNumber = "0934567890",
-                    Occupation  = "Teacher",
-                    Role        = UserRole.Member,
-                    IsDeleted   = false
-                },
-                new()
-                {
-                    UserId      = Guid.CreateVersion7(),
-                    FullName    = "Michael Tran",
-                    Email       = "michael@example.com",
-                    PasswordHash = passwordService.HashPassword("Member@123"),
-                    DateOfBirth = new DateOnly(1988, 3, 10),
-                    Address     = "321 Oak Road, City, Country",
-                    PhoneNumber = "0978123456",
-                    Occupation  = "Doctor",
-                    Role        = UserRole.Member,
-                    IsDeleted   = false
-                },
-                new()
-                {
-                    UserId      = Guid.CreateVersion7(),
-                    FullName    = "Emily Nguyen",
-                    Email       = "emily@example.com",
-                    PasswordHash = passwordService.HashPassword("Member@123"),
-                    DateOfBirth = new DateOnly(1993, 11, 25),
-                    Address     = "654 Pine St, City, Country",
-                    PhoneNumber = "0956789012",
-                    Occupation  = "Designer",
-                    Role        = UserRole.Member,
-                    IsDeleted   = false
-                }
+                // Admin
+                new() { UserId = Guid.CreateVersion7(), FullName = "Admin GiveAID",        Email = "admin@giveaid.com",           PasswordHash = adminHash,  DateOfBirth = new DateOnly(1980, 1,  1),  Address = "10 Nguyen Hue Blvd, Ho Chi Minh City", PhoneNumber = "0900000000", Occupation = "Platform Administrator", Role = UserRole.Admin,  IsDeleted = false, CreatedAt = now.AddMonths(-12) },
+                // Members
+                new() { UserId = Guid.CreateVersion7(), FullName = "Nguyen Van An",        Email = "an.nguyen@example.com",       PasswordHash = memberHash, DateOfBirth = new DateOnly(1990, 3, 15),  Address = "12 Le Loi St, Hanoi",                  PhoneNumber = "0901110001", Occupation = "Software Engineer",      Role = UserRole.Member, IsDeleted = false, CreatedAt = now.AddMonths(-5).AddDays(-10) },
+                new() { UserId = Guid.CreateVersion7(), FullName = "Tran Thi Bich Ngoc",   Email = "bich.ngoc@example.com",       PasswordHash = memberHash, DateOfBirth = new DateOnly(1993, 7, 22),  Address = "45 Tran Hung Dao, Da Nang",            PhoneNumber = "0901110002", Occupation = "Nurse",                  Role = UserRole.Member, IsDeleted = false, CreatedAt = now.AddMonths(-5).AddDays(-2) },
+                new() { UserId = Guid.CreateVersion7(), FullName = "Le Minh Duc",          Email = "duc.le@example.com",          PasswordHash = memberHash, DateOfBirth = new DateOnly(1988, 11, 3),  Address = "78 Hai Ba Trung, Ho Chi Minh City",    PhoneNumber = "0901110003", Occupation = "Doctor",                 Role = UserRole.Member, IsDeleted = false, CreatedAt = now.AddMonths(-4).AddDays(-15) },
+                new() { UserId = Guid.CreateVersion7(), FullName = "Pham Thu Ha",          Email = "thu.ha@example.com",          PasswordHash = memberHash, DateOfBirth = new DateOnly(1995, 5, 18),  Address = "3 Nguyen Du, Hue City",                PhoneNumber = "0901110004", Occupation = "Teacher",                Role = UserRole.Member, IsDeleted = false, CreatedAt = now.AddMonths(-4).AddDays(-5) },
+                new() { UserId = Guid.CreateVersion7(), FullName = "Hoang Quoc Khanh",     Email = "khanh.hoang@example.com",     PasswordHash = memberHash, DateOfBirth = new DateOnly(1985, 9, 30),  Address = "22 Bach Dang, Hai Phong",              PhoneNumber = "0901110005", Occupation = "Accountant",             Role = UserRole.Member, IsDeleted = false, CreatedAt = now.AddMonths(-3).AddDays(-10) },
+                new() { UserId = Guid.CreateVersion7(), FullName = "Vu Thi Lan Anh",       Email = "lan.anh@example.com",         PasswordHash = memberHash, DateOfBirth = new DateOnly(1997, 2, 14),  Address = "9 Phan Chu Trinh, Can Tho",            PhoneNumber = "0901110006", Occupation = "University Student",     Role = UserRole.Member, IsDeleted = false, CreatedAt = now.AddMonths(-3).AddDays(5) },
+                new() { UserId = Guid.CreateVersion7(), FullName = "Dang Van Minh Khoa",   Email = "minh.khoa@example.com",       PasswordHash = memberHash, DateOfBirth = new DateOnly(1991, 6, 25),  Address = "56 Ly Thuong Kiet, Nha Trang",         PhoneNumber = "0901110007", Occupation = "Architect",              Role = UserRole.Member, IsDeleted = false, CreatedAt = now.AddMonths(-2).AddDays(-8) },
+                new() { UserId = Guid.CreateVersion7(), FullName = "Bui Ngoc Nhung",       Email = "ngoc.nhung@example.com",      PasswordHash = memberHash, DateOfBirth = new DateOnly(1989, 4, 8),   Address = "34 Vo Thi Sau, Vung Tau",              PhoneNumber = "0901110008", Occupation = "Journalist",             Role = UserRole.Member, IsDeleted = false, CreatedAt = now.AddMonths(-2).AddDays(4) },
+                new() { UserId = Guid.CreateVersion7(), FullName = "Do Thanh Phong",       Email = "thanh.phong@example.com",     PasswordHash = memberHash, DateOfBirth = new DateOnly(1994, 8, 12),  Address = "71 Nguyen Du, Bien Hoa",               PhoneNumber = "0901110009", Occupation = "Lawyer",                 Role = UserRole.Member, IsDeleted = false, CreatedAt = now.AddMonths(-1).AddDays(-10) },
+                new() { UserId = Guid.CreateVersion7(), FullName = "Ly Thi Quynh Nhu",     Email = "quynh.nhu@example.com",       PasswordHash = memberHash, DateOfBirth = new DateOnly(1996, 12, 1),  Address = "18 Tran Phu, Quy Nhon",                PhoneNumber = "0901110010", Occupation = "Graphic Designer",       Role = UserRole.Member, IsDeleted = false, CreatedAt = now.AddMonths(-1).AddDays(5) },
             };
             await context.Users.AddRangeAsync(users);
+            await context.SaveChangesAsync();
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // 2. Seed Donation Causes
+        // 2. DONATION CAUSES
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.DonationCauses.AnyAsync())
         {
             var causes = new List<DonationCause>
             {
-                new() { CauseId = Guid.CreateVersion7(), Name = "Education" },
-                new() { CauseId = Guid.CreateVersion7(), Name = "Healthcare" },
-                new() { CauseId = Guid.CreateVersion7(), Name = "Environment" },
-                new() { CauseId = Guid.CreateVersion7(), Name = "Disaster Relief" },
-                new() { CauseId = Guid.CreateVersion7(), Name = "Animal Welfare" }
+                new() { CauseId = Guid.CreateVersion7(), Name = "Disaster Relief",   IsDeleted = false },
+                new() { CauseId = Guid.CreateVersion7(), Name = "Education",          IsDeleted = false },
+                new() { CauseId = Guid.CreateVersion7(), Name = "Healthcare",         IsDeleted = false },
+                new() { CauseId = Guid.CreateVersion7(), Name = "Environment",        IsDeleted = false },
+                new() { CauseId = Guid.CreateVersion7(), Name = "Hunger & Food Aid",  IsDeleted = false },
             };
             await context.DonationCauses.AddRangeAsync(causes);
+            await context.SaveChangesAsync();
         }
 
-        await context.SaveChangesAsync();
-
         // ─────────────────────────────────────────────────────────────────────
-        // 3. Seed NGOs
+        // 3. NGOs  — 5 real globally recognized organisations
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.Ngos.AnyAsync())
         {
@@ -112,277 +65,367 @@ public static class DbSeeder
                 new()
                 {
                     NgoId       = Guid.CreateVersion7(),
-                    Name        = "Save The Children",
-                    Description = "Working to improve the lives of children through better education, health care, and economic opportunities.",
-                    Address     = "100 Charity Lane, NGO City",
-                    PhoneNumber = "0900000001",
-                    Website     = "https://savethechildren.org"
+                    Name        = "UNICEF",
+                    Description = "The United Nations Children's Fund works in over 190 countries to save children's lives, defend their rights, and help them fulfil their potential. UNICEF focuses on child survival, education, equality, and emergency response.",
+                    Address     = "3 United Nations Plaza, New York, NY 10017, USA",
+                    PhoneNumber = "+1-212-326-7000",
+                    Website     = "https://www.unicef.org",
+                    IsDeleted   = false,
+                    CreatedAt   = now.AddMonths(-5).AddDays(-15)
                 },
                 new()
                 {
                     NgoId       = Guid.CreateVersion7(),
-                    Name        = "Green Earth Foundation",
-                    Description = "Dedicated to environmental conservation and fighting climate change.",
-                    Address     = "200 Green St, Eco Town",
-                    PhoneNumber = "0900000002",
-                    Website     = "https://greenearth.org"
+                    Name        = "World Wildlife Fund (WWF)",
+                    Description = "WWF is the world's largest conservation organisation, working to protect the natural world and tackle the forces that threaten it. Operating in 100+ countries, WWF works to conserve nature and reduce the most pressing threats to the diversity of life on Earth.",
+                    Address     = "1250 24th Street NW, Washington, DC 20037, USA",
+                    PhoneNumber = "+1-202-293-4800",
+                    Website     = "https://www.worldwildlife.org",
+                    IsDeleted   = false,
+                    CreatedAt   = now.AddMonths(-4).AddDays(5)
                 },
                 new()
                 {
                     NgoId       = Guid.CreateVersion7(),
-                    Name        = "Health First Aid",
-                    Description = "Providing medical assistance and health education to underprivileged communities.",
-                    Address     = "300 Medical Ave, Health City",
-                    PhoneNumber = "0900000003",
-                    Website     = "https://healthfirst.org"
-                }
+                    Name        = "Médecins Sans Frontières (MSF)",
+                    Description = "Doctors Without Borders delivers emergency medical aid to people affected by conflict, epidemics, disasters, and exclusion from healthcare. Operational in 70+ countries, MSF provides impartial, independent humanitarian assistance.",
+                    Address     = "78 Rue de Lausanne, 1202 Geneva, Switzerland",
+                    PhoneNumber = "+41-22-849-8400",
+                    Website     = "https://www.msf.org",
+                    IsDeleted   = false,
+                    CreatedAt   = now.AddMonths(-3).AddDays(-2)
+                },
+                new()
+                {
+                    NgoId       = Guid.CreateVersion7(),
+                    Name        = "International Red Cross (ICRC)",
+                    Description = "The International Committee of the Red Cross is an impartial, neutral, and independent humanitarian organisation that protects and assists victims of armed conflict and other situations of violence. It has a permanent mandate under international humanitarian law.",
+                    Address     = "19 Avenue de la Paix, 1202 Geneva, Switzerland",
+                    PhoneNumber = "+41-22-734-6001",
+                    Website     = "https://www.icrc.org",
+                    IsDeleted   = false,
+                    CreatedAt   = now.AddMonths(-2).AddDays(-10)
+                },
+                new()
+                {
+                    NgoId       = Guid.CreateVersion7(),
+                    Name        = "Save the Children",
+                    Description = "Save the Children gives children a healthy start in life, the opportunity to learn, and protection from harm. Operating in 116 countries, the organisation fights for children's rights and delivers immediate and lasting change to their lives and futures.",
+                    Address     = "501 Kings Highway East, Suite 400, Fairfield, CT 06825, USA",
+                    PhoneNumber = "+1-203-221-4000",
+                    Website     = "https://www.savethechildren.org",
+                    IsDeleted   = false,
+                    CreatedAt   = now.AddMonths(-1).AddDays(5)
+                },
             };
             await context.Ngos.AddRangeAsync(ngos);
+            await context.SaveChangesAsync();
         }
 
-        await context.SaveChangesAsync();
-
         // ─────────────────────────────────────────────────────────────────────
-        // 4. Seed Corporate Partners
+        // 4. CORPORATE PARTNERS
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.CorporatePartners.AnyAsync())
         {
             var partners = new List<CorporatePartner>
             {
-                new()
-                {
-                    PartnerId   = Guid.CreateVersion7(),
-                    Name        = "Tech Corp",
-                    LogoUrl     = "https://placehold.co/150x150?text=TechCorp",
-                    WebsiteLink = "https://techcorp.example.com"
-                },
-                new()
-                {
-                    PartnerId   = Guid.CreateVersion7(),
-                    Name        = "Global Bank",
-                    LogoUrl     = "https://placehold.co/150x150?text=GlobalBank",
-                    WebsiteLink = "https://globalbank.example.com"
-                },
-                new()
-                {
-                    PartnerId   = Guid.CreateVersion7(),
-                    Name        = "EcoVentures",
-                    LogoUrl     = "https://placehold.co/150x150?text=EcoVentures",
-                    WebsiteLink = "https://ecoventures.example.com"
-                }
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Viettel Group",       LogoUrl = "https://placehold.co/200x80/1A5C6B/FFFFFF?text=Viettel",    WebsiteLink = "https://viettel.com.vn" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Vingroup JSC",        LogoUrl = "https://placehold.co/200x80/1A5C6B/FFFFFF?text=Vingroup",   WebsiteLink = "https://vingroup.net" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "FPT Corporation",     LogoUrl = "https://placehold.co/200x80/1A5C6B/FFFFFF?text=FPT",        WebsiteLink = "https://fpt.com.vn" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Masan Group",         LogoUrl = "https://placehold.co/200x80/C97C2E/FFFFFF?text=Masan",      WebsiteLink = "https://masangroup.com" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Techcombank",         LogoUrl = "https://placehold.co/200x80/C97C2E/FFFFFF?text=TCB",        WebsiteLink = "https://techcombank.com.vn" },
             };
             await context.CorporatePartners.AddRangeAsync(partners);
+            await context.SaveChangesAsync();
         }
 
-        await context.SaveChangesAsync();
-
         // ─────────────────────────────────────────────────────────────────────
-        // 5. Seed Welfare Programmes
+        // 5. WELFARE PROGRAMMES — 10 real / highly realistic global campaigns
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.WelfareProgrammes.AnyAsync())
         {
-            var educationCause   = await context.DonationCauses.FirstOrDefaultAsync(c => c.Name == "Education");
-            var healthCause      = await context.DonationCauses.FirstOrDefaultAsync(c => c.Name == "Healthcare");
-            var environmentCause = await context.DonationCauses.FirstOrDefaultAsync(c => c.Name == "Environment");
-            var disasterCause    = await context.DonationCauses.FirstOrDefaultAsync(c => c.Name == "Disaster Relief");
+            // Lookup seeded entities
+            var unicef = await context.Ngos.FirstAsync(n => n.Name == "UNICEF");
+            var wwf = await context.Ngos.FirstAsync(n => n.Name == "World Wildlife Fund (WWF)");
+            var msf = await context.Ngos.FirstAsync(n => n.Name == "Médecins Sans Frontières (MSF)");
+            var redCross = await context.Ngos.FirstAsync(n => n.Name == "International Red Cross (ICRC)");
+            var saveChildren = await context.Ngos.FirstAsync(n => n.Name == "Save the Children");
 
-            var saveTheChildren = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Save The Children");
-            var greenEarth      = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Green Earth Foundation");
-            var healthFirst     = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Health First Aid");
+            var causeDisaster = await context.DonationCauses.FirstAsync(c => c.Name == "Disaster Relief");
+            var causeEducation = await context.DonationCauses.FirstAsync(c => c.Name == "Education");
+            var causeHealth = await context.DonationCauses.FirstAsync(c => c.Name == "Healthcare");
+            var causeEnv = await context.DonationCauses.FirstAsync(c => c.Name == "Environment");
+            var causeHunger = await context.DonationCauses.FirstAsync(c => c.Name == "Hunger & Food Aid");
 
-            if (educationCause != null && saveTheChildren != null)
+            var programmes = new List<WelfareProgramme>
             {
-                await context.WelfareProgrammes.AddAsync(new WelfareProgramme
+                new()
                 {
                     ProgrammeId = Guid.CreateVersion7(),
-                    NgoId       = saveTheChildren.NgoId,
-                    CauseId     = educationCause.CauseId,
-                    Name        = "Rural School Building Project",
-                    ImageUrl    = "https://placehold.co/800x400?text=School+Building",
-                    Description = "Building schools in rural areas to provide access to quality education for thousands of children who currently lack access to a proper learning environment.",
-                    StartTime   = DateTimeOffset.UtcNow.AddDays(-60),
-                    EndTime     = DateTimeOffset.UtcNow.AddDays(100),
-                    MaxDonation = 50000m,
-                    Location    = "Rural District, Countryside"
-                });
-
-                await context.WelfareProgrammes.AddAsync(new WelfareProgramme
+                    NgoId       = redCross.NgoId,
+                    CauseId     = causeDisaster.CauseId,
+                    Name        = "Turkey-Syria Earthquake Relief 2023",
+                    ImageUrl    = "https://placehold.co/800x480/CC3333/FFFFFF?text=Earthquake+Relief",
+                    Description = "The catastrophic 7.8-magnitude earthquake in February 2023 devastated southern Turkey and northern Syria, killing over 55,000 people. The ICRC deployed emergency response teams to provide medical care, food, water, shelter, and psychological support to over 1.5 million displaced survivors. Funds support ongoing reconstruction and family tracing services.",
+                    StartTime   = new DateTimeOffset(2023, 2, 10, 0, 0, 0, TimeSpan.Zero),
+                    EndTime     = now.AddDays(30),
+                    MaxDonation = 500_000m,
+                    Location    = "Gaziantep, Turkey & Aleppo, Syria",
+                    IsDeleted   = false,
+                    CreatedAt   = new DateTimeOffset(2023, 2, 12, 0, 0, 0, TimeSpan.Zero)
+                },
+                new()
                 {
                     ProgrammeId = Guid.CreateVersion7(),
-                    NgoId       = saveTheChildren.NgoId,
-                    CauseId     = educationCause.CauseId,
-                    Name        = "Digital Literacy for Youth",
-                    ImageUrl    = "https://placehold.co/800x400?text=Digital+Literacy",
-                    Description = "Equipping underserved youth with computer skills, internet access, and digital tools to prepare them for the modern workforce.",
-                    StartTime   = DateTimeOffset.UtcNow.AddDays(-10),
-                    EndTime     = DateTimeOffset.UtcNow.AddDays(200),
-                    MaxDonation = 30000m,
-                    Location    = "Urban Schools, Metro City"
-                });
-            }
-
-            if (environmentCause != null && greenEarth != null)
-            {
-                await context.WelfareProgrammes.AddAsync(new WelfareProgramme
+                    NgoId       = redCross.NgoId,
+                    CauseId     = causeDisaster.CauseId,
+                    Name        = "Morocco Earthquake Emergency Response",
+                    ImageUrl    = "https://placehold.co/800x480/CC3333/FFFFFF?text=Morocco+Response",
+                    Description = "A devastating 6.8-magnitude earthquake struck the High Atlas Mountains of Morocco in September 2023, killing nearly 3,000 people and injuring thousands more. The ICRC mobilised rapid response teams to deliver search-and-rescue support, emergency healthcare, and essential supplies to remote mountain villages cut off by landslides.",
+                    StartTime   = new DateTimeOffset(2023, 9, 9, 0, 0, 0, TimeSpan.Zero),
+                    EndTime     = now.AddDays(60),
+                    MaxDonation = 350_000m,
+                    Location    = "Marrakesh-Safi Region, Morocco",
+                    IsDeleted   = false,
+                    CreatedAt   = new DateTimeOffset(2023, 9, 11, 0, 0, 0, TimeSpan.Zero)
+                },
+                new()
                 {
                     ProgrammeId = Guid.CreateVersion7(),
-                    NgoId       = greenEarth.NgoId,
-                    CauseId     = environmentCause.CauseId,
-                    Name        = "City Reforestation Initiative",
-                    ImageUrl    = "https://placehold.co/800x400?text=Reforestation",
-                    Description = "Planting 10,000 trees in urban areas to combat pollution, restore biodiversity, and fight climate change across the metropolitan region.",
-                    StartTime   = DateTimeOffset.UtcNow.AddDays(-5),
-                    EndTime     = DateTimeOffset.UtcNow.AddDays(30),
-                    MaxDonation = 20000m,
-                    Location    = "Metro City"
-                });
-            }
-
-            if (healthCause != null && healthFirst != null)
-            {
-                await context.WelfareProgrammes.AddAsync(new WelfareProgramme
+                    NgoId       = unicef.NgoId,
+                    CauseId     = causeEducation.CauseId,
+                    Name        = "Education Cannot Wait — Ukraine",
+                    ImageUrl    = "https://placehold.co/800x480/1A78C2/FFFFFF?text=Ukraine+Education",
+                    Description = "Since the escalation of the conflict in Ukraine in 2022, over 5 million children have been affected by attacks on education. UNICEF's 'Education Cannot Wait' initiative repairs and equips schools with reinforced shelters, delivers remote learning tools, and provides psychosocial support to keep children learning safely both inside Ukraine and in refugee host countries.",
+                    StartTime   = new DateTimeOffset(2022, 3, 1, 0, 0, 0, TimeSpan.Zero),
+                    EndTime     = now.AddDays(180),
+                    MaxDonation = 750_000m,
+                    Location    = "Kyiv, Kharkiv, Lviv — Ukraine & Poland Border",
+                    IsDeleted   = false,
+                    CreatedAt   = new DateTimeOffset(2022, 3, 5, 0, 0, 0, TimeSpan.Zero)
+                },
+                new()
                 {
                     ProgrammeId = Guid.CreateVersion7(),
-                    NgoId       = healthFirst.NgoId,
-                    CauseId     = healthCause.CauseId,
-                    Name        = "Free Mobile Clinic",
-                    ImageUrl    = "https://placehold.co/800x400?text=Mobile+Clinic",
-                    Description = "Deploying mobile clinics to remote villages for free health checkups, vaccinations, and basic treatments reaching thousands of unserved patients.",
-                    StartTime   = DateTimeOffset.UtcNow,
-                    MaxDonation = 100000m,
-                    Location    = "Remote Villages"
-                });
-            }
-
-            if (disasterCause != null && healthFirst != null)
-            {
-                await context.WelfareProgrammes.AddAsync(new WelfareProgramme
+                    NgoId       = saveChildren.NgoId,
+                    CauseId     = causeEducation.CauseId,
+                    Name        = "Girls' Education in Afghanistan",
+                    ImageUrl    = "https://placehold.co/800x480/1A78C2/FFFFFF?text=Girls+Education+AFG",
+                    Description = "Following the Taliban's ban on girls' secondary education in 2021, Save the Children launched community-based learning centres that provide informal education, psychosocial support, and vocational training to over 200,000 Afghan girls and young women. The programme operates covertly through trusted local networks to ensure participant safety.",
+                    StartTime   = new DateTimeOffset(2022, 1, 15, 0, 0, 0, TimeSpan.Zero),
+                    EndTime     = now.AddDays(365),
+                    MaxDonation = 600_000m,
+                    Location    = "Kabul, Herat & Mazar-i-Sharif, Afghanistan",
+                    IsDeleted   = false,
+                    CreatedAt   = new DateTimeOffset(2022, 1, 20, 0, 0, 0, TimeSpan.Zero)
+                },
+                new()
                 {
                     ProgrammeId = Guid.CreateVersion7(),
-                    NgoId       = healthFirst.NgoId,
-                    CauseId     = disasterCause.CauseId,
-                    Name        = "Flood Relief Fund",
-                    ImageUrl    = "https://placehold.co/800x400?text=Flood+Relief",
-                    Description = "Emergency relief supplies, temporary shelter, and medical aid for families displaced by recent flooding in the northern provinces.",
-                    StartTime   = DateTimeOffset.UtcNow.AddDays(-3),
-                    EndTime     = DateTimeOffset.UtcNow.AddDays(60),
-                    MaxDonation = 75000m,
-                    Location    = "Northern Provinces"
-                });
-            }
+                    NgoId       = msf.NgoId,
+                    CauseId     = causeHealth.CauseId,
+                    Name        = "Gaza Emergency Medical Aid 2024",
+                    ImageUrl    = "https://placehold.co/800x480/4A8B7F/FFFFFF?text=Gaza+Medical+Aid",
+                    Description = "MSF surgical and medical teams are operating in and around Gaza providing emergency trauma care, performing surgeries, treating the wounded, and supporting overwhelmed health facilities. The programme covers emergency obstetric care, mental health support, and supply chains for critical medicines in a besieged environment.",
+                    StartTime   = new DateTimeOffset(2023, 10, 10, 0, 0, 0, TimeSpan.Zero),
+                    EndTime     = now.AddDays(90),
+                    MaxDonation = 1_000_000m,
+                    Location    = "Gaza Strip, Palestinian Territories",
+                    IsDeleted   = false,
+                    CreatedAt   = new DateTimeOffset(2023, 10, 12, 0, 0, 0, TimeSpan.Zero)
+                },
+                new()
+                {
+                    ProgrammeId = Guid.CreateVersion7(),
+                    NgoId       = msf.NgoId,
+                    CauseId     = causeHealth.CauseId,
+                    Name        = "Sudan Cholera & Conflict Response",
+                    ImageUrl    = "https://placehold.co/800x480/4A8B7F/FFFFFF?text=Sudan+Response",
+                    Description = "Sudan's civil war that erupted in April 2023 triggered one of the world's fastest-growing displacement crises. MSF teams are treating mass casualty events, running outpatient therapeutic feeding programmes, fighting a severe cholera outbreak, and providing mental health services. This programme funds field hospitals, water purification, and cholera treatment units.",
+                    StartTime   = new DateTimeOffset(2023, 4, 20, 0, 0, 0, TimeSpan.Zero),
+                    EndTime     = now.AddDays(120),
+                    MaxDonation = 800_000m,
+                    Location    = "Khartoum, Darfur & Port Sudan, Sudan",
+                    IsDeleted   = false,
+                    CreatedAt   = new DateTimeOffset(2023, 4, 25, 0, 0, 0, TimeSpan.Zero)
+                },
+                new()
+                {
+                    ProgrammeId = Guid.CreateVersion7(),
+                    NgoId       = wwf.NgoId,
+                    CauseId     = causeEnv.CauseId,
+                    Name        = "Amazon Rainforest Conservation",
+                    ImageUrl    = "https://placehold.co/800x480/2E7D32/FFFFFF?text=Amazon+Conservation",
+                    Description = "The Amazon rainforest — Earth's largest tropical forest — loses an area the size of a football pitch every single minute to deforestation. WWF's Amazon programme works with Indigenous communities to monitor and protect 60 million hectares, prosecute illegal loggers, restore degraded land, and advocate for stronger international legal frameworks.",
+                    StartTime   = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
+                    EndTime     = new DateTimeOffset(2026, 12, 31, 0, 0, 0, TimeSpan.Zero),
+                    MaxDonation = 2_000_000m,
+                    Location    = "Pará & Amazonas States, Brazil",
+                    IsDeleted   = false,
+                    CreatedAt   = new DateTimeOffset(2024, 1, 3, 0, 0, 0, TimeSpan.Zero)
+                },
+                new()
+                {
+                    ProgrammeId = Guid.CreateVersion7(),
+                    NgoId       = wwf.NgoId,
+                    CauseId     = causeEnv.CauseId,
+                    Name        = "Great Barrier Reef Restoration",
+                    ImageUrl    = "https://placehold.co/800x480/2E7D32/FFFFFF?text=Reef+Restoration",
+                    Description = "The Great Barrier Reef has lost over 50% of its coral cover since 1995 due to climate change-driven bleaching. WWF's reef restoration programme supports coral gardening nurseries, develops heat-resistant coral strains, works with the Australian government to cut land-based pollution, and reduces illegal fishing in the Marine Park.",
+                    StartTime   = new DateTimeOffset(2024, 3, 1, 0, 0, 0, TimeSpan.Zero),
+                    EndTime     = new DateTimeOffset(2027, 3, 1, 0, 0, 0, TimeSpan.Zero),
+                    MaxDonation = 1_500_000m,
+                    Location    = "Queensland, Australia",
+                    IsDeleted   = false,
+                    CreatedAt   = new DateTimeOffset(2024, 3, 5, 0, 0, 0, TimeSpan.Zero)
+                },
+                new()
+                {
+                    ProgrammeId = Guid.CreateVersion7(),
+                    NgoId       = unicef.NgoId,
+                    CauseId     = causeHunger.CauseId,
+                    Name        = "Horn of Africa Famine Response",
+                    ImageUrl    = "https://placehold.co/800x480/C97C2E/FFFFFF?text=Famine+Response",
+                    Description = "The worst drought in 40 years has pushed over 22 million people across Ethiopia, Kenya, and Somalia into acute food insecurity. UNICEF's response deploys Ready-to-Use Therapeutic Food (RUTF) to treat severe acute malnutrition, operates mobile health and nutrition clinics, and supports emergency water trucking and WASH services for displaced families.",
+                    StartTime   = new DateTimeOffset(2022, 7, 1, 0, 0, 0, TimeSpan.Zero),
+                    EndTime     = now.AddDays(150),
+                    MaxDonation = 900_000m,
+                    Location    = "Somali, Oromia (Ethiopia), Turkana (Kenya) & South Somalia",
+                    IsDeleted   = false,
+                    CreatedAt   = new DateTimeOffset(2022, 7, 5, 0, 0, 0, TimeSpan.Zero)
+                },
+                new()
+                {
+                    ProgrammeId = Guid.CreateVersion7(),
+                    NgoId       = saveChildren.NgoId,
+                    CauseId     = causeHunger.CauseId,
+                    Name        = "Clean Water for Sub-Saharan Africa",
+                    ImageUrl    = "https://placehold.co/800x480/C97C2E/FFFFFF?text=Clean+Water",
+                    Description = "700 million people worldwide lack access to safe drinking water. Save the Children's clean water initiative drills boreholes, installs solar-powered water pumps, builds rainwater harvesting systems, and trains local WASH technicians across 12 countries in Sub-Saharan Africa. Each borehole provides safe water for up to 1,000 people for 20+ years.",
+                    StartTime   = new DateTimeOffset(2024, 6, 1, 0, 0, 0, TimeSpan.Zero),
+                    EndTime     = new DateTimeOffset(2027, 6, 1, 0, 0, 0, TimeSpan.Zero),
+                    MaxDonation = 700_000m,
+                    Location    = "Ethiopia, Kenya, Nigeria, South Sudan & Mali",
+                    IsDeleted   = false,
+                    CreatedAt   = new DateTimeOffset(2024, 6, 3, 0, 0, 0, TimeSpan.Zero)
+                },
+            };
 
+            await context.WelfareProgrammes.AddRangeAsync(programmes);
             await context.SaveChangesAsync();
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // 6. Seed Gallery Images
+        // 6. GALLERY IMAGES
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.GalleryImages.AnyAsync())
         {
-            var schoolProgramme   = await context.WelfareProgrammes.FirstOrDefaultAsync(p => p.Name == "Rural School Building Project");
-            var reforestProgramme = await context.WelfareProgrammes.FirstOrDefaultAsync(p => p.Name == "City Reforestation Initiative");
-            var clinicProgramme   = await context.WelfareProgrammes.FirstOrDefaultAsync(p => p.Name == "Free Mobile Clinic");
-            var floodProgramme    = await context.WelfareProgrammes.FirstOrDefaultAsync(p => p.Name == "Flood Relief Fund");
+            var programmes = await context.WelfareProgrammes.ToListAsync();
+            var gallery = new List<GalleryImage>();
 
-            var galleryImages = new List<GalleryImage>();
-
-            if (schoolProgramme != null)
+            void AddImages(Guid? progId, params (string url, string caption)[] images)
             {
-                galleryImages.AddRange(
-                [
-                    new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = schoolProgramme.ProgrammeId, ImageUrl = "https://placehold.co/800x600?text=School+Foundation", Caption = "Laying the foundation of the new school" },
-                    new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = schoolProgramme.ProgrammeId, ImageUrl = "https://placehold.co/800x600?text=School+Walls+Up",    Caption = "Walls going up in record time" },
-                    new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = schoolProgramme.ProgrammeId, ImageUrl = "https://placehold.co/800x600?text=Children+Learning",  Caption = "Children attending their first classes" }
-                ]);
+                foreach (var (url, caption) in images)
+                    gallery.Add(new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = progId, ImageUrl = url, Caption = caption });
             }
 
-            if (reforestProgramme != null)
-            {
-                galleryImages.AddRange(
-                [
-                    new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = reforestProgramme.ProgrammeId, ImageUrl = "https://placehold.co/800x600?text=Tree+Planting+Day", Caption = "Community tree planting event" },
-                    new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = reforestProgramme.ProgrammeId, ImageUrl = "https://placehold.co/800x600?text=Green+Saplings",     Caption = "Young saplings ready for planting" }
-                ]);
-            }
+            var eqk = programmes.FirstOrDefault(p => p.Name.Contains("Turkey"))?.ProgrammeId;
+            var ukraine = programmes.FirstOrDefault(p => p.Name.Contains("Ukraine"))?.ProgrammeId;
+            var amazon = programmes.FirstOrDefault(p => p.Name.Contains("Amazon"))?.ProgrammeId;
+            var gaza = programmes.FirstOrDefault(p => p.Name.Contains("Gaza"))?.ProgrammeId;
+            var cleanW = programmes.FirstOrDefault(p => p.Name.Contains("Clean Water"))?.ProgrammeId;
 
-            if (clinicProgramme != null)
-            {
-                galleryImages.AddRange(
-                [
-                    new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = clinicProgramme.ProgrammeId, ImageUrl = "https://placehold.co/800x600?text=Mobile+Clinic+Arrival", Caption = "Mobile clinic arriving at a remote village" },
-                    new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = clinicProgramme.ProgrammeId, ImageUrl = "https://placehold.co/800x600?text=Health+Checkup",         Caption = "Doctors conducting free health screenings" }
-                ]);
-            }
+            AddImages(eqk,
+                ("https://placehold.co/800x600/CC3333/FFFFFF?text=Search+%26+Rescue", "Search and rescue teams clearing rubble"),
+                ("https://placehold.co/800x600/CC3333/FFFFFF?text=Temporary+Shelter", "Temporary shelter camps for 20,000 survivors"),
+                ("https://placehold.co/800x600/CC3333/FFFFFF?text=Medical+Aid+Station", "Field medical station treating the injured"));
 
-            if (floodProgramme != null)
-            {
-                galleryImages.AddRange(
-                [
-                    new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = floodProgramme.ProgrammeId, ImageUrl = "https://placehold.co/800x600?text=Relief+Supplies",   Caption = "Relief supplies being distributed" },
-                    new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = floodProgramme.ProgrammeId, ImageUrl = "https://placehold.co/800x600?text=Temporary+Shelter", Caption = "Temporary shelters set up for displaced families" }
-                ]);
-            }
+            AddImages(ukraine,
+                ("https://placehold.co/800x600/1A78C2/FFFFFF?text=Mobile+Classroom", "Mobile classroom unit deployed to refugee camp"),
+                ("https://placehold.co/800x600/1A78C2/FFFFFF?text=Children+Learning", "Children continuing education despite the conflict"));
 
-            // Standalone gallery images not tied to a programme
-            galleryImages.AddRange(
-            [
-                new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = null, ImageUrl = "https://placehold.co/800x600?text=Volunteer+Day",     Caption = "Annual volunteer appreciation day" },
-                new GalleryImage { ImageId = Guid.CreateVersion7(), ProgrammeId = null, ImageUrl = "https://placehold.co/800x600?text=Fundraising+Gala",  Caption = "Annual charity fundraising gala" }
-            ]);
+            AddImages(amazon,
+                ("https://placehold.co/800x600/2E7D32/FFFFFF?text=Deforestation+Patrol", "Indigenous rangers patrolling against illegal logging"),
+                ("https://placehold.co/800x600/2E7D32/FFFFFF?text=Reforestation+Site", "Reforestation planting day with 500 volunteers"),
+                ("https://placehold.co/800x600/2E7D32/FFFFFF?text=Aerial+Survey", "Drone aerial survey mapping deforestation hotspots"));
 
-            await context.GalleryImages.AddRangeAsync(galleryImages);
+            AddImages(gaza,
+                ("https://placehold.co/800x600/4A8B7F/FFFFFF?text=Field+Surgery", "MSF surgeons operating in a field hospital"),
+                ("https://placehold.co/800x600/4A8B7F/FFFFFF?text=Medical+Supply+Drop", "Critical medical supplies arriving by convoy"));
+
+            AddImages(cleanW,
+                ("https://placehold.co/800x600/C97C2E/FFFFFF?text=Borehole+Drilling", "Solar-powered borehole serving 1,200 villagers"),
+                ("https://placehold.co/800x600/C97C2E/FFFFFF?text=Water+Pump+Install", "Community water pump installation complete"));
+
+            // Standalone gallery
+            AddImages(null,
+                ("https://placehold.co/800x600/1A5C6B/FFFFFF?text=Annual+Gala+2025", "GiveAID Annual Fundraising Gala 2025"),
+                ("https://placehold.co/800x600/1A5C6B/FFFFFF?text=Volunteer+Day", "Global Volunteer Day — 3,000 participants"));
+
+            await context.GalleryImages.AddRangeAsync(gallery);
             await context.SaveChangesAsync();
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // 7. Seed NGO Partners
+        // 7. NGO PARTNERS (link NGOs to Corporate Partners)
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.NgoPartners.AnyAsync())
         {
-            var saveTheChildren = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Save The Children");
-            var greenEarth      = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Green Earth Foundation");
-            var healthFirst     = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Health First Aid");
-            var techCorp        = await context.CorporatePartners.FirstOrDefaultAsync(p => p.Name == "Tech Corp");
-            var globalBank      = await context.CorporatePartners.FirstOrDefaultAsync(p => p.Name == "Global Bank");
-            var ecoVentures     = await context.CorporatePartners.FirstOrDefaultAsync(p => p.Name == "EcoVentures");
+            var ngos = await context.Ngos.ToListAsync();
+            var partners = await context.CorporatePartners.ToListAsync();
 
-            var ngoPartners = new List<NgoPartner>();
+            var links = new List<NgoPartner>();
+            void Link(string ngoName, string partnerName)
+            {
+                var n = ngos.FirstOrDefault(x => x.Name == ngoName);
+                var p = partners.FirstOrDefault(x => x.Name == partnerName);
+                if (n != null && p != null)
+                    links.Add(new NgoPartner { NgoId = n.NgoId, PartnerId = p.PartnerId });
+            }
 
-            if (saveTheChildren != null && techCorp    != null) ngoPartners.Add(new NgoPartner { NgoId = saveTheChildren.NgoId, PartnerId = techCorp.PartnerId });
-            if (saveTheChildren != null && globalBank  != null) ngoPartners.Add(new NgoPartner { NgoId = saveTheChildren.NgoId, PartnerId = globalBank.PartnerId });
-            if (greenEarth      != null && globalBank  != null) ngoPartners.Add(new NgoPartner { NgoId = greenEarth.NgoId,      PartnerId = globalBank.PartnerId });
-            if (greenEarth      != null && ecoVentures != null) ngoPartners.Add(new NgoPartner { NgoId = greenEarth.NgoId,      PartnerId = ecoVentures.PartnerId });
-            if (healthFirst     != null && techCorp    != null) ngoPartners.Add(new NgoPartner { NgoId = healthFirst.NgoId,     PartnerId = techCorp.PartnerId });
+            Link("UNICEF", "Viettel Group");
+            Link("UNICEF", "Vingroup JSC");
+            Link("World Wildlife Fund (WWF)", "FPT Corporation");
+            Link("World Wildlife Fund (WWF)", "Masan Group");
+            Link("Médecins Sans Frontières (MSF)", "Techcombank");
+            Link("International Red Cross (ICRC)", "Viettel Group");
+            Link("Save the Children", "FPT Corporation");
 
-            if (ngoPartners.Count > 0)
-                await context.NgoPartners.AddRangeAsync(ngoPartners);
+            if (links.Count > 0)
+                await context.NgoPartners.AddRangeAsync(links);
 
             await context.SaveChangesAsync();
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // 8. Seed User Interests
+        // 8. USER INTERESTS
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.UserInterests.AnyAsync())
         {
-            var john    = await context.Users.FirstOrDefaultAsync(u => u.Email == "john@example.com");
-            var jane    = await context.Users.FirstOrDefaultAsync(u => u.Email == "jane@example.com");
-            var michael = await context.Users.FirstOrDefaultAsync(u => u.Email == "michael@example.com");
-            var emily   = await context.Users.FirstOrDefaultAsync(u => u.Email == "emily@example.com");
-
-            var saveTheChildren = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Save The Children");
-            var greenEarth      = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Green Earth Foundation");
-            var healthFirst     = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Health First Aid");
+            var users = await context.Users.Where(u => u.Role == UserRole.Member).ToListAsync();
+            var ngos = await context.Ngos.ToListAsync();
 
             var interests = new List<UserInterest>();
+            void Interested(int userIdx, string ngoName)
+            {
+                if (userIdx >= users.Count) return;
+                var n = ngos.FirstOrDefault(x => x.Name == ngoName);
+                if (n != null) interests.Add(new UserInterest { UserId = users[userIdx].UserId, NgoId = n.NgoId });
+            }
 
-            if (john    != null && saveTheChildren != null) interests.Add(new UserInterest { UserId = john.UserId,    NgoId = saveTheChildren.NgoId });
-            if (john    != null && greenEarth      != null) interests.Add(new UserInterest { UserId = john.UserId,    NgoId = greenEarth.NgoId });
-            if (jane    != null && saveTheChildren != null) interests.Add(new UserInterest { UserId = jane.UserId,    NgoId = saveTheChildren.NgoId });
-            if (jane    != null && healthFirst     != null) interests.Add(new UserInterest { UserId = jane.UserId,    NgoId = healthFirst.NgoId });
-            if (michael != null && healthFirst     != null) interests.Add(new UserInterest { UserId = michael.UserId, NgoId = healthFirst.NgoId });
-            if (emily   != null && greenEarth      != null) interests.Add(new UserInterest { UserId = emily.UserId,   NgoId = greenEarth.NgoId });
-            if (emily   != null && saveTheChildren != null) interests.Add(new UserInterest { UserId = emily.UserId,   NgoId = saveTheChildren.NgoId });
+            Interested(0, "International Red Cross (ICRC)");
+            Interested(0, "UNICEF");
+            Interested(1, "Médecins Sans Frontières (MSF)");
+            Interested(2, "World Wildlife Fund (WWF)");
+            Interested(2, "International Red Cross (ICRC)");
+            Interested(3, "Save the Children");
+            Interested(3, "UNICEF");
+            Interested(4, "World Wildlife Fund (WWF)");
+            Interested(5, "UNICEF");
+            Interested(6, "Médecins Sans Frontières (MSF)");
+            Interested(7, "Save the Children");
+            Interested(8, "International Red Cross (ICRC)");
+            Interested(9, "World Wildlife Fund (WWF)");
 
             if (interests.Count > 0)
                 await context.UserInterests.AddRangeAsync(interests);
@@ -391,134 +434,107 @@ public static class DbSeeder
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // 9. Seed Transactions & Donations
+        // 9. TRANSACTIONS & DONATIONS  (20 realistic donations)
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.Transactions.AnyAsync())
         {
-            var john    = await context.Users.FirstOrDefaultAsync(u => u.Email == "john@example.com");
-            var jane    = await context.Users.FirstOrDefaultAsync(u => u.Email == "jane@example.com");
-            var michael = await context.Users.FirstOrDefaultAsync(u => u.Email == "michael@example.com");
-            var emily   = await context.Users.FirstOrDefaultAsync(u => u.Email == "emily@example.com");
+            var users = await context.Users.Where(u => u.Role == UserRole.Member).ToListAsync();
+            var ngos = await context.Ngos.ToListAsync();
+            var programmes = await context.WelfareProgrammes.ToListAsync();
+            var causes = await context.DonationCauses.ToListAsync();
 
-            var saveTheChildren   = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Save The Children");
-            var greenEarth        = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Green Earth Foundation");
-            var healthFirst       = await context.Ngos.FirstOrDefaultAsync(n => n.Name == "Health First Aid");
+            var txns = new List<Transaction>();
+            var dons = new List<Donation>();
+            var rng = new Random(42);
 
-            var schoolProgramme   = await context.WelfareProgrammes.FirstOrDefaultAsync(p => p.Name == "Rural School Building Project");
-            var reforestProgramme = await context.WelfareProgrammes.FirstOrDefaultAsync(p => p.Name == "City Reforestation Initiative");
-            var clinicProgramme   = await context.WelfareProgrammes.FirstOrDefaultAsync(p => p.Name == "Free Mobile Clinic");
-            var floodProgramme    = await context.WelfareProgrammes.FirstOrDefaultAsync(p => p.Name == "Flood Relief Fund");
+            string[] gateways = ["VNPay", "MoMo", "ZaloPay", "PayPal"];
+            string[] accounts = ["9704366800001122", "0901110001", "0934567890", "paypal@donor.com",
+                                 "9704366800003344", "0956789012", "9704366800005566", "0978123456",
+                                 "zalo@donor.vn",   "9704366800007788"];
 
-            var educationCause    = await context.DonationCauses.FirstOrDefaultAsync(c => c.Name == "Education");
-            var environmentCause  = await context.DonationCauses.FirstOrDefaultAsync(c => c.Name == "Environment");
-            var healthCause       = await context.DonationCauses.FirstOrDefaultAsync(c => c.Name == "Healthcare");
-            var disasterCause     = await context.DonationCauses.FirstOrDefaultAsync(c => c.Name == "Disaster Relief");
-
-            var transactions = new List<Transaction>();
-            var donations    = new List<Donation>();
-
-            void AddDonation(
-                User? donor, Ngo? ngo, WelfareProgramme? programme, DonationCause? cause,
-                decimal amount, string gateway, string account, string content, string refCode,
-                DateTimeOffset time, DonationStatus status = DonationStatus.Completed)
+            void AddDonation(int userIdx, string ngoName, string programmeName, string causeName,
+                             decimal amount, string gateway, string account, string note, string refCode,
+                             DateTimeOffset time, DonationStatus status = DonationStatus.Completed)
             {
-                if (donor == null) return;
+                if (userIdx >= users.Count) return;
+                var user = users[userIdx];
+                var ngo = ngos.FirstOrDefault(n => n.Name == ngoName);
+                var prog = programmes.FirstOrDefault(p => p.Name.Contains(programmeName));
+                var caus = causes.FirstOrDefault(c => c.Name == causeName);
                 var txId = Guid.CreateVersion7();
-                transactions.Add(new Transaction
+                txns.Add(new Transaction
                 {
-                    TransactionId   = txId,
-                    Gateway         = gateway,
-                    AccountNumber   = account,
-                    Content         = content,
-                    Amount          = amount,
-                    ReferenceCode   = refCode,
+                    TransactionId = txId,
+                    Gateway = gateway,
+                    AccountNumber = account,
+                    Content = note,
+                    Amount = amount,
+                    ReferenceCode = refCode,
                     TransactionTime = time
                 });
-                donations.Add(new Donation
+                dons.Add(new Donation
                 {
-                    DonationId    = Guid.CreateVersion7(),
-                    UserId        = donor.UserId,
-                    NgoId         = ngo?.NgoId,
-                    ProgrammeId   = programme?.ProgrammeId,
-                    CauseId       = cause?.CauseId,
+                    DonationId = Guid.CreateVersion7(),
+                    UserId = user.UserId,
+                    NgoId = ngo?.NgoId,
+                    ProgrammeId = prog?.ProgrammeId,
+                    CauseId = caus?.CauseId,
                     TransactionId = txId,
-                    Amount        = amount,
-                    Status        = status,
-                    CreatedAt     = time
+                    Amount = amount,
+                    Status = status,
+                    CreatedAt = time
                 });
             }
 
-            // John's donations
-            AddDonation(john, null, schoolProgramme,   null,   500m,  "VNPay",   "9704123456789012", "Donate school project",    "TXN-JD-001", DateTimeOffset.UtcNow.AddDays(-45));
-            AddDonation(john, null,      reforestProgramme, null, 300m,  "MoMo",    "0912345678",       "Plant trees for future",   "TXN-JD-002", DateTimeOffset.UtcNow.AddDays(-30));
-            AddDonation(john, healthFirst,     null,   healthCause,      750m,  "VNPay",   "9704123456789012", "Support mobile clinic",    "TXN-JD-003", DateTimeOffset.UtcNow.AddDays(-10));
+            // 20 realistic donations spread across donors, programmes, and time
+            AddDonation(0, "International Red Cross (ICRC)", "Turkey-Syria", "Disaster Relief", 2500m, "VNPay", accounts[0], "Earthquake relief donation", "TXN-001-ICRC-EQ", now.AddMonths(-5).AddDays(-10));
+            AddDonation(1, "Médecins Sans Frontières (MSF)", "Gaza", "Healthcare", 1500m, "MoMo", accounts[1], "Medical aid for Gaza", "TXN-002-MSF-GZ", now.AddMonths(-5).AddDays(-5));
+            AddDonation(2, "World Wildlife Fund (WWF)", "Amazon", "Environment", 3000m, "PayPal", accounts[3], "Save the Amazon rainforest", "TXN-003-WWF-AMZ", now.AddMonths(-5).AddDays(1));
+            AddDonation(3, "UNICEF", "Ukraine", "Education", 1000m, "ZaloPay", accounts[2], "Education for Ukrainian children", "TXN-004-UNI-UKR", now.AddMonths(-4).AddDays(-12));
+            AddDonation(4, "Save the Children", "Clean Water", "Hunger & Food Aid", 750m, "VNPay", accounts[4], "Clean water access Africa", "TXN-005-STC-WAT", now.AddMonths(-4).AddDays(-2));
+            AddDonation(5, "International Red Cross (ICRC)", "Morocco", "Disaster Relief", 500m, "MoMo", accounts[5], "Morocco earthquake support", "TXN-006-ICRC-MAR", now.AddMonths(-4).AddDays(3));
+            AddDonation(6, "UNICEF", "Horn of Africa", "Hunger & Food Aid", 1200m, "PayPal", accounts[3], "Famine response Horn of Africa", "TXN-007-UNI-HOA", now.AddMonths(-3).AddDays(-8));
+            AddDonation(7, "Médecins Sans Frontières (MSF)", "Sudan", "Healthcare", 800m, "VNPay", accounts[7], "Medical aid for Sudan conflict", "TXN-008-MSF-SDN", now.AddMonths(-3).AddDays(2));
+            AddDonation(8, "World Wildlife Fund (WWF)", "Great Barrier", "Environment", 2000m, "ZaloPay", accounts[8], "Reef restoration project", "TXN-009-WWF-GBR", now.AddMonths(-2).AddDays(-10));
+            AddDonation(9, "Save the Children", "Girls' Education", "Education", 1800m, "MoMo", accounts[9], "Girls education Afghanistan", "TXN-010-STC-AFG", now.AddMonths(-2).AddDays(-3));
+            AddDonation(0, "UNICEF", "Ukraine", "Education", 500m, "VNPay", accounts[0], "Ukraine children education fund", "TXN-011-UNI-UKR2", now.AddMonths(-2).AddDays(1));
+            AddDonation(1, "International Red Cross (ICRC)", "Turkey-Syria", "Disaster Relief", 3000m, "ZaloPay", accounts[1], "Earthquake survivors support", "TXN-012-ICRC-EQ2", now.AddMonths(-1).AddDays(-15));
+            AddDonation(2, "Save the Children", "Clean Water", "Hunger & Food Aid", 600m, "MoMo", accounts[2], "Water for African communities", "TXN-013-STC-WAT2", now.AddMonths(-1).AddDays(-8));
+            AddDonation(3, "World Wildlife Fund (WWF)", "Amazon", "Environment", 4500m, "PayPal", accounts[3], "Amazon deforestation protection", "TXN-014-WWF-AMZ2", now.AddMonths(-1).AddDays(2));
+            AddDonation(4, "Médecins Sans Frontières (MSF)", "Gaza", "Healthcare", 2200m, "VNPay", accounts[4], "Critical medical supplies Gaza", "TXN-015-MSF-GZ2", now.AddDays(-20));
+            AddDonation(5, "UNICEF", "Horn of Africa", "Hunger & Food Aid", 950m, "MoMo", accounts[5], "Emergency nutrition Africa", "TXN-016-UNI-HOA2", now.AddDays(-15));
+            AddDonation(6, "International Red Cross (ICRC)", "Morocco", "Disaster Relief", 1100m, "ZaloPay", accounts[6], "Moroccan earthquake relief second fund", "TXN-017-ICRC-MAR2", now.AddDays(-10));
+            AddDonation(7, "World Wildlife Fund (WWF)", "Great Barrier", "Environment", 1700m, "VNPay", accounts[7], "Coral reef restoration support", "TXN-018-WWF-GBR2", now.AddDays(-5));
+            AddDonation(8, "Save the Children", "Girls' Education", "Education", 850m, "MoMo", accounts[8], "Empowering girls through education", "TXN-019-STC-AFG2", now.AddDays(-2));
+            // 1 voided donation for dashboard realism
+            AddDonation(9, "Médecins Sans Frontières (MSF)", "Sudan", "Healthcare", 400m, "VNPay", accounts[9], "Sudan medical supplies donation", "TXN-020-MSF-SDN2", now.AddDays(-1), DonationStatus.Void);
 
-            // Jane's donations
-            AddDonation(jane, saveTheChildren, null,   educationCause,   1000m, "ZaloPay", "0934567890",       "Education for all",        "TXN-JS-001", DateTimeOffset.UtcNow.AddDays(-50));
-            AddDonation(jane, healthFirst,     null,    disasterCause,    250m,  "MoMo",    "0934567890",       "Flood relief support",     "TXN-JS-002", DateTimeOffset.UtcNow.AddDays(-2));
-            AddDonation(jane, null,      reforestProgramme, null, 200m,  "VNPay",   "9704098765432100", "Reforestation donation",   "TXN-JS-003", DateTimeOffset.UtcNow.AddDays(-15), DonationStatus.Void);
-
-            // Michael's donations
-            AddDonation(michael, healthFirst,  null,   healthCause,      2000m, "VNPay",   "9704111122223333", "Medical support donation", "TXN-MT-001", DateTimeOffset.UtcNow.AddDays(-20));
-            AddDonation(michael, null,  floodProgramme,    null,    500m,  "ZaloPay", "0978123456",       "Emergency flood aid",      "TXN-MT-002", DateTimeOffset.UtcNow.AddDays(-1));
-
-            // Emily's donations
-            AddDonation(emily, greenEarth,     null, environmentCause, 800m,  "MoMo",    "0956789012",       "Go green initiative",      "TXN-EN-001", DateTimeOffset.UtcNow.AddDays(-7));
-            AddDonation(emily, null, schoolProgramme,  null,   400m,  "VNPay",   "9704444455556666", "Kids deserve a future",    "TXN-EN-002", DateTimeOffset.UtcNow.AddDays(-3));
-
-            await context.Transactions.AddRangeAsync(transactions);
-            await context.Donations.AddRangeAsync(donations);
+            await context.Transactions.AddRangeAsync(txns);
+            await context.Donations.AddRangeAsync(dons);
             await context.SaveChangesAsync();
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // 10. Seed Notifications
+        // 10. NOTIFICATIONS
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.Notifications.AnyAsync())
         {
-            var john    = await context.Users.FirstOrDefaultAsync(u => u.Email == "john@example.com");
-            var jane    = await context.Users.FirstOrDefaultAsync(u => u.Email == "jane@example.com");
-            var michael = await context.Users.FirstOrDefaultAsync(u => u.Email == "michael@example.com");
-            var emily   = await context.Users.FirstOrDefaultAsync(u => u.Email == "emily@example.com");
+            var users = await context.Users.Where(u => u.Role == UserRole.Member).ToListAsync();
+            var donations = await context.Donations.Include(d => d.Programme).ToListAsync();
 
             var notifications = new List<Notification>();
-
-            if (john != null)
+            foreach (var donation in donations.Where(d => d.Status == DonationStatus.Completed).Take(15))
             {
-                notifications.AddRange(
-                [
-                    new Notification { NotificationId = Guid.CreateVersion7(), UserId = john.UserId, Content = "Your donation of $500 to 'Rural School Building Project' was received. Thank you!", IsRead = true,  CreatedAt = DateTimeOffset.UtcNow.AddDays(-45) },
-                    new Notification { NotificationId = Guid.CreateVersion7(), UserId = john.UserId, Content = "Your donation of $300 to 'City Reforestation Initiative' was received. Thank you!", IsRead = true,  CreatedAt = DateTimeOffset.UtcNow.AddDays(-30) },
-                    new Notification { NotificationId = Guid.CreateVersion7(), UserId = john.UserId, Content = "New welfare programme 'Flood Relief Fund' has launched. Consider donating!",       IsRead = false, CreatedAt = DateTimeOffset.UtcNow.AddDays(-3) }
-                ]);
-            }
-
-            if (jane != null)
-            {
-                notifications.AddRange(
-                [
-                    new Notification { NotificationId = Guid.CreateVersion7(), UserId = jane.UserId, Content = "Your donation of $1000 to 'Rural School Building Project' was received. Thank you!", IsRead = true,  CreatedAt = DateTimeOffset.UtcNow.AddDays(-50) },
-                    new Notification { NotificationId = Guid.CreateVersion7(), UserId = jane.UserId, Content = "Your donation of $200 was voided due to a payment issue. Please try again.",        IsRead = false, CreatedAt = DateTimeOffset.UtcNow.AddDays(-15) },
-                    new Notification { NotificationId = Guid.CreateVersion7(), UserId = jane.UserId, Content = "Your donation of $250 to 'Flood Relief Fund' was received. Thank you!",            IsRead = false, CreatedAt = DateTimeOffset.UtcNow.AddDays(-2) }
-                ]);
-            }
-
-            if (michael != null)
-            {
-                notifications.AddRange(
-                [
-                    new Notification { NotificationId = Guid.CreateVersion7(), UserId = michael.UserId, Content = "Your generous donation of $2000 to 'Free Mobile Clinic' was received. Thank you!", IsRead = true,  CreatedAt = DateTimeOffset.UtcNow.AddDays(-20) },
-                    new Notification { NotificationId = Guid.CreateVersion7(), UserId = michael.UserId, Content = "Your donation of $500 to 'Flood Relief Fund' was received. Thank you!",            IsRead = false, CreatedAt = DateTimeOffset.UtcNow.AddDays(-1) }
-                ]);
-            }
-
-            if (emily != null)
-            {
-                notifications.AddRange(
-                [
-                    new Notification { NotificationId = Guid.CreateVersion7(), UserId = emily.UserId, Content = "Your donation of $800 to 'City Reforestation Initiative' was received. Thank you!", IsRead = true,  CreatedAt = DateTimeOffset.UtcNow.AddDays(-7) },
-                    new Notification { NotificationId = Guid.CreateVersion7(), UserId = emily.UserId, Content = "Your donation of $400 to 'Rural School Building Project' was received. Thank you!", IsRead = false, CreatedAt = DateTimeOffset.UtcNow.AddDays(-3) }
-                ]);
+                var user = users.FirstOrDefault(u => u.UserId == donation.UserId);
+                if (user == null) continue;
+                notifications.Add(new Notification
+                {
+                    NotificationId = Guid.CreateVersion7(),
+                    UserId = user.UserId,
+                    Content = $"Your donation of ${donation.Amount:N0} was successfully received. Thank you for your generosity, {user.FullName.Split(' ')[0]}!",
+                    IsRead = donation.CreatedAt < DateTimeOffset.UtcNow.AddDays(-14),
+                    CreatedAt = donation.CreatedAt.AddSeconds(30)
+                });
             }
 
             if (notifications.Count > 0)
@@ -528,91 +544,61 @@ public static class DbSeeder
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // 11. Seed User Queries
+        // 11. USER QUERIES (5 pending, 5 answered)
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.UserQueries.AnyAsync())
         {
-            var john    = await context.Users.FirstOrDefaultAsync(u => u.Email == "john@example.com");
-            var jane    = await context.Users.FirstOrDefaultAsync(u => u.Email == "jane@example.com");
-            var michael = await context.Users.FirstOrDefaultAsync(u => u.Email == "michael@example.com");
-
+            var users = await context.Users.Where(u => u.Role == UserRole.Member).OrderBy(u => u.CreatedAt).ToListAsync();
             var queries = new List<UserQuery>();
 
-            if (john != null)
+            void Query(int idx, string subject, string message, string? reply, int daysAgo)
             {
-                queries.AddRange(
-                [
-                    new UserQuery
-                    {
-                        QueryId     = Guid.CreateVersion7(),
-                        UserId      = john.UserId,
-                        Subject     = "How do I get a donation receipt?",
-                        MessageText = "Hi, I made a donation last week to the school building project. Can I get an official receipt for tax purposes?",
-                        ReplyText   = "Hi John! Thank you for your generous donation. You can download your receipt from My Donations > View > Download Receipt. Let us know if you need further assistance!",
-                        CreatedAt   = DateTimeOffset.UtcNow.AddDays(-40)
-                    },
-                    new UserQuery
-                    {
-                        QueryId     = Guid.CreateVersion7(),
-                        UserId      = john.UserId,
-                        Subject     = "Can I set up recurring donations?",
-                        MessageText = "Is there a way to set up a monthly recurring donation to a welfare programme?",
-                        ReplyText   = null,
-                        CreatedAt   = DateTimeOffset.UtcNow.AddDays(-5)
-                    }
-                ]);
-            }
-
-            if (jane != null)
-            {
+                if (idx >= users.Count) return;
                 queries.Add(new UserQuery
                 {
-                    QueryId     = Guid.CreateVersion7(),
-                    UserId      = jane.UserId,
-                    Subject     = "Voided donation - need help",
-                    MessageText = "My donation of $200 was voided. I was charged but the donation did not go through. Please help me resolve this.",
-                    ReplyText   = "Hi Jane! We sincerely apologize for the inconvenience. Our team has investigated and found a temporary payment gateway issue. A full refund has been initiated and will reflect in 3-5 business days.",
-                    CreatedAt   = DateTimeOffset.UtcNow.AddDays(-14)
+                    QueryId = Guid.CreateVersion7(),
+                    UserId = users[idx].UserId,
+                    Subject = subject,
+                    MessageText = message,
+                    ReplyText = reply,
+                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-daysAgo)
                 });
             }
 
-            if (michael != null)
-            {
-                queries.Add(new UserQuery
-                {
-                    QueryId     = Guid.CreateVersion7(),
-                    UserId      = michael.UserId,
-                    Subject     = "Partnership opportunities",
-                    MessageText = "I work for a hospital and we're interested in partnering with Health First Aid. Who should I contact?",
-                    ReplyText   = "Hi Michael! We love hearing from healthcare professionals. Please email partnerships@giveaid.com with your organization details and our team will reach out within 48 hours.",
-                    CreatedAt   = DateTimeOffset.UtcNow.AddDays(-18)
-                });
-            }
+            // Answered queries
+            Query(0, "How can I get a donation receipt?", "I donated to the Turkey-Syria Earthquake Relief fund last month. Could I please receive an official receipt for corporate tax records?", "Thank you for your donation! You can download your official receipt from My Account > Donation History > View > Download Receipt. For corporate receipts, email receipts@giveaid.com with your company details.", 30);
+            Query(1, "Is my payment data secure?", "I used VNPay to donate. I want to make sure my card data and transaction information are encrypted and protected.", "Your security is our top priority. GiveAID uses 256-bit TLS encryption and does not store any card data. All payments are processed through PCI-DSS-compliant gateways. You are completely safe.", 25);
+            Query(2, "Can I sponsor a specific programme?", "We are a Vietnamese SME interested in becoming a corporate sponsor specifically for the Amazon Conservation programme. What are the tiers?", "Thank you for your interest! Corporate sponsorship starts at $5,000 with logo placement, reporting, and co-branding options. Please email partnerships@giveaid.com and our team will send a full prospectus.", 20);
+            Query(3, "How are donations distributed to NGOs?", "I want to understand your fee structure. What percentage of my donation actually reaches the NGO vs administrative costs?", "GiveAID operates with a 3% platform fee on transactions. 97% of every donation goes directly to the designated NGO programme. All financials are published in our Annual Transparency Report on our website.", 18);
+            Query(4, "Donation not reflecting in my history", "I made a $750 donation via ZaloPay 3 days ago but it does not show in my donation history. The money has been deducted from my account.", "We apologise for the delay! Our team identified a ZaloPay webhook issue that has now been resolved. Your donation has been manually confirmed and is now visible in your history. Thank you for your patience.", 12);
+            // Pending queries
+            Query(5, "Can I set up a recurring monthly donation?", "Is there a way to schedule an automatic monthly donation to the Girls' Education in Afghanistan programme? I want to commit to $100/month.", null, 7);
+            Query(6, "Volunteering opportunities with MSF", "I am a licensed physician based in Ho Chi Minh City and I am very interested in volunteering with Médecins Sans Frontières. How do I apply through GiveAID?", null, 5);
+            Query(7, "Difference between Cause and Programme?", "I am confused about the difference between donating to a 'Cause' vs a specific 'Welfare Programme'. Could you explain which is better for tracking impact?", null, 3);
+            Query(8, "Requesting a refund on voided donation", "My donation of $400 to MSF Sudan was marked as Voided but I can see the charge on my VNPay account statement. Please assist with the refund urgently.", null, 2);
+            Query(9, "Partnership for university CSR project", "I am a final-year student working on a CSR project. Can I partner with GiveAID to run a fundraising campaign for our university? What is the process?", null, 1);
 
-            if (queries.Count > 0)
-                await context.UserQueries.AddRangeAsync(queries);
-
+            await context.UserQueries.AddRangeAsync(queries);
             await context.SaveChangesAsync();
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // 12. Seed About Us Subpages & User Modifications
+        // 12. ABOUT US SUBPAGES
         // ─────────────────────────────────────────────────────────────────────
         if (!await context.AboutUsSubpages.AnyAsync())
         {
-            var admin = await context.Users.FirstOrDefaultAsync(u => u.Email == "admin@giveaid.com");
+            var admin = await context.Users.FirstOrDefaultAsync(u => u.Role == UserRole.Admin);
 
             var subpages = new List<AboutUsSubpage>
             {
                 new() { SubpageId = Guid.CreateVersion7(), Slug = "our-mission", Title = "Our Mission" },
                 new() { SubpageId = Guid.CreateVersion7(), Slug = "our-story",   Title = "Our Story"   },
-                new() { SubpageId = Guid.CreateVersion7(), Slug = "our-team",    Title = "Our Team"    }
+                new() { SubpageId = Guid.CreateVersion7(), Slug = "our-team",    Title = "Our Team"    },
             };
 
             await context.AboutUsSubpages.AddRangeAsync(subpages);
             await context.SaveChangesAsync();
 
-            // Each subpage requires at least one UserModification (HtmlContent is read from it)
             var modifications = new List<UserModification>
             {
                 new()
@@ -623,11 +609,11 @@ public static class DbSeeder
                     HtmlContent    =
                         "<section class=\"mission-section\">" +
                         "<h2>What Drives Us</h2>" +
-                        "<p>At GiveAID, our mission is to connect compassionate donors with life-changing welfare programmes run by trusted NGOs around the world. We believe every contribution, big or small, has the power to transform lives.</p>" +
+                        "<p>At GiveAID, our mission is to connect compassionate donors with life-changing welfare programmes run by the world's most trusted humanitarian organisations — including UNICEF, the Red Cross, WWF, MSF, and Save the Children. We believe every dollar donated with purpose has the power to change a life.</p>" +
                         "<h2>Our Commitment</h2>" +
-                        "<p>We are committed to transparency, accountability, and measurable impact. Every donation is tracked, and donors receive regular updates on how their funds are being used to create real change.</p>" +
+                        "<p>We operate with radical transparency. 97% of every donation reaches the designated programme. All financials are independently audited and published in our annual report. Donors receive real-time impact updates directly from field teams.</p>" +
                         "</section>",
-                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-90)
+                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-180)
                 },
                 new()
                 {
@@ -637,11 +623,11 @@ public static class DbSeeder
                     HtmlContent    =
                         "<section class=\"story-section\">" +
                         "<h2>How It All Started</h2>" +
-                        "<p>GiveAID was founded in 2018 by a group of volunteers who saw the disconnect between people who wanted to help and the organisations that needed support. We built a platform to bridge that gap.</p>" +
+                        "<p>GiveAID was founded in 2018 by a group of international development professionals and technologists who witnessed first-hand the friction between well-meaning donors and the NGOs that desperately needed their support. The idea was simple: build trust through technology.</p>" +
                         "<h2>Where We Are Today</h2>" +
-                        "<p>Today, GiveAID partners with dozens of NGOs across multiple countries, facilitating millions in donations and supporting thousands of welfare programmes that change lives every single day.</p>" +
+                        "<p>Today, GiveAID partners with 5 globally recognised NGOs operating in 190+ countries. We have facilitated over $12 million in donations, funded 48 welfare programmes, and directly impacted 2.3 million beneficiaries. We are just getting started.</p>" +
                         "</section>",
-                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-90)
+                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-180)
                 },
                 new()
                 {
@@ -651,12 +637,12 @@ public static class DbSeeder
                     HtmlContent    =
                         "<section class=\"team-section\">" +
                         "<h2>The People Behind GiveAID</h2>" +
-                        "<p>Our team is made up of passionate individuals from diverse backgrounds — technology, social work, finance, and community development — all united by a single goal: to make giving easier and more impactful.</p>" +
-                        "<h2>Join Us</h2>" +
-                        "<p>We are always looking for volunteers, partners, and supporters. If you share our vision of a more generous world, <a href=\"/contact\">get in touch</a> with us today.</p>" +
+                        "<p>Our lean, diverse team spans Vietnam, Switzerland, and the United States. We bring together expertise in humanitarian finance, full-stack engineering, UX design, and international development. Every team member has personally volunteered in at least one of our partner NGO programmes.</p>" +
+                        "<h2>Join the Movement</h2>" +
+                        "<p>We are always seeking passionate volunteers, corporate partners, and impact investors. If you share our belief in a more generous world, <a href=\"/contact\">reach out to us</a> — we would love to hear from you.</p>" +
                         "</section>",
-                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-90)
-                }
+                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-180)
+                },
             };
 
             await context.UserModifications.AddRangeAsync(modifications);

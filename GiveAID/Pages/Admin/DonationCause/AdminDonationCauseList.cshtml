@@ -1,0 +1,65 @@
+@model AdminDonationCauseList
+
+<div class="bg-white rounded-xl border border-[#E3DDD3] overflow-hidden">
+    <div class="p-6 border-b border-[#E3DDD3]">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+            <div class="flex flex-wrap items-center gap-2">
+              <h3 class="text-[#1C1A17]">Donation Causes</h3>
+              <span class="badge badge-lg bg-[#1A5C6B]/10 text-[#1A5C6B] border-0 font-semibold"><i class="ph ph-tag mr-1"></i> @Model.TotalCount total</span>
+              <span class="badge badge-lg bg-[#C97C2E]/10 text-[#C97C2E] border-0 font-semibold"><i class="ph ph-funnel mr-1"></i> @Model.Causes.Length showing</span>
+            </div>
+            <a asp-page="/Admin/DonationCause/Editor" class="btn btn-primary btn-sm">
+                <i class="ph ph-plus"></i> Add Cause
+            </a>
+        </div>
+
+        <div class="flex flex-wrap gap-3 items-end">
+            <div class="flex-1 min-w-[200px]">
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Search by Name</label>
+                <label class="input input-bordered input-sm flex items-center gap-2 w-full">
+                    <i class="ph ph-magnifying-glass text-[#6B6459]"></i>
+                    <input type="text" asp-for="SearchTerm" bind:keydown.debounce.300ms
+                           on:input="@(() => Model.Search())"
+                           placeholder="Cause name…" />
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="table w-full">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th class="w-24">Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var c in Model.Causes)
+            {
+                <tr>
+                    <td class="font-semibold">@c.Name</td>
+                    <td>
+                        <div class="flex gap-1">
+                            <a asp-page="/Admin/DonationCause/Editor" asp-route-id="@c.Id" asp-route-mode="view" class="btn btn-ghost btn-xs text-[#1A5C6B]" title="View details">
+                                <i class="ph ph-eye text-lg"></i>
+                            </a>
+                            <a asp-page="/Admin/DonationCause/Editor" asp-route-id="@c.Id" class="btn btn-ghost btn-xs text-[#C97C2E]" title="Edit">
+                                <i class="ph ph-pencil-simple text-lg"></i>
+                            </a>
+                            <button on:click="@(() => Model.Delete(c.Id))" class="btn btn-ghost btn-xs text-error"
+                                    title="Delete"><i class="ph ph-trash text-lg"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+        @if (Model.Causes.Length == 0)
+        {
+            <div class="p-8 text-center text-[#6B6459] text-sm">
+                No donation causes found. Click "Add Cause" to create one.
+            </div>
+        }
+    </div>
+</div>

@@ -5,76 +5,156 @@
 }
 
 <div>
-    <hero-component title="FAQ" subtitle="Find answers to common questions"/>
+    <hero-component title="Frequently Asked Questions" subtitle="Everything you need to know about how we work and how you can help."/>
 
-    <div class="max-w-4xl mx-auto px-6 py-12">
-        <div>
-            <!-- FAQs -->
-            <div>
-                <h3 class="font-['Playfair_Display',serif] text-2xl font-bold text-[#1C1A17] mb-6">Frequently Asked
-                    Questions</h3>
-                <div class="space-y-3">
-                    <div class="bg-white border border-[#E3DDD3] rounded-xl overflow-hidden" x-data="{ open: false }">
-                        <button @@click="open = !open"
-                                class="w-full text-left px-5 py-4 flex items-center justify-between text-sm font-semibold text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors">
-                            How do I make a donation?
-                            <i class="ph ph-caret-down text-[#6B6459] transition-transform flex-shrink-0"
-                               :class="open ? 'rotate-180' : ''"></i>
-                        </button>
-                        <div x-show="open"
-                             class="px-5 pb-4 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3] pt-3"
-                             style="display: none;">
-                            Go to the Donate page, select your preferred amount and cause, then complete the secure
-                            payment form.
-                        </div>
-                    </div>
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-6 py-16" x-data="{ searchQuery: '', activeCategory: 'all' }">
+        
+        <!-- Search and Filter Header -->
+        <div class="flex flex-col md:flex-row gap-6 mb-12 items-center justify-between">
+            <!-- Search Bar -->
+            <div class="relative w-full md:w-96">
+                <i class="ph ph-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-[#6B6459] text-lg"></i>
+                <input type="text" x-model="searchQuery" placeholder="Search for answers..."
+                       class="w-full pl-12 pr-4 py-3 bg-white border border-[#E3DDD3] rounded-xl focus:border-[#1A5C6B] focus:ring-1 focus:ring-[#1A5C6B] outline-none transition-all shadow-sm placeholder:text-[#6B6459]" />
+            </div>
 
-                    <div class="bg-white border border-[#E3DDD3] rounded-xl overflow-hidden" x-data="{ open: false }">
-                        <button @@click="open = !open"
-                                class="w-full text-left px-5 py-4 flex items-center justify-between text-sm font-semibold text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors">
-                            Is my payment information secure?
-                            <i class="ph ph-caret-down text-[#6B6459] transition-transform flex-shrink-0"
-                               :class="open ? 'rotate-180' : ''"></i>
-                        </button>
-                        <div x-show="open"
-                             class="px-5 pb-4 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3] pt-3"
-                             style="display: none;">
-                            Yes. All transactions are processed with 256-bit SSL encryption. We do not store card
-                            details.
-                        </div>
-                    </div>
-
-                    <div class="bg-white border border-[#E3DDD3] rounded-xl overflow-hidden" x-data="{ open: false }">
-                        <button @@click="open = !open"
-                                class="w-full text-left px-5 py-4 flex items-center justify-between text-sm font-semibold text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors">
-                            Can I get a tax receipt?
-                            <i class="ph ph-caret-down text-[#6B6459] transition-transform flex-shrink-0"
-                               :class="open ? 'rotate-180' : ''"></i>
-                        </button>
-                        <div x-show="open"
-                             class="px-5 pb-4 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3] pt-3"
-                             style="display: none;">
-                            Yes. Donations are eligible for tax benefits under Section 80G. A receipt is emailed after
-                            each donation.
-                        </div>
-                    </div>
-
-                    <div class="bg-white border border-[#E3DDD3] rounded-xl overflow-hidden" x-data="{ open: false }">
-                        <button @@click="open = !open"
-                                class="w-full text-left px-5 py-4 flex items-center justify-between text-sm font-semibold text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors">
-                            How are donations allocated?
-                            <i class="ph ph-caret-down text-[#6B6459] transition-transform flex-shrink-0"
-                               :class="open ? 'rotate-180' : ''"></i>
-                        </button>
-                        <div x-show="open"
-                             class="px-5 pb-4 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3] pt-3"
-                             style="display: none;">
-                            100% of the donation amount (minus payment gateway fees) goes directly to the selected
-                            cause.
-                        </div>
-                    </div>
-                </div>
+            <!-- Categories -->
+            <div class="flex gap-2 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 hide-scrollbar">
+                <button @@click="activeCategory = 'all'"
+                        :class="activeCategory === 'all' ? 'bg-[#1A5C6B] text-white border-[#1A5C6B]' : 'bg-white text-[#6B6459] border-[#E3DDD3] hover:border-[#1A5C6B] hover:text-[#1A5C6B]'"
+                        class="px-5 py-2.5 rounded-full text-sm font-semibold border transition-colors whitespace-nowrap">
+                    All
+                </button>
+                <button @@click="activeCategory = 'donations'"
+                        :class="activeCategory === 'donations' ? 'bg-[#1A5C6B] text-white border-[#1A5C6B]' : 'bg-white text-[#6B6459] border-[#E3DDD3] hover:border-[#1A5C6B] hover:text-[#1A5C6B]'"
+                        class="px-5 py-2.5 rounded-full text-sm font-semibold border transition-colors whitespace-nowrap">
+                    Donations
+                </button>
+                <button @@click="activeCategory = 'account'"
+                        :class="activeCategory === 'account' ? 'bg-[#1A5C6B] text-white border-[#1A5C6B]' : 'bg-white text-[#6B6459] border-[#E3DDD3] hover:border-[#1A5C6B] hover:text-[#1A5C6B]'"
+                        class="px-5 py-2.5 rounded-full text-sm font-semibold border transition-colors whitespace-nowrap">
+                    Account
+                </button>
             </div>
         </div>
+
+        <!-- FAQs List -->
+        <div class="space-y-4">
+            
+            <!-- Question 1: Donations -->
+            <div class="bg-white border border-[#E3DDD3] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow" 
+                 x-data="{ open: false, question: 'How do I make a donation?', category: 'donations' }"
+                 x-show="(activeCategory === 'all' || activeCategory === category) && question.toLowerCase().includes(searchQuery.toLowerCase())">
+                <button @@click="open = !open"
+                        class="w-full text-left px-6 py-5 flex items-center justify-between text-base font-bold font-['Playfair_Display',serif] text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors focus:outline-none">
+                    <span x-text="question"></span>
+                    <i class="ph ph-plus text-[#1A5C6B] text-xl transition-transform duration-300"
+                       :class="open ? 'rotate-45' : ''"></i>
+                </button>
+                <div x-show="open" x-collapse
+                     class="px-6 pb-5 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3]/50 pt-4"
+                     style="display: none;">
+                    Go to the Donate page, select your preferred amount and cause, then complete the secure payment form. We accept major credit cards, PayPal, and bank transfers.
+                </div>
+            </div>
+
+            <!-- Question 2: Donations -->
+            <div class="bg-white border border-[#E3DDD3] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow" 
+                 x-data="{ open: false, question: 'Is my payment information secure?', category: 'donations' }"
+                 x-show="(activeCategory === 'all' || activeCategory === category) && question.toLowerCase().includes(searchQuery.toLowerCase())">
+                <button @@click="open = !open"
+                        class="w-full text-left px-6 py-5 flex items-center justify-between text-base font-bold font-['Playfair_Display',serif] text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors focus:outline-none">
+                    <span x-text="question"></span>
+                    <i class="ph ph-plus text-[#1A5C6B] text-xl transition-transform duration-300"
+                       :class="open ? 'rotate-45' : ''"></i>
+                </button>
+                <div x-show="open" x-collapse
+                     class="px-6 pb-5 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3]/50 pt-4"
+                     style="display: none;">
+                    Yes, absolutely. All transactions are processed with 256-bit SSL encryption. We partner with industry-leading payment gateways and do not store your credit card details on our servers.
+                </div>
+            </div>
+
+            <!-- Question 3: Donations -->
+            <div class="bg-white border border-[#E3DDD3] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow" 
+                 x-data="{ open: false, question: 'Can I get a tax receipt?', category: 'donations' }"
+                 x-show="(activeCategory === 'all' || activeCategory === category) && question.toLowerCase().includes(searchQuery.toLowerCase())">
+                <button @@click="open = !open"
+                        class="w-full text-left px-6 py-5 flex items-center justify-between text-base font-bold font-['Playfair_Display',serif] text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors focus:outline-none">
+                    <span x-text="question"></span>
+                    <i class="ph ph-plus text-[#1A5C6B] text-xl transition-transform duration-300"
+                       :class="open ? 'rotate-45' : ''"></i>
+                </button>
+                <div x-show="open" x-collapse
+                     class="px-6 pb-5 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3]/50 pt-4"
+                     style="display: none;">
+                    Yes. Donations made to verified NGOs through our platform are eligible for tax benefits under applicable laws (e.g., Section 80G). A digital receipt is automatically emailed to you immediately after your donation is successful.
+                </div>
+            </div>
+
+            <!-- Question 4: Donations -->
+            <div class="bg-white border border-[#E3DDD3] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow" 
+                 x-data="{ open: false, question: 'How are donations allocated?', category: 'donations' }"
+                 x-show="(activeCategory === 'all' || activeCategory === category) && question.toLowerCase().includes(searchQuery.toLowerCase())">
+                <button @@click="open = !open"
+                        class="w-full text-left px-6 py-5 flex items-center justify-between text-base font-bold font-['Playfair_Display',serif] text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors focus:outline-none">
+                    <span x-text="question"></span>
+                    <i class="ph ph-plus text-[#1A5C6B] text-xl transition-transform duration-300"
+                       :class="open ? 'rotate-45' : ''"></i>
+                </button>
+                <div x-show="open" x-collapse
+                     class="px-6 pb-5 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3]/50 pt-4"
+                     style="display: none;">
+                    100% of your donation amount (minus standard third-party payment gateway processing fees) goes directly to the NGO and the specific cause you selected. GiveAID does not take a cut from your donation.
+                </div>
+            </div>
+
+            <!-- Question 5: Account -->
+            <div class="bg-white border border-[#E3DDD3] rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow" 
+                 x-data="{ open: false, question: 'How do I update my profile information?', category: 'account' }"
+                 x-show="(activeCategory === 'all' || activeCategory === category) && question.toLowerCase().includes(searchQuery.toLowerCase())">
+                <button @@click="open = !open"
+                        class="w-full text-left px-6 py-5 flex items-center justify-between text-base font-bold font-['Playfair_Display',serif] text-[#1C1A17] hover:bg-[#F6F1E9] transition-colors focus:outline-none">
+                    <span x-text="question"></span>
+                    <i class="ph ph-plus text-[#1A5C6B] text-xl transition-transform duration-300"
+                       :class="open ? 'rotate-45' : ''"></i>
+                </button>
+                <div x-show="open" x-collapse
+                     class="px-6 pb-5 text-sm text-[#6B6459] leading-relaxed border-t border-[#E3DDD3]/50 pt-4"
+                     style="display: none;">
+                    Once logged in, click on your avatar in the top right corner and select "Profile Settings". From there, you can update your name, contact details, and communication preferences.
+                </div>
+            </div>
+            
+            <!-- Empty State for Search -->
+            <div x-show="!['How do I make a donation?', 'Is my payment information secure?', 'Can I get a tax receipt?', 'How are donations allocated?', 'How do I update my profile information?'].some(q => q.toLowerCase().includes(searchQuery.toLowerCase()))" 
+                 class="py-12 text-center" style="display: none;">
+                <div class="size-16 bg-[#F6F1E9] rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="ph ph-magnifying-glass text-2xl text-[#1A5C6B]"></i>
+                </div>
+                <h3 class="text-xl font-bold font-['Playfair_Display',serif] text-[#1C1A17] mb-2">No results found</h3>
+                <p class="text-[#6B6459]">We couldn't find any FAQs matching "<span x-text="searchQuery" class="font-semibold"></span>"</p>
+                <button @@click="searchQuery = ''; activeCategory = 'all'" class="mt-4 text-[#1A5C6B] font-semibold hover:underline">
+                    Clear search
+                </button>
+            </div>
+        </div>
+        
+        <!-- Still have questions CTA -->
+        <div class="mt-16 bg-gradient-to-br from-[#1A5C6B] to-[#4A8B7F] rounded-3xl p-8 md:p-12 text-center text-white relative overflow-hidden">
+            <!-- Decorative background element -->
+            <div class="absolute -top-24 -right-24 size-64 bg-white opacity-5 rounded-full blur-2xl pointer-events-none"></div>
+            
+            <i class="ph ph-chats-circle text-5xl mb-4 opacity-90"></i>
+            <h2 class="font-['Playfair_Display',serif] text-3xl font-bold mb-4">Still have questions?</h2>
+            <p class="text-white/80 max-w-lg mx-auto mb-8 text-base">
+                Can't find the answer you're looking for? Our support team is here to help you with any inquiries you might have.
+            </p>
+            <a asp-page="/Contact" class="inline-flex items-center gap-2 px-8 py-4 bg-white text-[#1A5C6B] font-bold rounded-xl hover:bg-[#F6F1E9] hover:-translate-y-1 transition-all duration-300 shadow-lg no-underline">
+                Contact Support <i class="ph ph-arrow-right"></i>
+            </a>
+        </div>
+        
     </div>
 </div>
