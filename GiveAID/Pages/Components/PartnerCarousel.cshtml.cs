@@ -18,7 +18,8 @@ public class PartnerCarousel(AppDbContext dbContext) : HydroComponent
             .Select(p => new PartnerDto
             {
                 Name = p.Name,
-                LogoUrl = p.LogoUrl
+                LogoUrl = p.LogoUrl,
+                WebsiteLink = p.WebsiteLink
             })
             .ToListAsync();
     }
@@ -27,5 +28,6 @@ public class PartnerCarousel(AppDbContext dbContext) : HydroComponent
     {
         public string Name { get; set; } = string.Empty;
         public string LogoUrl { get; set; } = string.Empty;
+        public string WebsiteLink { get; set; } = string.Empty;
     }
 }

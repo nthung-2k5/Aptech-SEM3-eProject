@@ -8,11 +8,15 @@
 <div>
     <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
         <div class="flex flex-wrap gap-2">
-            @foreach (string filter in new[] { "All", "Health", "Education", "Women", "Environment" })
+            <button type="button" on:click="@(() => Model.SetFilter("All"))"
+                    class="px-4 py-2 rounded-full text-sm font-medium transition-colors @(Model.Filter == "All" ? "bg-[#1A5C6B] text-white" : "bg-white border border-[#E3DDD3] text-[#6B6459] hover:border-[#1A5C6B]")">
+                All
+            </button>
+            @foreach (var cause in Model.Causes)
             {
-                <button type="button" on:click="@(() => Model.SetFilter(filter))"
-                        class="px-4 py-2 rounded-full text-sm font-medium transition-colors @(Model.Filter == filter ? "bg-[#1A5C6B] text-white" : "bg-white border border-[#E3DDD3] text-[#6B6459] hover:border-[#1A5C6B]")">
-                    @filter
+                <button type="button" on:click="@(() => Model.SetFilter(cause.Name))"
+                        class="px-4 py-2 rounded-full text-sm font-medium transition-colors @(Model.Filter == cause.Name ? "bg-[#1A5C6B] text-white" : "bg-white border border-[#E3DDD3] text-[#6B6459] hover:border-[#1A5C6B]")">
+                    @cause.Name
                 </button>
             }
         </div>
@@ -27,7 +31,7 @@
     </div>
 
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-        @foreach (var img in Model.Images)
+        @foreach (var img in Model.FilteredImages)
         {
             bool hasProgramme = img.AssociatedProgramme.HasValue;
             var routeId = img.AssociatedProgramme?.Id;

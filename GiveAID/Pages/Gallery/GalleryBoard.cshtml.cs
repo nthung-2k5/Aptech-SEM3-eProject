@@ -9,13 +9,23 @@ namespace GiveAID.Pages.Gallery;
 public class GalleryBoard(
     IGalleryImageService galleryService,
     IProgrammeService programmeService,
+    IDonationCauseService causeService,
     IImageService imageService,
     IValidator<GalleryBoard> validator
 ) : HydroComponent
 {
     public GalleryImageDto[] Images { get; set; } = [];
     public ProgrammeDto[] Programmes { get; set; } = [];
+    public DonationCauseDto[] Causes { get; set; } = [];
     public string Filter { get; set; } = "All";
+
+    public GalleryImageDto[] FilteredImages =>
+        Filter == "All" 
+            ? Images 
+            : Images.Where(img => 
+                img.AssociatedProgramme.HasValue && 
+                Programmes.FirstOrDefault(p => p.Id == img.AssociatedProgramme.Value.Id)?.Cause == Filter
+              ).ToArray();
 
     public bool IsModalOpen { get; set; }
     public Guid? EditingId { get; set; }
@@ -39,6 +49,7 @@ public class GalleryBoard(
     {
         Images = await galleryService.GetAllImagesAsync();
         Programmes = await programmeService.GetAllProgrammesAsync(null);
+        Causes = await causeService.GetAllDonationCausesAsync();
     }
 
     public void SetFilter(string filter) { Filter = filter; }
@@ -102,15 +113,13 @@ public class GalleryBoard(
             
             if (EditingId.HasValue && EditingId.Value != Guid.Empty && imageUri.Contains("127.0.0.1:9000"))
             {
-                await imageService.UpdateImageAsync(new Uri(imageUri), bytes);
+                await imageService.DeleteImageAsync(new Uri(imageUri));
             }
-            else
-            {
-                imageUri = await imageService.UploadImageAsync(
-                    "gallery",
-                    $"{Guid.NewGuid()}{Form.NewImageExtension}",
-                    bytes);
-            }
+
+            imageUri = await imageService.UploadImageAsync(
+                "gallery",
+                $"{Guid.NewGuid()}{Form.NewImageExtension}",
+                bytes);
         }
 
         var saveDto = new GalleryImageSaveDto(imageUri, Form.Caption, Form.AssociatedProgrammeId);
