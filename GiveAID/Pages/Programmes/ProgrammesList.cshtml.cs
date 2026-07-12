@@ -13,7 +13,8 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
     public int PageNumber { get; set; } = 1;
 
     public ProgrammeDto[] Programmes { get; set; } = [];
-    public int TotalPages => (int)Math.Ceiling(Programmes.Length / 6.0);
+    public int TotalPages { get; set; } = 1;
+    public int TotalCount { get; set; } = 0;
 
     public override async Task MountAsync() { await LoadProgrammesAsync(); }
 
@@ -50,6 +51,9 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
             PageNumber = PageNumber,
             PageSize = 6
         };
-        Programmes = await programmeService.GetAllProgrammesAsync(query);
+        var result = await programmeService.GetAllProgrammesPagedAsync(query);
+        Programmes = result.Items;
+        TotalPages = result.TotalPages;
+        TotalCount = result.TotalCount;
     }
 }
