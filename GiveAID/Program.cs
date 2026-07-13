@@ -30,7 +30,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultSignOutScheme = "Cookies";
-}).AddCookie("Cookies", options => { options.LoginPath = "/Login"; }).AddJwtBearer(options =>
+}).AddCookie("Cookies", options => { options.LoginPath = "/Register/Index"; }).AddJwtBearer(options =>
 {
     var jwtSettings = builder.Configuration.GetSection("JwtSettings");
     string secretKey = jwtSettings["Secret"] ?? "super_secret_default_key_replace_me_in_production_over_32_chars";

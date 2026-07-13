@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using FluentValidation;
 using GiveAID.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -27,11 +27,11 @@ public class ProfileModel(AppDbContext context, IValidator<ProfileModel.InputMod
     {
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Register/Index"); }
 
         var user = await context.Users.FindAsync(userId);
 
-        if (user == null) { return RedirectToPage("/Login/Index"); }
+        if (user == null) { return RedirectToPage("/Register/Index"); }
 
         Input = new InputModel
         {
@@ -62,11 +62,11 @@ public class ProfileModel(AppDbContext context, IValidator<ProfileModel.InputMod
 
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Register/Index"); }
 
         var user = await context.Users.FindAsync(userId);
 
-        if (user == null) { return RedirectToPage("/Login/Index"); }
+        if (user == null) { return RedirectToPage("/Register/Index"); }
 
         user.FullName = Input.FullName;
         user.PhoneNumber = Input.PhoneNumber;

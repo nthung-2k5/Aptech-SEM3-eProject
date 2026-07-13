@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace GiveAID.Pages.Donate;
 
-[Authorize(Roles = nameof(UserRole.Member))]
 public class IndexModel : PageModel
 {
     [BindProperty(SupportsGet = true)]
@@ -21,6 +20,16 @@ public class IndexModel : PageModel
 
     public IActionResult OnGet()
     {
+        if (User.Identity?.IsAuthenticated != true)
+        {
+            return RedirectToPage("/Register/Index");
+        }
+
+        if (!User.IsInRole(nameof(UserRole.Member)))
+        {
+            return Forbid();
+        }
+
         UserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
         
         return Page();

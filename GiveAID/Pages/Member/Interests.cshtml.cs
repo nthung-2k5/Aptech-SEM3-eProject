@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
@@ -16,7 +16,7 @@ public class InterestsModel(IUserInterestService userInterestService) : PageMode
     {
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Register/Index"); }
 
         Interests = await userInterestService.GetUserInterestsAsync(userId);
 
@@ -27,7 +27,7 @@ public class InterestsModel(IUserInterestService userInterestService) : PageMode
     {
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Register/Index"); }
 
         await userInterestService.UnfollowNgoAsync(userId, ngoId);
 

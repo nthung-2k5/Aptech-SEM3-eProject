@@ -37,7 +37,9 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
         }
 
         var totalCount = await q.CountAsync(ct);
-        var items = await q.OrderByDescending(p => p.StartTime)
+        var currentTime = DateTimeOffset.UtcNow;
+        var items = await q.OrderBy(p => p.EndTime.HasValue && p.EndTime > currentTime ? 0 : (!p.EndTime.HasValue ? 1 : 2))
+                .ThenBy(p => p.EndTime)
                 .Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
                 .ProjectToDto().ToArrayAsync(ct);
 

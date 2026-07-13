@@ -117,9 +117,15 @@
                                 Manage Platform <i class="ph ph-gear ml-1"></i>
                             </a>
                         }
-                        else
+                        else if (User.Identity?.IsAuthenticated == true)
                         {
                             <a href="/Donate/Index" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
+                                Donate Now <i class="ph ph-arrow-right ml-1"></i>
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="/Register/Index" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
                                 Donate Now <i class="ph ph-arrow-right ml-1"></i>
                             </a>
                         }
@@ -151,9 +157,15 @@
                                         Manage Causes <i class="ph ph-list-dashes"></i>
                                     </a>
                                 }
+                                else if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <a href="/Donate/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
+                                        Proceed to Donate <i class="ph ph-arrow-right"></i>
+                                    </a>
+                                }
                                 else
                                 {
-                                    <a href="/Programmes/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
+                                    <a href="/Register/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
                                         Proceed to Donate <i class="ph ph-arrow-right"></i>
                                     </a>
                                 }
