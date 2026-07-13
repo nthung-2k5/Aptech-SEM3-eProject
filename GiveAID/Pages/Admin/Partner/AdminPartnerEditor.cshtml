@@ -1,8 +1,10 @@
 @model AdminPartnerEditor
 
 <form on:submit="@(() => Model.Save())" enctype="multipart/form-data" class="bg-white border border-[#E3DDD3] rounded-xl p-6">
-    <h4 class="font-bold text-[#1C1A17] mb-4">@(Model.Id.HasValue ? "Edit Partner" : "Add Partner")</h4>
-    <div class="grid md:grid-cols-[1fr_16rem] gap-4 mb-4">
+    @{ bool isViewMode = Context.Request.Query["mode"] == "view"; }
+    <h4 class="font-bold text-[#1C1A17] mb-4">@(isViewMode ? "View Partner" : (Model.Id.HasValue ? "Edit Partner" : "Add Partner"))</h4>
+    <fieldset disabled="@isViewMode">
+        <div class="grid md:grid-cols-[1fr_16rem] gap-4 mb-4">
         <div class="space-y-4">
             <div>
                 <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Name <span
@@ -35,8 +37,12 @@
             }
         </div>
     </div>
+    </fieldset>
     <div class="flex justify-end gap-2">
-        <a asp-page="/Admin/Partner/Index" class="btn btn-soft">Cancel</a>
-        <button type="submit" class="btn btn-secondary">Save Partner</button>
+        <a asp-page="/Admin/Partner/Index" class="btn btn-soft">@(isViewMode ? "Back" : "Cancel")</a>
+        @if (!isViewMode)
+        {
+            <button type="submit" class="btn btn-secondary">Save Partner</button>
+        }
     </div>
 </form>

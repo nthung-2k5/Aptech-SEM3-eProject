@@ -13,6 +13,9 @@ public static class DbSeeder
         // 1. Seed Users
         if (!await context.Users.AnyAsync())
         {
+            var adminHash = passwordService.HashPassword("Admin@123");
+            var memberHash = passwordService.HashPassword("Member@123");
+
             var users = new List<User>
             {
                 new() { FullName = "Admin User", Email = "admin@giveaid.com", PasswordHash = passwordService.HashPassword("Admin@123"), DateOfBirth = new DateOnly(1980, 1, 1), Address = "123 Admin St", PhoneNumber = "+14155550001", Occupation = "Administrator", Role = UserRole.Admin, IsDeleted = false },
@@ -33,6 +36,7 @@ public static class DbSeeder
                 new() { FullName = "Harper Moore", Email = "harper@example.com", PasswordHash = passwordService.HashPassword("Member@123"), DateOfBirth = new DateOnly(1989, 8, 14), Address = "101 Ocean Ave", PhoneNumber = "+821012345678", Occupation = "Journalist", Role = UserRole.Member, IsDeleted = false }
             };
             await context.Users.AddRangeAsync(users);
+            await context.SaveChangesAsync();
         }
 
         // 2. Seed Donation Causes
@@ -58,6 +62,7 @@ public static class DbSeeder
                 new() { Name = "Community Building" }
             };
             await context.DonationCauses.AddRangeAsync(causes);
+            await context.SaveChangesAsync();
         }
 
         await context.SaveChangesAsync();
@@ -85,6 +90,7 @@ public static class DbSeeder
                 new() { Name = "Community Heroes", Description = "Local community improvement.", Address = "707 Hero Blvd", PhoneNumber = "+82212345678", Website = "https://communityheroes.org" }
             };
             await context.Ngos.AddRangeAsync(ngos);
+            await context.SaveChangesAsync();
         }
 
         await context.SaveChangesAsync();
@@ -112,6 +118,7 @@ public static class DbSeeder
                 new() { Name = "Sony", LogoUrl = "https://logo.clearbit.com/sony.com", WebsiteLink = "https://sony.com" }
             };
             await context.CorporatePartners.AddRangeAsync(partners);
+            await context.SaveChangesAsync();
         }
 
         await context.SaveChangesAsync();
@@ -500,11 +507,11 @@ public static class DbSeeder
                     HtmlContent    =
                         "<section class=\"mission-section\">" +
                         "<h2>What Drives Us</h2>" +
-                        "<p>At GiveAID, our mission is to connect compassionate donors with life-changing welfare programmes run by trusted NGOs around the world. We believe every contribution, big or small, has the power to transform lives.</p>" +
+                        "<p>At GiveAID, our mission is to connect compassionate donors with life-changing welfare programmes run by the world's most trusted humanitarian organisations — including UNICEF, the Red Cross, WWF, MSF, and Save the Children. We believe every dollar donated with purpose has the power to change a life.</p>" +
                         "<h2>Our Commitment</h2>" +
-                        "<p>We are committed to transparency, accountability, and measurable impact. Every donation is tracked, and donors receive regular updates on how their funds are being used to create real change.</p>" +
+                        "<p>We operate with radical transparency. 97% of every donation reaches the designated programme. All financials are independently audited and published in our annual report. Donors receive real-time impact updates directly from field teams.</p>" +
                         "</section>",
-                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-90)
+                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-180)
                 },
                 new()
                 {
@@ -514,11 +521,11 @@ public static class DbSeeder
                     HtmlContent    =
                         "<section class=\"story-section\">" +
                         "<h2>How It All Started</h2>" +
-                        "<p>GiveAID was founded in 2018 by a group of volunteers who saw the disconnect between people who wanted to help and the organisations that needed support. We built a platform to bridge that gap.</p>" +
+                        "<p>GiveAID was founded in 2018 by a group of international development professionals and technologists who witnessed first-hand the friction between well-meaning donors and the NGOs that desperately needed their support. The idea was simple: build trust through technology.</p>" +
                         "<h2>Where We Are Today</h2>" +
-                        "<p>Today, GiveAID partners with dozens of NGOs across multiple countries, facilitating millions in donations and supporting thousands of welfare programmes that change lives every single day.</p>" +
+                        "<p>Today, GiveAID partners with 5 globally recognised NGOs operating in 190+ countries. We have facilitated over $12 million in donations, funded 48 welfare programmes, and directly impacted 2.3 million beneficiaries. We are just getting started.</p>" +
                         "</section>",
-                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-90)
+                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-180)
                 },
                 new()
                 {
@@ -528,12 +535,12 @@ public static class DbSeeder
                     HtmlContent    =
                         "<section class=\"team-section\">" +
                         "<h2>The People Behind GiveAID</h2>" +
-                        "<p>Our team is made up of passionate individuals from diverse backgrounds — technology, social work, finance, and community development — all united by a single goal: to make giving easier and more impactful.</p>" +
-                        "<h2>Join Us</h2>" +
-                        "<p>We are always looking for volunteers, partners, and supporters. If you share our vision of a more generous world, <a href=\"/contact\">get in touch</a> with us today.</p>" +
+                        "<p>Our lean, diverse team spans Vietnam, Switzerland, and the United States. We bring together expertise in humanitarian finance, full-stack engineering, UX design, and international development. Every team member has personally volunteered in at least one of our partner NGO programmes.</p>" +
+                        "<h2>Join the Movement</h2>" +
+                        "<p>We are always seeking passionate volunteers, corporate partners, and impact investors. If you share our belief in a more generous world, <a href=\"/contact\">reach out to us</a> — we would love to hear from you.</p>" +
                         "</section>",
-                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-90)
-                }
+                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-180)
+                },
             };
 
             var extraSubpageContent = new Dictionary<string, string>

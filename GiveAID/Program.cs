@@ -94,7 +94,7 @@ using (var scope = app.Services.CreateScope())
 
     var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
     await DbSeeder.SeedAsync(db, passwordService);
-    
+
     var s3 = scope.ServiceProvider.GetRequiredService<IImageService>();
     await s3.EnsureBucketExists();
 }

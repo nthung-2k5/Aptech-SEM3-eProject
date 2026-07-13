@@ -1,4 +1,4 @@
-﻿using GiveAID.Models;
+using GiveAID.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -41,7 +41,12 @@ public class AuditingInterceptor : SaveChangesInterceptor
                 {
                     if (entry.Entity is IHasCreatedAt createdEntity)
                     {
-                        createdEntity.CreatedAt = utcNow;
+                        // Only overwrite if the date is close to now (default initialization). 
+                        // This allows the DbSeeder to set historical CreatedAt dates for charts.
+                        if (Math.Abs((utcNow - createdEntity.CreatedAt).TotalMinutes) < 5)
+                        {
+                            createdEntity.CreatedAt = utcNow;
+                        }
                     }
 
                     break;

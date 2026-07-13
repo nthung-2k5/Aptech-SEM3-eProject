@@ -1,11 +1,13 @@
 @model AdminProgrammeEditor
 
 <form on:submit="@(() => Model.Save())" enctype="multipart/form-data" class="bg-white border border-[#E3DDD3] rounded-xl p-6 space-y-6">
+    @{ bool isViewMode = Context.Request.Query["mode"] == "view"; }
     <h4 class="font-bold text-[#1C1A17]">
-        @(Model.Id.HasValue ? "Edit Programme" : "Add Programme")
+        @(isViewMode ? "View Programme" : (Model.Id.HasValue ? "Edit Programme" : "Add Programme"))
     </h4>
 
-    <div class="grid md:grid-cols-[1fr_24rem] gap-6">
+    <fieldset disabled="@isViewMode">
+        <div class="grid md:grid-cols-[1fr_24rem] gap-6">
         <div class="space-y-6">
             @* Core details *@
             <div class="grid md:grid-cols-2 gap-4">
@@ -95,9 +97,13 @@
             }
         </div>
     </div>
+    </fieldset>
     
     <div class="flex justify-end gap-2">
-        <a asp-page="/Admin/Programme/Index" class="btn btn-soft">Cancel</a>
-        <button type="submit" class="btn btn-secondary">Save Programme</button>
+        <a asp-page="/Admin/Programme/Index" class="btn btn-soft">@(isViewMode ? "Back" : "Cancel")</a>
+        @if (!isViewMode)
+        {
+            <button type="submit" class="btn btn-secondary">Save Programme</button>
+        }
     </div>
 </form>

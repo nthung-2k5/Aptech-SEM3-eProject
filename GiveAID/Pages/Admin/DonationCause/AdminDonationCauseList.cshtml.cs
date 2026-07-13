@@ -1,113 +1,44 @@
 using GiveAID.Dtos;
-using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
 
 namespace GiveAID.Pages.Admin.DonationCause;
 
-public class AdminDonationCauseList(IDonationCauseService causeService) : HydroComponent
+public class AdminDonationCauseList(IDonationCauseService donationCauseService) : HydroComponent
 {
+    // Filter / Search state
+    public string SearchTerm { get; set; } = string.Empty;
+
+    // Results
     public DonationCauseDto[] Causes { get; set; } = [];
+    public int TotalCount { get; set; }
 
-    // State for create
-    public bool IsCreating { get; set; }
-    public string NewCauseName { get; set; } = string.Empty;
+    public override async Task MountAsync() { await LoadDataAsync(); }
 
-    // State for edit
-    public Guid? EditingId { get; set; }
-    public string EditingName { get; set; } = string.Empty;
-
-    public override async Task MountAsync()
+    public async Task Search()
     {
+        await LoadDataAsync();
+    }
+
+    public async Task Delete(Guid id)
+    {
+        await donationCauseService.DeleteDonationCauseAsync(id);
         await LoadDataAsync();
     }
 
     private async Task LoadDataAsync()
     {
-        Causes = await causeService.GetAllDonationCausesAsync();
-    }
-
-    public void StartCreate()
-    {
-        IsCreating = true;
-        NewCauseName = string.Empty;
-        EditingId = null;
-        ModelState.Clear();
-    }
-
-    public void CancelCreate()
-    {
-        IsCreating = false;
-        NewCauseName = string.Empty;
-        ModelState.Clear();
-    }
-
-    public async Task SaveNew()
-    {
-        if (string.IsNullOrWhiteSpace(NewCauseName))
+        var allCauses = await donationCauseService.GetAllDonationCausesAsync();
+        
+        if (!string.IsNullOrWhiteSpace(SearchTerm))
         {
-            return;
+            Causes = allCauses.Where(c => c.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)).ToArray();
         }
-
-        try
+        else
         {
-            await causeService.CreateDonationCauseAsync(new DonationCauseSaveDto(NewCauseName.Trim()));
-            IsCreating = false;
-            NewCauseName = string.Empty;
-            ModelState.Clear();
-            await LoadDataAsync();
+            Causes = allCauses;
         }
-        catch (DuplicateException ex)
-        {
-            if (ex.FieldName == nameof(DonationCauseSaveDto.Name))
-            {
-                ModelState.AddModelError(nameof(NewCauseName), "The cause name already exists.");
-            }
-        }
-    }
-
-    public void StartEdit(Guid id, string currentName)
-    {
-        EditingId = id;
-        EditingName = currentName;
-        IsCreating = false;
-        ModelState.Clear();
-    }
-
-    public void CancelEdit()
-    {
-        EditingId = null;
-        EditingName = string.Empty;
-        ModelState.Clear();
-    }
-
-    public async Task SaveEdit()
-    {
-        if (EditingId == null || string.IsNullOrWhiteSpace(EditingName))
-        {
-            return;
-        }
-
-        try
-        {
-            await causeService.UpdateDonationCauseAsync(EditingId.Value, new DonationCauseSaveDto(EditingName.Trim()));
-            EditingId = null;
-            EditingName = string.Empty;
-            ModelState.Clear();
-            await LoadDataAsync();
-        }
-        catch (DuplicateException ex)
-        {
-            if (ex.FieldName == nameof(DonationCauseSaveDto.Name))
-            {
-                ModelState.AddModelError(nameof(EditingName), "The cause name already exists.");
-            }
-        }
-    }
-
-    public async Task Delete(Guid id)
-    {
-        await causeService.DeleteDonationCauseAsync(id);
-        await LoadDataAsync();
+        
+        TotalCount = Causes.Length;
     }
 }

@@ -1,0 +1,39 @@
+@model GiveAID.Pages.Admin.Components.DashboardMetrics
+
+<div class="stats shadow w-full border border-[#E3DDD3]">
+  <div class="stat">
+    <div class="stat-figure text-[#1A5C6B]">
+      <i class="ph ph-currency-dollar text-3xl"></i>
+    </div>
+    <div class="stat-title font-semibold text-[#1C1A17]">Total Funds Raised</div>
+    <div class="stat-value text-[#1A5C6B] font-['Playfair_Display',serif]">$@Model.TotalFundsRaised.ToString("N0")</div>
+    <div class="stat-desc text-[#6B6459]">All time</div>
+  </div>
+  
+  <div class="stat">
+    <div class="stat-figure text-[#4A8B7F]">
+      <i class="ph ph-flag text-3xl"></i>
+    </div>
+    <div class="stat-title font-semibold text-[#1C1A17]">Active Programmes</div>
+    <div class="stat-value text-[#4A8B7F] font-['Playfair_Display',serif]">@Model.ActiveProgrammes</div>
+    <div class="stat-desc text-[#6B6459]">Currently running</div>
+  </div>
+  
+  <div class="stat">
+    <div class="stat-figure text-[#D4183D]">
+      <i class="ph ph-chat-circle text-3xl"></i>
+    </div>
+    <div class="stat-title font-semibold text-[#1C1A17]">Pending Approvals</div>
+    <div class="stat-value text-[#D4183D] font-['Playfair_Display',serif]">@Model.PendingApprovals</div>
+    <div class="stat-desc text-[#6B6459]">Requires attention</div>
+  </div>
+  
+  <div class="stat">
+    <div class="stat-figure text-[#C97C2E]">
+      <i class="ph ph-handshake text-3xl"></i>
+    </div>
+    <div class="stat-title font-semibold text-[#1C1A17]">Total Partners</div>
+    <div class="stat-value text-[#C97C2E] font-['Playfair_Display',serif]">@Model.TotalPartners</div>
+    <div class="stat-desc text-[#6B6459]">Verified</div>
+  </div>
+</div>

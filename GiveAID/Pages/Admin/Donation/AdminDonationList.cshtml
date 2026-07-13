@@ -5,9 +5,10 @@
     <div class="p-6 border-b border-[#E3DDD3]">
         <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
             <h3 class="text-[#1C1A17]">Donation Records</h3>
-            <div class="flex items-center gap-2">
-                <span class="badge badge-neutral text-sm font-medium">Total Amount: @Model.TotalAmount.ToUsCurrencyString()</span>
-                <span class="badge badge-ghost text-sm font-medium">@Model.TotalCount Donations</span>
+            <div class="flex flex-wrap gap-2">
+              <span class="badge badge-lg bg-[#1A5C6B]/10 text-[#1A5C6B] border-0 font-semibold"><i class="ph ph-receipt mr-1"></i> @Model.TotalCount total</span>
+              <span class="badge badge-lg bg-[#4A8B7F]/10 text-[#4A8B7F] border-0 font-semibold"><i class="ph ph-check-circle mr-1"></i> @Model.Donations.Count(d => d.Status == DonationStatus.Completed) completed</span>
+              <span class="badge badge-lg bg-[#D4183D]/10 text-[#D4183D] border-0 font-semibold"><i class="ph ph-x-circle mr-1"></i> @Model.Donations.Count(d => d.Status == DonationStatus.Void) void</span>
             </div>
         </div>
 

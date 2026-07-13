@@ -79,19 +79,22 @@
 
                 <a asp-page="/Gallery/Index" class="navbar-button">Gallery</a>
 
-                <div class="relative group">
-                    <a href="#" class="navbar-button">
-                        Help Centre
-                    </a>
-                    <div
-                        class="absolute left-0 mt-1 w-40 bg-white text-black shadow-lg rounded-b-md hidden group-hover:block border border-[#E3DDD3]">
-                        <a asp-page="/Faq"
-                           class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] no-underline transition-colors">FAQ</a>
-                        <a asp-page="/Contact"
-                           class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] no-underline transition-colors">Contact
-                            Us</a>
+                @if (!User.IsInRole("Admin"))
+                {
+                    <div class="relative group">
+                        <a href="#" class="navbar-button">
+                            Help Centre
+                        </a>
+                        <div
+                            class="absolute left-0 mt-1 w-40 bg-white text-black shadow-lg rounded-b-md hidden group-hover:block border border-[#E3DDD3]">
+                            <a asp-page="/Faq"
+                               class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] border-b border-[#E3DDD3] no-underline transition-colors">FAQ</a>
+                            <a asp-page="/Contact"
+                               class="block px-4 py-2 text-sm text-[#1C1A17] hover:bg-[#F6F1E9] no-underline transition-colors">Contact
+                                Us</a>
+                        </div>
                     </div>
-                </div>
+                }
 
                 @if (User.Identity?.IsAuthenticated == true)
                 {
@@ -196,11 +199,13 @@
                     }
                     else if (isAdmin)
                     {
-                        <a asp-page="/Admin/Index" class="navbar-button">Admin Dashboard</a>
+                        <a asp-page="/Admin/Index" class="btn btn-sm bg-white/15 hover:bg-white/25 text-white border-white/30 hover:border-white/50 font-semibold gap-1 no-underline">
+                            <i class="ph ph-shield-check"></i> Admin Dashboard
+                        </a>
                         <form asp-page="/Logout" method="post">
                             <button type="submit"
-                                    class="px-3 py-2 text-white/80 hover:text-white text-sm transition-colors no-underline">
-                                Logout
+                                    class="btn btn-sm btn-error gap-1 font-semibold">
+                                <i class="ph ph-sign-out"></i> Logout
                             </button>
                         </form>
                     }

@@ -38,22 +38,35 @@
         <div class="h-[40vh] min-h-[300px] max-h-[500px] relative">
             <img src="@p.ImageUrl" alt="@p.Name" class="w-full h-full object-cover"/>
             <div class="absolute inset-0 bg-black/50"></div>
+            
+            <div class="absolute top-6 left-6 md:left-12 z-10">
+                <a href="/Programmes" class="btn btn-sm bg-white/20 hover:bg-white/40 border-none text-white backdrop-blur-md rounded-full shadow-lg pr-4">
+                    <i class="ph ph-arrow-left"></i> Back to Programmes
+                </a>
+            </div>
+
             <div class="absolute inset-0 flex items-center">
                 <div class="max-w-7xl mx-auto px-6 w-full text-white mt-16">
                     <div class="badge badge-secondary badge-xl uppercase tracking-widest font-bold mb-4">
                         @p.Cause
                     </div>
                     <h1 class="font-['Playfair_Display',serif] text-4xl md:text-5xl lg:text-6xl font-bold mb-4">@p.Name</h1>
-                    <div class="flex items-center gap-6 text-white/90">
+                    <div class="flex flex-wrap items-center gap-6 text-white/90">
                         <div class="flex items-center gap-2">
                             <i class="ph ph-buildings text-xl"></i>
                             <span class="text-lg">@p.NgoName</span>
                         </div>
+                        <div class="flex items-center gap-2">
+                            <i class="ph ph-calendar-blank text-xl"></i>
+                            <span class="text-lg">
+                                @p.StartDate.ToString("MMM dd, yyyy") @(p.EndDate.HasValue ? $"- {p.EndDate.Value.ToString("MMM dd, yyyy")}" : "(Ongoing)")
+                            </span>
+                        </div>
                         @if (timeText != null)
                         {
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 font-semibold bg-white/20 px-3 py-1 rounded-full">
                                 <i class="ph ph-clock text-xl"></i>
-                                <span class="text-lg">@timeText</span>
+                                <span>@timeText</span>
                             </div>
                         }
                     </div>
@@ -124,29 +137,38 @@
                             bool isQuotaReached = p.TargetAmount.HasValue && p.RaisedAmount >= p.TargetAmount.Value;
                         }
 
-                        @if (isEnded)
+                        @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
                         {
-                            <button class="btn btn-secondary btn-block btn-xl" disabled>
-                                The programme has ended. Thank you for your support!
-                            </button>
-                        }
-                        else if (isQuotaReached)
-                        {
-                            <button class="btn btn-secondary btn-block btn-xl" disabled>
-                                The donation target has been reached. Thank you for your support!
-                            </button>
+                            <a href="/Admin/Programme/Editor/@p.Id" class="btn bg-[#1A5C6B] hover:bg-[#154D5A] text-white btn-block btn-xl border-none">
+                                <i class="ph ph-pencil-simple text-xl"></i> Edit Programme
+                            </a>
                         }
                         else
                         {
-                            <a asp-page="/Donate/Index" asp-route-programmeId="@p.Id" class="btn btn-secondary btn-block btn-xl">
-                                Donate Now
-                            </a>
+                            @if (isEnded)
+                            {
+                                <button class="btn btn-secondary btn-block btn-xl" disabled>
+                                    The programme has ended. Thank you for your support!
+                                </button>
+                            }
+                            else if (isQuotaReached)
+                            {
+                                <button class="btn btn-secondary btn-block btn-xl" disabled>
+                                    The donation target has been reached. Thank you for your support!
+                                </button>
+                            }
+                            else
+                            {
+                                <a asp-page="/Donate/Index" asp-route-programmeId="@p.Id" class="btn btn-secondary btn-block btn-xl">
+                                    Donate Now
+                                </a>
+                            }
+                            
+                            <button class="btn btn-outline btn-block mt-4" onclick="inviteModal.showModal()">
+                                <i class="ph ph-envelope-simple text-xl"></i>
+                                Invite Friends
+                            </button>
                         }
-                        
-                        <button class="btn btn-outline btn-block mt-4" onclick="inviteModal.showModal()">
-                            <i class="ph ph-envelope-simple text-xl"></i>
-                            Invite Friends
-                        </button>
 
                         <div class="text-center text-sm text-gray-500 mt-6 flex items-center justify-center gap-2">
                             <i class="ph ph-shield-check text-[#1A5C6B] text-lg"></i>

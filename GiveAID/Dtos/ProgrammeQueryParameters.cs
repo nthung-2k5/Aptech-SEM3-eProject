@@ -9,6 +9,7 @@ public class ProgrammeQueryParameters
     public Guid? NgoId { get; set; }
     public Guid? CauseId { get; set; }
     public string? StatusFilter { get; set; } // "Active", "Upcoming", "Ended"
+    public DateTime? DateFilter { get; set; }
 
     // Sorting
     public string? SortBy { get; set; }
