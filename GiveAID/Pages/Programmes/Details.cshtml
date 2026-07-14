@@ -18,18 +18,19 @@
         </div>
         <script>
             setTimeout(() => {
-                var t = document.querySelector('.toast');
+                const t = document.querySelector('.toast');
                 if (t) t.remove();
             }, 3000);
         </script>
     }
 
-    var timeRemaining = p.EndDate - DateTimeOffset.Now;
-    bool isStarted = p.StartDate <= DateTimeOffset.Now;
+    var nowDay = DateOnly.FromDateTime(DateTimeOffset.Now.DateTime);
+    int? timeRemaining = p.EndDate.HasValue ? p.EndDate.Value.DayNumber - nowDay.DayNumber : null;
+    bool isStarted = p.StartDate <= nowDay;
     string? timeText = null;
 
-    if (!isStarted) { timeText = $"Starts in {(p.StartDate - DateTimeOffset.Now).Days} days"; }
-    else if (timeRemaining.HasValue) { timeText = timeRemaining.Value.TotalDays > 0 ? $"{timeRemaining.Value.Days} days left" : "Ended"; }
+    if (!isStarted) { timeText = $"Starts in {p.StartDate.DayNumber - nowDay.DayNumber} days"; }
+    else if (timeRemaining.HasValue) { timeText = timeRemaining.Value > 0 ? $"{timeRemaining.Value} days left" : "Ended"; }
 
     int progress = p.TargetAmount is > 0 ? (int)(p.RaisedAmount / p.TargetAmount.Value * 100) : 0;
     if (progress > 100) progress = 100;
@@ -136,7 +137,7 @@
                         </div>
 
                         @{
-                            bool isEnded = p.EndDate.HasValue && p.EndDate.Value <= DateTimeOffset.Now;
+                            bool isEnded = p.EndDate.HasValue && p.EndDate.Value <= nowDay;
                             bool isQuotaReached = p.TargetAmount.HasValue && p.RaisedAmount >= p.TargetAmount.Value;
                         }
 

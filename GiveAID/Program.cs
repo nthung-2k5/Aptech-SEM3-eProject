@@ -69,7 +69,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
-builder.Services.AddSingleton<IImageService, S3ImageService>();
+builder.Services.AddSingleton<IImageService, ImageService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddScoped<IAboutUsSubpageService, AboutUsSubpageService>();
@@ -94,9 +94,6 @@ using (var scope = app.Services.CreateScope())
 
     var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
     await DbSeeder.SeedAsync(db, passwordService);
-
-    var s3 = scope.ServiceProvider.GetRequiredService<IImageService>();
-    await s3.EnsureBucketExists();
 }
 
 // Configure the HTTP request pipeline.

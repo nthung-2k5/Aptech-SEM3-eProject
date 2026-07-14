@@ -77,12 +77,13 @@
         <div class="grid lg:grid-cols-2 xl:grid-cols-3 gap-6 flex-grow">
             @foreach (var p in Model.Programmes.Items)
             {
-                var timeRemaining = p.EndDate - DateTimeOffset.Now;
-                bool isStarted = p.StartDate <= DateTimeOffset.Now;
+                var nowDay = DateOnly.FromDateTime(DateTimeOffset.Now.DateTime);
+                int? timeRemaining = p.EndDate.HasValue ? p.EndDate.Value.DayNumber - nowDay.DayNumber : null;
+                bool isStarted = p.StartDate <= nowDay;
                 string? timeText = null;
 
-                if (!isStarted) { timeText = $"Starts in {(p.StartDate - DateTimeOffset.Now).Days} days"; }
-                else if (timeRemaining.HasValue) { timeText = timeRemaining.Value.TotalDays > 0 ? $"{timeRemaining.Value.Days} days left" : "Ended"; }
+                if (!isStarted) { timeText = $"Starts in {p.StartDate.DayNumber - nowDay.DayNumber} days"; }
+                else if (timeRemaining.HasValue) { timeText = timeRemaining.Value > 0 ? $"{timeRemaining.Value} days left" : "Ended"; }
 
                 int progress = p.TargetAmount is > 0 ? (int)(p.RaisedAmount / p.TargetAmount.Value * 100) : 0;
                 if (progress > 100) progress = 100;

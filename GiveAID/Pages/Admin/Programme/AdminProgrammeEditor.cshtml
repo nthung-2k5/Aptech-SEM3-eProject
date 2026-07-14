@@ -60,13 +60,13 @@
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Start Date <span class="text-red-500">*</span></label>
-                        <input type="datetime-local" asp-for="Form.StartTime" bind required class="input w-full"/>
-                        <span asp-validation-for="Form.StartTime"></span>
+                        <input type="date" asp-for="Form.StartDate" bind required class="input w-full"/>
+                        <span asp-validation-for="Form.StartDate"></span>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-[#1C1A17] mb-1">End Date <span class="text-xs text-[#6B6459] font-normal">(optional)</span></label>
-                        <input type="datetime-local" asp-for="Form.EndTime" bind class="input w-full"/>
-                        <span asp-validation-for="Form.EndTime"></span>
+                        <input type="date" asp-for="Form.EndDate" bind class="input w-full"/>
+                        <span asp-validation-for="Form.EndDate"></span>
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Donation Target ($) <span class="text-xs text-[#6B6459] font-normal">(optional)</span></label>
@@ -85,12 +85,12 @@
             </div>
 
             @* Image preview *@
-            @if (!string.IsNullOrEmpty(Model.Form.ImageUrl))
+            @if (!string.IsNullOrEmpty(Model.PreviewImageSource))
             {
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Image Preview</label>
                     <div class="border border-[#E3DDD3] rounded-lg p-3 bg-[#F6F1E9] flex items-center justify-center">
-                        <img src="@Model.Form.ImageUrl" alt="Programme image preview"
+                        <img src="@Model.PreviewImageSource" alt="Programme image preview"
                              class="w-full object-cover rounded-lg aspect-[4/3]"/>
                     </div>
                 </div>

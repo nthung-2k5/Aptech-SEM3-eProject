@@ -19,7 +19,7 @@ public class AdminNgoEditor(
         public string Name { get; set; } = "";
         public string Description { get; set; } = "";
         public string Address { get; set; } = "";
-        public string Website { get; set; } = "";
+        public string? Website { get; set; } = "";
         public string PhoneNumber { get; set; } = "";
         public List<Guid> SelectedPartnerIds { get; set; } = [];
     }
@@ -100,6 +100,8 @@ public class AdminNgoEditor(
                 .MaximumLength(255).WithMessage("Address cannot exceed 255 characters");
 
             RuleFor(x => x.Form.Website)
+                .Must(uri => string.IsNullOrEmpty(uri) || Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                .WithMessage("Invalid website URL")
                 .MaximumLength(1024).WithMessage("Website cannot exceed 1024 characters");
 
             RuleFor(x => x.Form.PhoneNumber)

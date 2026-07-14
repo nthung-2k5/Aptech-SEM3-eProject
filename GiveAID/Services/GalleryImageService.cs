@@ -96,7 +96,7 @@ public class GalleryImageService(AppDbContext dbContext, IImageService imageServ
     {
         string? imageUrl = await dbContext.GalleryImages.AsNoTracking().Where(i => i.ImageId == id).Select(i => i.ImageUrl).FirstOrDefaultAsync(ct);
 
-        if (!string.IsNullOrEmpty(imageUrl)) { await imageService.DeleteImageAsync(new Uri(imageUrl)); }
+        if (!string.IsNullOrEmpty(imageUrl)) { await imageService.DeleteImageAsync(imageUrl); }
 
         // Hard delete — GalleryImage has no IsDeleted field
         return await dbContext.GalleryImages.Where(i => i.ImageId == id).ExecuteDeleteAsync(ct) > 0;

@@ -27,7 +27,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> opts) : DbContext(opts)
     public IQueryable<DonationCause> ActiveDonationCauses => DonationCauses.Where(u => !u.IsDeleted);
 
     public IQueryable<WelfareProgramme> ActiveWelfareProgrammes => WelfareProgrammes.Where(u => !u.IsDeleted);
-    public IQueryable<WelfareProgramme> AvailableWelfareProgrammes => ActiveWelfareProgrammes.Where(u => u.StartTime <= DateTimeOffset.UtcNow && (!u.EndTime.HasValue || u.EndTime >= DateTimeOffset.UtcNow));
+    public IQueryable<WelfareProgramme> AvailableWelfareProgrammes => ActiveWelfareProgrammes.Where(u => u.StartDate <= DateOnly.FromDateTime(DateTime.UtcNow) && (!u.EndDate.HasValue || u.EndDate >= DateOnly.FromDateTime(DateTime.UtcNow)));
 
     public IQueryable<Donation> ValidDonations => Donations.Where(u => u.Status == DonationStatus.Completed);
 

@@ -2,36 +2,34 @@
 
 <form on:submit="@(() => Model.Save())" enctype="multipart/form-data" class="bg-white border border-[#E3DDD3] rounded-xl p-6">
     @{ bool isViewMode = Context.Request.Query["mode"] == "view"; }
-    <h4 class="font-bold text-[#1C1A17] mb-4">@(isViewMode ? "View Partner" : (Model.Id.HasValue ? "Edit Partner" : "Add Partner"))</h4>
+    <h4 class="font-bold text-[#1C1A17] mb-4">@(isViewMode ? "View Partner" : Model.Id.HasValue ? "Edit Partner" : "Add Partner")</h4>
     <fieldset disabled="@isViewMode">
         <div class="grid md:grid-cols-[1fr_16rem] gap-4 mb-4">
         <div class="space-y-4">
             <div>
-                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Name <span
-                        class="text-red-500">*</span></label>
-                <input type="text" asp-for="Form.Name" bind required class="input w-full"/>
+                <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Name</label>
+                <input type="text" asp-for="Form.Name" bind class="input w-full"/>
                 <span asp-validation-for="Form.Name"></span>
             </div>
             <div>
-                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Website Link</label>
-                <input type="url" asp-for="Form.WebsiteLink" bind placeholder="https://example.com" required class="input w-full"/>
+                <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Website Link</label>
+                <input type="text" asp-for="Form.WebsiteLink" bind placeholder="https://example.com" class="input w-full"/>
                 <span asp-validation-for="Form.WebsiteLink"></span>
             </div>
         </div>
         <div class="space-y-4">
             <div>
-                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Logo <span
-                        class="text-red-500">*</span></label>
+                <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Logo</label>
                 <input type="file" asp-for="ImageFile" bind accept="image/*" class="file-input w-full"/>
                 <span asp-validation-for="ImageFile"></span>
             </div>
-            @if (!string.IsNullOrEmpty(Model.Form.LogoUrl))
+            @if (!string.IsNullOrEmpty(Model.PreviewImageSource))
             {
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Logo Preview</label>
                     <div
                         class="border border-[#E3DDD3] rounded-lg p-3 bg-[#F6F1E9] flex items-center justify-center">
-                        <img src="@Model.Form.LogoUrl" alt="Logo preview" class="w-full object-cover rounded-lg aspect-[4/3]"/>
+                        <img src="@Model.PreviewImageSource" alt="Logo preview" class="w-full object-cover rounded-lg aspect-[4/3]"/>
                     </div>
                 </div>
             }

@@ -9,7 +9,7 @@ namespace GiveAID.Pages.Components;
 
 public class PartnerCarousel(AppDbContext dbContext) : HydroComponent
 {
-    public List<PartnerDto> Partners { get; set; } = new List<PartnerDto>();
+    public List<PartnerDto> Partners { get; set; } = [];
 
     public override async Task MountAsync()
     {

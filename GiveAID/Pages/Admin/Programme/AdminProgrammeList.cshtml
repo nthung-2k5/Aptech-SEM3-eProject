@@ -72,7 +72,7 @@
             <tbody>
             @foreach (var p in Model.Programmes)
             {
-                var now = DateTimeOffset.UtcNow;
+                var now = DateOnly.FromDateTime(DateTime.Now);
                 string statusLabel = p.EndDate.HasValue && p.EndDate < now ? "Ended"
                     : p.StartDate > now ? "Upcoming"
                     : "Active";
@@ -102,8 +102,8 @@
                         }
                     </td>
                     <td class="text-sm text-[#6B6459]">
-                        @p.StartDate.Date.ToShortDateString()<br/>
-                        @(p.EndDate.HasValue ? "→ " + p.EndDate.Value.Date.ToShortDateString() : "→ ongoing")
+                        @p.StartDate.ToShortDateString()<br/>
+                        @(p.EndDate.HasValue ? "→ " + p.EndDate.Value.ToShortDateString() : "→ ongoing")
                     </td>
                     <td>
                         <span class="badge @badgeCss">@statusLabel</span>

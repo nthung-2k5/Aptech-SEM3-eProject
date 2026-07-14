@@ -57,7 +57,10 @@ public class NgoService(AppDbContext dbContext) : INgoService
 
         await dbContext.SaveChangesAsync(ct);
 
-        return entity.ToDto();
+        return await dbContext.ActiveNgos.AsNoTracking()
+                .Where(n => n.NgoId == entity.NgoId)
+                .ProjectToDto()
+                .FirstAsync(ct);
     }
 
     public async Task UpdateNgoAsync(Guid id, NgoSaveDto dto, CancellationToken ct = default)

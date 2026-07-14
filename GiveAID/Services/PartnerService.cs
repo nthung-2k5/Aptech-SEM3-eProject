@@ -79,7 +79,7 @@ public class PartnerService(AppDbContext dbContext, IImageService imageService) 
     {
         string? imageUrl = await dbContext.CorporatePartners.AsNoTracking().Where(i => i.PartnerId == id).Select(i => i.LogoUrl).FirstOrDefaultAsync(ct);
 
-        if (!string.IsNullOrEmpty(imageUrl)) { await imageService.DeleteImageAsync(new Uri(imageUrl)); }
+        if (!string.IsNullOrEmpty(imageUrl)) { await imageService.DeleteImageAsync(imageUrl); }
         
         await dbContext.CorporatePartners.Where(p => p.PartnerId == id).ExecuteDeleteAsync(ct);
     }
