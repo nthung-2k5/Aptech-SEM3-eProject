@@ -1,3 +1,4 @@
+@using GiveAID.Models
 @model ActiveProgrammes
 
 <section class="w-full bg-base-200 py-20 mt-16">
@@ -53,15 +54,15 @@
 
                             <!-- Card Action -->
                             <div class="card-actions w-full mt-auto">
-                                @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
+                                @if (User.IsInRole(nameof(UserRole.Admin)))
                                 {
-                                    <a href="/Programmes/@prog.Id" class="btn btn-outline w-full text-[#1A5C6B] border-[#1A5C6B] hover:bg-[#1A5C6B] hover:text-white rounded-xl h-12 text-base font-semibold transition-colors">
+                                    <a asp-page="/Programmes/Details" asp-route-id="@prog.Id" class="btn btn-outline w-full text-[#1A5C6B] border-[#1A5C6B] hover:bg-[#1A5C6B] hover:text-white rounded-xl h-12 text-base font-semibold transition-colors">
                                         View Details
                                     </a>
                                 }
                                 else
                                 {
-                                    <a href="/Donate?programmeId=@prog.Id" class="btn btn-primary w-full bg-[#1A5C6B] hover:bg-[#154D5A] border-none text-white rounded-xl h-12 text-base font-semibold transition-colors">
+                                    <a asp-page="/Donate/Index" asp-route-programmeId="@prog.Id" class="btn btn-primary w-full bg-[#1A5C6B] hover:bg-[#154D5A] border-none text-white rounded-xl h-12 text-base font-semibold transition-colors">
                                         Donate Now
                                     </a>
                                 }

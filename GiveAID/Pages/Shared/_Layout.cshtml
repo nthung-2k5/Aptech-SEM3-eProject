@@ -110,18 +110,15 @@
                         var notifications = await NotificationService.GetUserNotificationsAsync(userId, 5);
 
                         <!-- Notifications Dropdown -->
-                        <div class="relative group" x-data="{ open: false }">
+                        <div class="indicator" x-data="{ open: false }">
+                            @if (unreadCount > 0)
+                            {
+                                <div class="indicator-item status bg-red-500 text-red-500 animate-ping"></div>
+                                <div class="indicator-item status bg-red-500 text-red-500"></div>
+                            }
                             <button @@click="open = !open" @@click.outside="open = false"
                                     class="navbar-button flex items-center gap-1 relative">
                                 <i class="ph-fill ph-bell text-lg"></i>
-                                @if (unreadCount > 0)
-                                {
-                                    <span class="absolute top-1 right-1 flex size-2">
-                                        <span
-                                            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                        <span class="relative inline-flex rounded-full size-2 bg-red-500"></span>
-                                    </span>
-                                }
                             </button>
                             <div x-show="open" style="display: none;"
                                  class="absolute right-0 mt-2 w-80 bg-white text-black shadow-lg rounded-md border border-[#E3DDD3] overflow-hidden">

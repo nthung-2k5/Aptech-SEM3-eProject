@@ -141,7 +141,37 @@ public class DonateForm(
 
             RuleFor(x => x.ExpiryDate)
                 .NotEmpty().WithMessage("Expiry date is required")
-                .Matches(@"^\d{2}/\d{2}$").WithMessage("Use MM/YY format");
+                .Matches(@"^\d{2}/\d{2}$").WithMessage("Use MM/YY format")
+                .Must(expiryDate =>
+                {
+                    if (string.IsNullOrEmpty(expiryDate)) return false;
+
+                    // Split the MM/YY string
+                    string[] parts = expiryDate.Split('/');
+                    if (parts.Length != 2) return false;
+
+                    if (int.TryParse(parts[0], out int month) && int.TryParse(parts[1], out int year))
+                    {
+                        // Convert 2-digit year to 4-digit year (e.g., 26 -> 2026)
+                        int fullYear = 2000 + year;
+
+                        try
+                        {
+                            // Get the last millisecond of the expiry month
+                            int daysInMonth = DateTime.DaysInMonth(fullYear, month);
+                            var expiryDateTime = new DateTime(fullYear, month, daysInMonth, 23, 59, 59);
+
+                            return expiryDateTime > DateTime.Now;
+                        }
+                        catch (ArgumentOutOfRangeException)
+                        {
+                            // Handles invalid months like 13
+                            return false;
+                        }
+                    }
+                    
+                    return false;
+                }).WithMessage("Expiry date must be in the future");
 
             RuleFor(x => x.CVV)
                 .NotEmpty().WithMessage("CVV is required")

@@ -127,7 +127,7 @@
         </div>
       </div>
       <div class="card-actions justify-center p-4 border-t border-base-200">
-        <a href="/Admin/Donation" class="btn btn-ghost btn-sm">View All</a>
+        <a asp-page="/Admin/Donation/Index" class="btn btn-ghost btn-sm">View All</a>
       </div>
     </div>
 
@@ -153,7 +153,7 @@
                         <span class="text-xs">@req.Type</span>
                     </td>
                     <td class="text-right">
-                        <a href="/Admin/UserQuery" class="btn btn-sm btn-outline border-[#1A5C6B] text-[#1A5C6B] hover:bg-[#1A5C6B] hover:text-white">Reply</a>
+                        <a asp-page="/Admin/UserQuery/Index" class="btn btn-sm btn-outline border-[#1A5C6B] text-[#1A5C6B] hover:bg-[#1A5C6B] hover:text-white">Reply</a>
                     </td>
                   </tr>
               }
@@ -168,7 +168,7 @@
         </div>
       </div>
       <div class="card-actions justify-center p-4 border-t border-base-200">
-        <a href="/Admin/UserQuery" class="btn btn-ghost btn-sm">View All</a>
+        <a asp-page="/Admin/UserQuery/Index" class="btn btn-ghost btn-sm">View All</a>
       </div>
     </div>
   </div>

@@ -129,11 +129,11 @@ public static class DbSeeder
         {
             var partners = new List<CorporatePartner>
             {
-                new() { PartnerId = Guid.CreateVersion7(), Name = "Viettel Group",       LogoUrl = "/images/viettel-logo.png",    WebsiteLink = "https://viettel.com.vn" },
-                new() { PartnerId = Guid.CreateVersion7(), Name = "Vingroup JSC",        LogoUrl = "/images/vingroup-logo.png",   WebsiteLink = "https://vingroup.net" },
-                new() { PartnerId = Guid.CreateVersion7(), Name = "FPT Corporation",     LogoUrl = "/images/fpt-logo.png",        WebsiteLink = "https://fpt.com.vn" },
-                new() { PartnerId = Guid.CreateVersion7(), Name = "Masan Group",         LogoUrl = "/images/masan-logo.png",      WebsiteLink = "https://masangroup.com" },
-                new() { PartnerId = Guid.CreateVersion7(), Name = "Techcombank",         LogoUrl = "/images/techcombank-logo.png",        WebsiteLink = "https://techcombank.com.vn" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Viettel Group",       LogoUrl = "/images/partners-logo/viettel-logo.png",    WebsiteLink = "https://viettel.com.vn" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Vingroup JSC",        LogoUrl = "/images/partners-logo/vingroup-logo.png",   WebsiteLink = "https://vingroup.net" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "FPT Corporation",     LogoUrl = "/images/partners-logo/fpt-logo.png",        WebsiteLink = "https://fpt.com.vn" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Masan Group",         LogoUrl = "/images/partners-logo/masan-logo.png",      WebsiteLink = "https://masangroup.com" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Techcombank",         LogoUrl = "/images/partners-logo/techcombank-logo.png",        WebsiteLink = "https://techcombank.com.vn" },
             };
             await context.CorporatePartners.AddRangeAsync(partners);
             await context.SaveChangesAsync();
@@ -165,7 +165,7 @@ public static class DbSeeder
                     NgoId       = redCross.NgoId,
                     CauseId     = causeDisaster.CauseId,
                     Name        = "Turkey-Syria Earthquake Relief 2023",
-                    ImageUrl    = "https://placehold.co/800x480/CC3333/FFFFFF?text=Earthquake+Relief",
+                    ImageUrl    = "/images/programmes/turkey-syria-earthquake-relief.jpg",
                     Description = "The catastrophic 7.8-magnitude earthquake in February 2023 devastated southern Turkey and northern Syria, killing over 55,000 people. The ICRC deployed emergency response teams to provide medical care, food, water, shelter, and psychological support to over 1.5 million displaced survivors. Funds support ongoing reconstruction and family tracing services.",
                     StartTime   = new DateTimeOffset(2023, 2, 10, 0, 0, 0, TimeSpan.Zero),
                     EndTime     = now.AddDays(30),
@@ -180,7 +180,7 @@ public static class DbSeeder
                     NgoId       = redCross.NgoId,
                     CauseId     = causeDisaster.CauseId,
                     Name        = "Morocco Earthquake Emergency Response",
-                    ImageUrl    = "https://placehold.co/800x480/CC3333/FFFFFF?text=Morocco+Response",
+                    ImageUrl    = "/images/programmes/morocco-earthquake-response.jpg",
                     Description = "A devastating 6.8-magnitude earthquake struck the High Atlas Mountains of Morocco in September 2023, killing nearly 3,000 people and injuring thousands more. The ICRC mobilised rapid response teams to deliver search-and-rescue support, emergency healthcare, and essential supplies to remote mountain villages cut off by landslides.",
                     StartTime   = new DateTimeOffset(2023, 9, 9, 0, 0, 0, TimeSpan.Zero),
                     EndTime     = now.AddDays(60),
@@ -195,7 +195,7 @@ public static class DbSeeder
                     NgoId       = unicef.NgoId,
                     CauseId     = causeEducation.CauseId,
                     Name        = "Education Cannot Wait — Ukraine",
-                    ImageUrl    = "https://placehold.co/800x480/1A78C2/FFFFFF?text=Ukraine+Education",
+                    ImageUrl    = "/images/programmes/ukraine-children-education.jpg",
                     Description = "Since the escalation of the conflict in Ukraine in 2022, over 5 million children have been affected by attacks on education. UNICEF's 'Education Cannot Wait' initiative repairs and equips schools with reinforced shelters, delivers remote learning tools, and provides psychosocial support to keep children learning safely both inside Ukraine and in refugee host countries.",
                     StartTime   = new DateTimeOffset(2022, 3, 1, 0, 0, 0, TimeSpan.Zero),
                     EndTime     = now.AddDays(180),
@@ -210,7 +210,7 @@ public static class DbSeeder
                     NgoId       = saveChildren.NgoId,
                     CauseId     = causeEducation.CauseId,
                     Name        = "Girls' Education in Afghanistan",
-                    ImageUrl    = "https://placehold.co/800x480/1A78C2/FFFFFF?text=Girls+Education+AFG",
+                    ImageUrl    = "/images/programmes/afghanistan-girls-education.jpg",
                     Description = "Following the Taliban's ban on girls' secondary education in 2021, Save the Children launched community-based learning centres that provide informal education, psychosocial support, and vocational training to over 200,000 Afghan girls and young women. The programme operates covertly through trusted local networks to ensure participant safety.",
                     StartTime   = new DateTimeOffset(2022, 1, 15, 0, 0, 0, TimeSpan.Zero),
                     EndTime     = now.AddDays(365),
@@ -225,7 +225,7 @@ public static class DbSeeder
                     NgoId       = msf.NgoId,
                     CauseId     = causeHealth.CauseId,
                     Name        = "Gaza Emergency Medical Aid 2024",
-                    ImageUrl    = "https://placehold.co/800x480/4A8B7F/FFFFFF?text=Gaza+Medical+Aid",
+                    ImageUrl    = "/images/programmes/gaza-medical-aid.jpg",
                     Description = "MSF surgical and medical teams are operating in and around Gaza providing emergency trauma care, performing surgeries, treating the wounded, and supporting overwhelmed health facilities. The programme covers emergency obstetric care, mental health support, and supply chains for critical medicines in a besieged environment.",
                     StartTime   = new DateTimeOffset(2023, 10, 10, 0, 0, 0, TimeSpan.Zero),
                     EndTime     = now.AddDays(90),
@@ -240,7 +240,7 @@ public static class DbSeeder
                     NgoId       = msf.NgoId,
                     CauseId     = causeHealth.CauseId,
                     Name        = "Sudan Cholera & Conflict Response",
-                    ImageUrl    = "https://placehold.co/800x480/4A8B7F/FFFFFF?text=Sudan+Response",
+                    ImageUrl    = "/images/programmes/sudan-conflict-clinic.jpg",
                     Description = "Sudan's civil war that erupted in April 2023 triggered one of the world's fastest-growing displacement crises. MSF teams are treating mass casualty events, running outpatient therapeutic feeding programmes, fighting a severe cholera outbreak, and providing mental health services. This programme funds field hospitals, water purification, and cholera treatment units.",
                     StartTime   = new DateTimeOffset(2023, 4, 20, 0, 0, 0, TimeSpan.Zero),
                     EndTime     = now.AddDays(120),
@@ -255,7 +255,7 @@ public static class DbSeeder
                     NgoId       = wwf.NgoId,
                     CauseId     = causeEnv.CauseId,
                     Name        = "Amazon Rainforest Conservation",
-                    ImageUrl    = "https://placehold.co/800x480/2E7D32/FFFFFF?text=Amazon+Conservation",
+                    ImageUrl    = "/images/programmes/amazon-conservation-patrol.jpg",
                     Description = "The Amazon rainforest — Earth's largest tropical forest — loses an area the size of a football pitch every single minute to deforestation. WWF's Amazon programme works with Indigenous communities to monitor and protect 60 million hectares, prosecute illegal loggers, restore degraded land, and advocate for stronger international legal frameworks.",
                     StartTime   = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
                     EndTime     = new DateTimeOffset(2026, 12, 31, 0, 0, 0, TimeSpan.Zero),
@@ -270,7 +270,7 @@ public static class DbSeeder
                     NgoId       = wwf.NgoId,
                     CauseId     = causeEnv.CauseId,
                     Name        = "Great Barrier Reef Restoration",
-                    ImageUrl    = "https://placehold.co/800x480/2E7D32/FFFFFF?text=Reef+Restoration",
+                    ImageUrl    = "/images/programmes/great-barrier-reef-restoration.jpg",
                     Description = "The Great Barrier Reef has lost over 50% of its coral cover since 1995 due to climate change-driven bleaching. WWF's reef restoration programme supports coral gardening nurseries, develops heat-resistant coral strains, works with the Australian government to cut land-based pollution, and reduces illegal fishing in the Marine Park.",
                     StartTime   = new DateTimeOffset(2024, 3, 1, 0, 0, 0, TimeSpan.Zero),
                     EndTime     = new DateTimeOffset(2027, 3, 1, 0, 0, 0, TimeSpan.Zero),
@@ -285,7 +285,7 @@ public static class DbSeeder
                     NgoId       = unicef.NgoId,
                     CauseId     = causeHunger.CauseId,
                     Name        = "Horn of Africa Famine Response",
-                    ImageUrl    = "https://placehold.co/800x480/C97C2E/FFFFFF?text=Famine+Response",
+                    ImageUrl    = "/images/programmes/horn-of-africa-famine-relief.jpg",
                     Description = "The worst drought in 40 years has pushed over 22 million people across Ethiopia, Kenya, and Somalia into acute food insecurity. UNICEF's response deploys Ready-to-Use Therapeutic Food (RUTF) to treat severe acute malnutrition, operates mobile health and nutrition clinics, and supports emergency water trucking and WASH services for displaced families.",
                     StartTime   = new DateTimeOffset(2022, 7, 1, 0, 0, 0, TimeSpan.Zero),
                     EndTime     = now.AddDays(150),
@@ -300,7 +300,7 @@ public static class DbSeeder
                     NgoId       = saveChildren.NgoId,
                     CauseId     = causeHunger.CauseId,
                     Name        = "Clean Water for Sub-Saharan Africa",
-                    ImageUrl    = "https://placehold.co/800x480/C97C2E/FFFFFF?text=Clean+Water",
+                    ImageUrl    = "/images/programmes/sub-saharan-clean-water.jpg",
                     Description = "700 million people worldwide lack access to safe drinking water. Save the Children's clean water initiative drills boreholes, installs solar-powered water pumps, builds rainwater harvesting systems, and trains local WASH technicians across 12 countries in Sub-Saharan Africa. Each borehole provides safe water for up to 1,000 people for 20+ years.",
                     StartTime   = new DateTimeOffset(2024, 6, 1, 0, 0, 0, TimeSpan.Zero),
                     EndTime     = new DateTimeOffset(2027, 6, 1, 0, 0, 0, TimeSpan.Zero),
@@ -336,31 +336,31 @@ public static class DbSeeder
             var cleanW = programmes.FirstOrDefault(p => p.Name.Contains("Clean Water"))?.ProgrammeId;
 
             AddImages(eqk,
-                ("https://placehold.co/800x600/CC3333/FFFFFF?text=Search+%26+Rescue", "Search and rescue teams clearing rubble"),
-                ("https://placehold.co/800x600/CC3333/FFFFFF?text=Temporary+Shelter", "Temporary shelter camps for 20,000 survivors"),
-                ("https://placehold.co/800x600/CC3333/FFFFFF?text=Medical+Aid+Station", "Field medical station treating the injured"));
+                ("/images/gallery/earthquake-rescue-rubble.jpg", "Search and rescue teams clearing rubble"),
+                ("/images/gallery/station.jpg", "Temporary shelter camps for 20,000 survivors"),
+                ("/images/gallery/earthquake-medical-tent.jpg", "Field medical station treating the injured"));
 
             AddImages(ukraine,
-                ("https://placehold.co/800x600/1A78C2/FFFFFF?text=Mobile+Classroom", "Mobile classroom unit deployed to refugee camp"),
-                ("https://placehold.co/800x600/1A78C2/FFFFFF?text=Children+Learning", "Children continuing education despite the conflict"));
+                ("/images/gallery/ukraine-mobile-classroom.jpg", "Mobile classroom unit deployed to refugee camp"),
+                ("/images/gallery/ukraine-bunker-study.jpg", "Children continuing education despite the conflict"));
 
             AddImages(amazon,
-                ("https://placehold.co/800x600/2E7D32/FFFFFF?text=Deforestation+Patrol", "Indigenous rangers patrolling against illegal logging"),
-                ("https://placehold.co/800x600/2E7D32/FFFFFF?text=Reforestation+Site", "Reforestation planting day with 500 volunteers"),
-                ("https://placehold.co/800x600/2E7D32/FFFFFF?text=Aerial+Survey", "Drone aerial survey mapping deforestation hotspots"));
+                ("/images/gallery/amazon-indigenous-patrol.jpg", "Indigenous rangers patrolling against illegal logging"),
+                ("/images/gallery/amazon-tree-planting.jpg", "Reforestation planting day with 500 volunteers"),
+                ("/images/gallery/drone.jpg", "Drone aerial survey mapping deforestation hotspots"));
 
             AddImages(gaza,
-                ("https://placehold.co/800x600/4A8B7F/FFFFFF?text=Field+Surgery", "MSF surgeons operating in a field hospital"),
-                ("https://placehold.co/800x600/4A8B7F/FFFFFF?text=Medical+Supply+Drop", "Critical medical supplies arriving by convoy"));
+                ("/images/gallery/gaza-field-hospital-surgery.jpg", "MSF surgeons operating in a field hospital"),
+                ("/images/gallery/medical-aid-convoy.jpg", "Critical medical supplies arriving by convoy"));
 
             AddImages(cleanW,
-                ("https://placehold.co/800x600/C97C2E/FFFFFF?text=Borehole+Drilling", "Solar-powered borehole serving 1,200 villagers"),
-                ("https://placehold.co/800x600/C97C2E/FFFFFF?text=Water+Pump+Install", "Community water pump installation complete"));
+                ("/images/gallery/africa-borehole-drilling.jpg", "Solar-powered borehole serving 1,200 villagers"),
+                ("/images/gallery/village-water-pump.jpg", "Community water pump installation complete"));
 
             // Standalone gallery
             AddImages(null,
-                ("https://placehold.co/800x600/1A5C6B/FFFFFF?text=Annual+Gala+2025", "GiveAID Annual Fundraising Gala 2025"),
-                ("https://placehold.co/800x600/1A5C6B/FFFFFF?text=Volunteer+Day", "Global Volunteer Day — 3,000 participants"));
+                ("/images/gallery/giveaid-gala-dinner.jpg", "GiveAID Annual Fundraising Gala 2025"),
+                ("/images/gallery/giveaid-volunteer-group.jpg", "Global Volunteer Day — 3,000 participants"));
 
             await context.GalleryImages.AddRangeAsync(gallery);
             await context.SaveChangesAsync();
@@ -531,7 +531,7 @@ public static class DbSeeder
                 {
                     NotificationId = Guid.CreateVersion7(),
                     UserId = user.UserId,
-                    Content = $"Your donation of ${donation.Amount:N0} was successfully received. Thank you for your generosity, {user.FullName.Split(' ')[0]}!",
+                    Content = $"Your donation of ${donation.Amount:N0} was successfully received. Thank you for your generosity!",
                     IsRead = donation.CreatedAt < DateTimeOffset.UtcNow.AddDays(-14),
                     CreatedAt = donation.CreatedAt.AddSeconds(30)
                 });

@@ -110,10 +110,10 @@
                     </td>
                     <td>
                         <div class="flex gap-1">
-                            <a href="/Admin/Programme/Editor/@p.Id?mode=view" class="btn btn-ghost btn-xs text-[#1A5C6B]" title="View details">
+                            <a asp-page="/Admin/Programme/Editor" asp-route-id="@p.Id" asp-route-mode="view" class="btn btn-ghost btn-xs text-[#1A5C6B]" title="View details">
                                 <i class="ph ph-eye text-lg"></i>
                             </a>
-                            <a href="/Admin/Programme/Editor/@p.Id" class="btn btn-ghost btn-xs text-[#C97C2E]" title="Edit">
+                            <a asp-page="/Admin/Programme/Editor" asp-route-id="@p.Id" class="btn btn-ghost btn-xs text-[#C97C2E]" title="Edit">
                                 <i class="ph ph-pencil-simple text-lg"></i>
                             </a>
                             <button on:click="@(() => Model.Delete(p.Id))" class="btn btn-ghost btn-xs text-error"

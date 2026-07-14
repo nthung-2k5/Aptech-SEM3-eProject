@@ -5,90 +5,11 @@ using GiveAID.Services.Abstractions;
 
 namespace GiveAID.Services;
 
-public class S3ImageService : IImageService
+public class S3ImageService(IWebHostEnvironment environment) : IImageService
 {
-    private readonly AmazonS3Client s3Client;
-    private readonly string bucketName;
-    
-    private static readonly AmazonS3Config S3Config = new()
+    public Task EnsureBucketExists()
     {
-        ServiceURL = "http://127.0.0.1:9000",
-        ForcePathStyle = true,
-        AuthenticationRegion = "us-east-1"
-    };
-
-    public S3ImageService(IConfiguration config)
-    {
-        string? accessKey = config["AWS:AccessKey"];
-        string? secretKey = config["AWS:SecretKey"];
-        bucketName = config["AWS:BucketName"] ?? "giveaid-bucket";
-
-        s3Client = new AmazonS3Client(accessKey, secretKey, S3Config);
-    }
-
-    // public async Task<Uri> GetImageUriAsync(string key)
-    // {
-    //     if (Uri.TryCreate(key, UriKind.Absolute, out var uri))
-    //     {
-    //         return uri;
-    //     }
-    //     
-    //     var getRequest = new GetPreSignedUrlRequest
-    //     {
-    //         BucketName = bucketName,
-    //         Key = key,
-    //         Verb = HttpVerb.GET,
-    //         Protocol = Protocol.HTTP,
-    //         Expires = DateTime.UtcNow.AddDays(7)
-    //     };
-    //     
-    //     return new Uri(await s3Client.GetPreSignedURLAsync(getRequest));
-    // }
-
-    public async Task EnsureBucketExists()
-    {
-        var response = await s3Client.ListBucketsAsync();
-        if (response.Buckets != null && response.Buckets.Any(b => b.BucketName.Equals(bucketName, StringComparison.OrdinalIgnoreCase))) return;
-        
-        var putBucketRequest = new PutBucketRequest
-        {
-            BucketName = bucketName
-        };
-
-        await s3Client.PutBucketAsync(putBucketRequest);
-        
-        await s3Client.PutPublicAccessBlockAsync(new PutPublicAccessBlockRequest
-        {
-            BucketName = bucketName,
-            PublicAccessBlockConfiguration = new PublicAccessBlockConfiguration
-            {
-                BlockPublicAcls = false,
-                IgnorePublicAcls = false,
-                BlockPublicPolicy = false,
-                RestrictPublicBuckets = false
-            }
-        });
-
-        string bucketPolicy = $$"""
-                            {
-                                "Version": "2012-10-17",
-                                "Statement": [
-                                    {
-                                        "Sid": "PublicReadGetObject",
-                                        "Effect": "Allow",
-                                        "Principal": "*",
-                                        "Action": "s3:GetObject",
-                                        "Resource": "arn:aws:s3:::{{bucketName}}/*"
-                                    }
-                                ]
-                            }
-            """;
-
-        await s3Client.PutBucketPolicyAsync(new PutBucketPolicyRequest
-        {
-            BucketName = bucketName,
-            Policy = bucketPolicy
-        });
+        return Task.CompletedTask;
     }
 
     public async Task<string> UploadImageAsync(string folder, string filename, byte[] bytes)
@@ -98,57 +19,53 @@ public class S3ImageService : IImageService
             return string.Empty;
         }
 
-        string uniqueFileName = $"{folder}/{filename}";
-        
-        using var newMemoryStream = new MemoryStream(bytes);
-
-        var uploadRequest = new TransferUtilityUploadRequest
+        try
         {
-            InputStream = newMemoryStream,
-            Key = uniqueFileName,
-            BucketName = bucketName
-        };
+            string uploadsFolder = Path.Combine(environment.WebRootPath, "images", folder);
+            
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
 
-        var fileTransferUtility = new TransferUtility(s3Client);
-        await fileTransferUtility.UploadAsync(uploadRequest);
+            string realFilename = Path.GetRandomFileName() + Path.GetExtension(filename);
 
-        return $"http://127.0.0.1:9000/{bucketName}/{uniqueFileName}";
+            string filePath = Path.Combine(uploadsFolder, realFilename);
+
+            await File.WriteAllBytesAsync(filePath, bytes);
+
+            return $"/images/{folder}/{realFilename}";
+        }
+        catch (Exception)
+        {
+            return string.Empty;
+        }
     }
     
-    private static string ExtractObjectKey(Uri imageUrl)
+    private static (string folder, string filename) ExtractImageUrlPath(string url)
     {
-        string[] segments = imageUrl.Segments;
-
-        return segments.Length < 3 ? throw new ArgumentException("Invalid local S3 URL structure.") : imageUrl.LocalPath[(segments[0].Length + segments[1].Length)..];
+        url = url["/images".Length..].TrimStart('/');
+        return (url.Split('/')[0], url.Split('/')[1]);
     }
     
-    public async Task UpdateImageAsync(Uri imageUrl, byte[] fileBytes)
+    public async Task<string> UpdateImageAsync(Uri imageUrl, byte[] fileBytes)
     {
-        string objectKey = ExtractObjectKey(imageUrl);
-
-        using var newMemoryStream = new MemoryStream(fileBytes);
-
-        var uploadRequest = new TransferUtilityUploadRequest
-        {
-            InputStream = newMemoryStream,
-            Key = objectKey,
-            BucketName = bucketName
-        };
-
-        var fileTransferUtility = new TransferUtility(s3Client);
-        await fileTransferUtility.UploadAsync(uploadRequest);
+        (string folder, string filename) = ExtractImageUrlPath(imageUrl.ToString());
+        await DeleteImageAsync(imageUrl);
+        return await UploadImageAsync(folder, filename, fileBytes);
     }
 
     public Task DeleteImageAsync(Uri imageUrl)
     {
-        string objectKey = ExtractObjectKey(imageUrl);
+        (string folder, string filename) = ExtractImageUrlPath(imageUrl.ToString());
+        string uploadsFolder = Path.Combine(environment.WebRootPath, "images", folder);
+        string filePath = Path.Combine(uploadsFolder, filename);
 
-        var deleteRequest = new DeleteObjectRequest
+        if (File.Exists(filePath))
         {
-            BucketName = bucketName,
-            Key = objectKey
-        };
-        
-        return s3Client.DeleteObjectAsync(deleteRequest);
+            File.Delete(filePath);
+        }
+
+        return Task.CompletedTask;
     }
 }

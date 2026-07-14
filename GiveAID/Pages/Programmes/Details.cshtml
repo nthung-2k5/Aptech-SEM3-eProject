@@ -1,4 +1,5 @@
 @page "/Programmes/{id:guid}"
+@using GiveAID.Models
 @model ProgrammeDetailsModel
 @{
     ViewData["Title"] = Model.Programme?.Name ?? "Programme Details";
@@ -40,7 +41,7 @@
             <div class="absolute inset-0 bg-black/50"></div>
             
             <div class="absolute top-6 left-6 md:left-12 z-10">
-                <a href="/Programmes" class="btn btn-sm bg-white/20 hover:bg-white/40 border-none text-white backdrop-blur-md rounded-full shadow-lg pr-4">
+                <a asp-page="/Programmes/Index" class="btn btn-sm bg-white/20 hover:bg-white/40 border-none text-white backdrop-blur-md rounded-full shadow-lg pr-4">
                     <i class="ph ph-arrow-left"></i> Back to Programmes
                 </a>
             </div>
@@ -137,9 +138,9 @@
                             bool isQuotaReached = p.TargetAmount.HasValue && p.RaisedAmount >= p.TargetAmount.Value;
                         }
 
-                        @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
+                        @if (User.IsInRole(nameof(UserRole.Admin)))
                         {
-                            <a href="/Admin/Programme/Editor/@p.Id" class="btn bg-[#1A5C6B] hover:bg-[#154D5A] text-white btn-block btn-xl border-none">
+                            <a asp-page="/Admin/Programme/Editor" asp-route-id="@p.Id" class="btn bg-[#1A5C6B] hover:bg-[#154D5A] text-white btn-block btn-xl border-none">
                                 <i class="ph ph-pencil-simple text-xl"></i> Edit Programme
                             </a>
                         }

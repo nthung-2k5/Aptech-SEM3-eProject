@@ -15,7 +15,7 @@ public class RegisterForm(
     public string Phone { get; set; }
     public string DateOfBirth { get; set; }
     public string? Occupation { get; set; }
-    public string Address { get; set; }
+    public string? Address { get; set; }
     public string Password { get; set; }
     public string ConfirmPassword { get; set; }
     public bool Agree { get; set; }
@@ -31,7 +31,7 @@ public class RegisterForm(
             Email,
             Password,
             DateOnly.Parse(DateOfBirth),
-            Address,
+            Address ?? string.Empty,
             Phone,
             Occupation ?? string.Empty);
 
@@ -65,10 +65,11 @@ public class RegisterForm(
 
             RuleFor(x => x.Phone)
                 .NotEmpty().WithMessage("Phone number is required")
-                .Matches(@"^\d{10}$").WithMessage("Enter 10-digit phone number");
+                .PhoneNumber().WithMessage("Phone number must be in E.164 format");
 
             RuleFor(x => x.DateOfBirth)
-                .NotEmpty().WithMessage("Date of Birth is required");
+                .NotEmpty().WithMessage("Date of Birth is required")
+                .LessThan(DateTime.Today.ToString("yyyy-MM-dd")).WithMessage("Date of Birth must be in the past");
 
             RuleFor(x => x.Occupation)
                 .NotEmpty().WithMessage("Occupation is required")
