@@ -110,6 +110,26 @@
                         Give-AID unites NGOs, donors, and communities to fund welfare programmes for children, women, the elderly, and the differently-abled.
                     </p>
 
+                    <!-- Search Bar -->
+                    <div class="relative mb-8 w-full max-w-lg"
+                         x-data="{ q: '' }"
+                         x-on:keydown.enter="if(q.trim()) window.location.href = '/Programmes?search=' + encodeURIComponent(q.trim())">
+                        <div class="flex items-center bg-white/15 backdrop-blur-sm border border-white/30 rounded-full px-5 py-1 gap-3 focus-within:bg-white/25 focus-within:border-white/60 transition-all duration-300">
+                            <i class="ph ph-magnifying-glass text-white/70 text-xl flex-shrink-0"></i>
+                            <input id="hero-search"
+                                   type="text"
+                                   placeholder="Search programmes, causes..."
+                                   x-model="q"
+                                   class="flex-1 bg-transparent text-white placeholder-white/50 outline-none border-none focus:outline-none text-base py-3 min-w-0"
+                                   autocomplete="off"/>
+                            <button id="hero-search-btn"
+                                    x-on:click="if(q.trim()) window.location.href = '/Programmes?search=' + encodeURIComponent(q.trim())"
+                                    class="btn btn-sm bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white rounded-full px-5 h-9 font-semibold text-sm flex-shrink-0 transition-all">
+                                Search
+                            </button>
+                        </div>
+                    </div>
+
                     <div class="flex flex-wrap gap-4">
                         @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
                         {

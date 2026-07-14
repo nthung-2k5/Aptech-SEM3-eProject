@@ -36,7 +36,9 @@
     <div class="pb-12">
         <!-- Hero Section -->
         <div class="h-[40vh] min-h-[300px] max-h-[500px] relative">
-            <img src="@p.ImageUrl" alt="@p.Name" class="w-full h-full object-cover"/>
+            <img src="@(string.IsNullOrWhiteSpace(p.ImageUrl) ? "/images/programme-placeholder.png" : p.ImageUrl)"
+                 onerror="this.onerror=null;this.src='/images/programme-placeholder.png'"
+                 alt="@p.Name" class="w-full h-full object-cover"/>
             <div class="absolute inset-0 bg-black/50"></div>
             
             <div class="absolute top-6 left-6 md:left-12 z-10">
