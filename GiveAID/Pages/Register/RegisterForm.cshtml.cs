@@ -1,5 +1,6 @@
 using FluentValidation;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
 
@@ -34,16 +35,19 @@ public class RegisterForm(
             Phone,
             Occupation ?? string.Empty);
 
-        await memberService.CreateMemberAsync(user);
-
-        // if (result.Success)
-        // {
-        //     IsSuccess = true; 
-        // }
-        // else
-        // {
-        //     // Optionally handle registration errors here (e.g. email already registered)
-        // }
+        try
+        {
+            await memberService.CreateMemberAsync(user);
+            IsSuccess = true;
+        }
+        catch (DuplicateException ex) when (ex.FieldName == nameof(Email))
+        {
+            ModelState.AddModelError(nameof(Email), "An account with this email already exists.");
+        }
+        catch (DuplicateException ex) when (ex.FieldName == nameof(Phone))
+        {
+            ModelState.AddModelError(nameof(Phone), "An account with this phone number already exists.");
+        }
     }
 
     public class Validator : AbstractValidator<RegisterForm>

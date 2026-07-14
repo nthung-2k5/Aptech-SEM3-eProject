@@ -1,4 +1,4 @@
-﻿using GiveAID.Data;
+using GiveAID.Data;
 using GiveAID.Dtos;
 using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
@@ -22,7 +22,7 @@ public class DonationCauseService(AppDbContext dbContext) : IDonationCauseServic
     {
         bool exists = await dbContext.ActiveDonationCauses.AnyAsync(cause => cause.Name == dto.Name, ct);
 
-        if (exists) { throw new AlreadyExistsException(); }
+        if (exists) { throw new DuplicateException(nameof(dto.Name)); }
 
         var entity = dto.ToEntity();
 

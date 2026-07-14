@@ -1,5 +1,6 @@
 using FluentValidation;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
 using Hydro.Utils;
@@ -42,8 +43,16 @@ public class AdminDonationCauseEditor(
 
         var saveDto = new DonationCauseSaveDto(Form.Name);
 
-        if (Id.HasValue && Id.Value != Guid.Empty) { await donationCauseService.UpdateDonationCauseAsync(Id.Value, saveDto); }
-        else { await donationCauseService.CreateDonationCauseAsync(saveDto); }
+        try
+        {
+            if (Id.HasValue && Id.Value != Guid.Empty) { await donationCauseService.UpdateDonationCauseAsync(Id.Value, saveDto); }
+            else { await donationCauseService.CreateDonationCauseAsync(saveDto); }
+        }
+        catch (DuplicateException)
+        {
+            ModelState.AddModelError("Form.Name", "A cause with this name already exists.");
+            return;
+        }
 
         Redirect(Url.Page("/Admin/DonationCause/Index"));
     }

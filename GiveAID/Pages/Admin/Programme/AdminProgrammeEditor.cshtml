@@ -85,12 +85,12 @@
             </div>
 
             @* Image preview *@
-            @if (!string.IsNullOrEmpty(Model.PreviewImageSource))
+            @if (!string.IsNullOrEmpty(Model.Form.ImageUrl))
             {
                 <div>
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Image Preview</label>
                     <div class="border border-[#E3DDD3] rounded-lg p-3 bg-[#F6F1E9] flex items-center justify-center">
-                        <img src="@Model.PreviewImageSource" alt="Programme image preview"
+                        <img src="@Model.Form.ImageUrl" alt="Programme image preview"
                              class="w-full object-cover rounded-lg aspect-[4/3]"/>
                     </div>
                 </div>

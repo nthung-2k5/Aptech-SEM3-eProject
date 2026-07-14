@@ -129,11 +129,11 @@ public static class DbSeeder
         {
             var partners = new List<CorporatePartner>
             {
-                new() { PartnerId = Guid.CreateVersion7(), Name = "Viettel Group",       LogoUrl = "https://placehold.co/200x80/1A5C6B/FFFFFF?text=Viettel",    WebsiteLink = "https://viettel.com.vn" },
-                new() { PartnerId = Guid.CreateVersion7(), Name = "Vingroup JSC",        LogoUrl = "https://placehold.co/200x80/1A5C6B/FFFFFF?text=Vingroup",   WebsiteLink = "https://vingroup.net" },
-                new() { PartnerId = Guid.CreateVersion7(), Name = "FPT Corporation",     LogoUrl = "https://placehold.co/200x80/1A5C6B/FFFFFF?text=FPT",        WebsiteLink = "https://fpt.com.vn" },
-                new() { PartnerId = Guid.CreateVersion7(), Name = "Masan Group",         LogoUrl = "https://placehold.co/200x80/C97C2E/FFFFFF?text=Masan",      WebsiteLink = "https://masangroup.com" },
-                new() { PartnerId = Guid.CreateVersion7(), Name = "Techcombank",         LogoUrl = "https://placehold.co/200x80/C97C2E/FFFFFF?text=TCB",        WebsiteLink = "https://techcombank.com.vn" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Viettel Group",       LogoUrl = "/images/viettel-logo.png",    WebsiteLink = "https://viettel.com.vn" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Vingroup JSC",        LogoUrl = "/images/vingroup-logo.png",   WebsiteLink = "https://vingroup.net" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "FPT Corporation",     LogoUrl = "/images/fpt-logo.png",        WebsiteLink = "https://fpt.com.vn" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Masan Group",         LogoUrl = "/images/masan-logo.png",      WebsiteLink = "https://masangroup.com" },
+                new() { PartnerId = Guid.CreateVersion7(), Name = "Techcombank",         LogoUrl = "/images/techcombank-logo.png",        WebsiteLink = "https://techcombank.com.vn" },
             };
             await context.CorporatePartners.AddRangeAsync(partners);
             await context.SaveChangesAsync();

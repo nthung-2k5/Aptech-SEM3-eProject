@@ -1,5 +1,6 @@
 using FluentValidation;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
 using Hydro.Utils;
@@ -28,15 +29,11 @@ public class AdminProgrammeEditor(
         public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset? EndTime { get; set; }
         public decimal? MaxDonation { get; set; }
-        public string? NewImageExtension { get; set; }
     }
 
     public FormModel Form { get; set; } = new();
     public NgoSummaryDto[] AvailableNgos { get; set; } = [];
     public DonationCauseDto[] AvailableCauses { get; set; } = [];
-
-    /// <summary>Preview data-URL shown below the file picker. Set in BindAsync; not persisted in Hydro state.</summary>
-    public string? PreviewImageSource { get; set; }
 
     [Transient]
     public IFormFile? ImageFile { get; set; }
@@ -63,7 +60,6 @@ public class AdminProgrammeEditor(
                     EndTime = p.EndTime,
                     MaxDonation = p.MaxDonation
                 };
-                PreviewImageSource = p.ImageUrl;
             }
         }
     }
@@ -73,19 +69,10 @@ public class AdminProgrammeEditor(
         if (property.Name == nameof(ImageFile))
         {
             var image = (IFormFile)value;
-            PreviewImageSource = await image.ToDataUrlAsync();
-            Form.NewImageExtension = Path.GetExtension(image.FileName);
-        }
-    }
+            using var ms = new MemoryStream();
+            await image.CopyToAsync(ms);
 
-    public async Task Save()
-    {
-        if (!this.Validate(validator)) { return; }
-
-        if (Form.NewImageExtension != null)
-        {
-            string base64Data = PreviewImageSource!.Split(',')[1];
-            byte[] bytes = Convert.FromBase64String(base64Data);
+            var extension = Path.GetExtension(image.FileName);
 
             if (Id.HasValue && Id.Value != Guid.Empty && Form.ImageUrl.Contains("127.0.0.1:9000"))
             {
@@ -94,9 +81,14 @@ public class AdminProgrammeEditor(
 
             Form.ImageUrl = await imageService.UploadImageAsync(
                 "programmes",
-                $"{Guid.NewGuid()}{Form.NewImageExtension}",
-                bytes);
+                $"{Guid.NewGuid()}{extension}",
+                ms.ToArray());
         }
+    }
+
+    public async Task Save()
+    {
+        if (!this.Validate(validator)) { return; }
 
         var saveDto = new ProgrammeSaveDto(
             Form.NgoId,
@@ -110,8 +102,16 @@ public class AdminProgrammeEditor(
             Form.Location
         );
 
-        if (Id.HasValue && Id.Value != Guid.Empty) { await programmeService.UpdateProgrammeAsync(Id.Value, saveDto); }
-        else { await programmeService.CreateProgrammeAsync(saveDto); }
+        try
+        {
+            if (Id.HasValue && Id.Value != Guid.Empty) { await programmeService.UpdateProgrammeAsync(Id.Value, saveDto); }
+            else { await programmeService.CreateProgrammeAsync(saveDto); }
+        }
+        catch (MissingForeignEntityException ex)
+        {
+            ModelState.AddModelError($"Form.{ex.ReferenceField}", $"The selected {ex.ReferenceField.Replace("Id", "")} is no longer available. Please select another.");
+            return;
+        }
 
         Redirect(Url.Page("/Admin/Programme/Index"));
     }
@@ -133,22 +133,28 @@ public class AdminProgrammeEditor(
             RuleFor(x => x.Form.Description)
                 .NotEmpty().WithMessage("Description is required");
 
-            RuleFor(x => x.ImageFile)
-                .NotNull().WithMessage("Image file is required")
+            RuleFor(x => x.Form.ImageUrl)
+                .NotEmpty().WithMessage("Image file is required")
+                .OverridePropertyName(nameof(ImageFile))
                 .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
 
             RuleFor(x => x.Form.Location)
                 .MaximumLength(255).WithMessage("Location cannot exceed 255 characters");
 
+            RuleFor(x => x.Form.StartTime)
+                .GreaterThanOrEqualTo(x => DateTimeOffset.Now.Date)
+                .WithMessage("Start date cannot be in the past")
+                .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
+
             RuleFor(x => x.Form.EndTime)
                 .GreaterThan(x => x.Form.StartTime)
-                .When(x => x.Form.EndTime.HasValue)
-                .WithMessage("End time must be after start time");
+                .WithMessage("End time must be after start time")
+                .When(x => x.Form.EndTime.HasValue);
 
             RuleFor(x => x.Form.MaxDonation)
                 .GreaterThan(0)
-                .When(x => x.Form.MaxDonation.HasValue)
-                .WithMessage("Max donation must be a positive value");
+                .WithMessage("Max donation must be a positive value")
+                .When(x => x.Form.MaxDonation.HasValue);
         }
     }
 }

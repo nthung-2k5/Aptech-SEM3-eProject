@@ -90,8 +90,8 @@ public class ProfileModel(AppDbContext context, IValidator<ProfileModel.InputMod
                 .MaximumLength(100).WithMessage("Full name cannot exceed 100 characters");
 
             RuleFor(x => x.PhoneNumber)
-                .NotEmpty().WithMessage("Phone number is required")
-                .PhoneNumber().WithMessage("Phone number must be in E.164 format");
+                .PhoneNumber().WithMessage("Phone number must be in E.164 format")
+                .When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber));
 
             RuleFor(x => x.DateOfBirth)
                 .NotEmpty().WithMessage("Date of birth is required")

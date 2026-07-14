@@ -1,5 +1,6 @@
 using FluentValidation;
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
 using Microsoft.AspNetCore.Mvc;
@@ -46,31 +47,27 @@ public class AdminMemberEditor(
     {
         if (!this.Validate(validator)) { return; }
 
-        if (Id.HasValue && Id.Value != Guid.Empty)
+        try
         {
-            var updateDto = new MemberUpdateDto(
-                Form.FullName,
-                Form.Email,
-                Form.Password,
-                Form.DateOfBirth,
-                Form.Address,
-                Form.PhoneNumber,
-                Form.Occupation);
-
-            await memberService.UpdateMemberAsync(Id.Value, updateDto);
+            if (Id.HasValue && Id.Value != Guid.Empty)
+            {
+                var updateDto = new MemberUpdateDto(
+                    Form.FullName, Form.Email, Form.Password, Form.DateOfBirth,
+                    Form.Address, Form.PhoneNumber, Form.Occupation);
+                await memberService.UpdateMemberAsync(Id.Value, updateDto);
+            }
+            else
+            {
+                var createDto = new MemberCreateDto(
+                    Form.FullName, Form.Email, Form.Password!, Form.DateOfBirth,
+                    Form.Address, Form.PhoneNumber, Form.Occupation);
+                await memberService.CreateMemberAsync(createDto);
+            }
         }
-        else
+        catch (DuplicateException ex)
         {
-            var createDto = new MemberCreateDto(
-                Form.FullName,
-                Form.Email,
-                Form.Password!,
-                Form.DateOfBirth,
-                Form.Address,
-                Form.PhoneNumber,
-                Form.Occupation);
-
-            await memberService.CreateMemberAsync(createDto);
+            ModelState.AddModelError($"Form.{ex.FieldName}", $"{ex.FieldName} is already in use.");
+            return;
         }
 
         Redirect(Url.Page("/Admin/Member/Index"));
@@ -90,8 +87,8 @@ public class AdminMemberEditor(
                 .MaximumLength(255).WithMessage("Email cannot exceed 255 characters");
 
             RuleFor(x => x.Form.PhoneNumber)
-                .NotEmpty().WithMessage("Phone number is required")
-                .PhoneNumber().WithMessage("Phone number must be in E.164 format");
+                .PhoneNumber().WithMessage("Phone number must be in E.164 format")
+                .When(x => !string.IsNullOrWhiteSpace(x.Form.PhoneNumber));
 
             RuleFor(x => x.Form.Address)
                 .MaximumLength(255).WithMessage("Address cannot exceed 255 characters");

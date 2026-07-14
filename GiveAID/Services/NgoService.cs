@@ -54,7 +54,7 @@ public class NgoService(AppDbContext dbContext) : INgoService
             NgoId = entity.NgoId,
             PartnerId = partnerId
         }), ct);
-        
+
         await dbContext.SaveChangesAsync(ct);
 
         return entity.ToDto();
@@ -77,7 +77,7 @@ public class NgoService(AppDbContext dbContext) : INgoService
         entity.Address = dto.Address;
         entity.PhoneNumber = dto.PhoneNumber;
         entity.Website = dto.Website;
-        
+
         await dbContext.NgoPartners.Where(p => p.NgoId == id).ExecuteDeleteAsync(ct);
         await dbContext.NgoPartners.AddRangeAsync(dto.PartnersId.Select(partnerId => new NgoPartner
         {
