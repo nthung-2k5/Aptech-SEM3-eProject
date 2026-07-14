@@ -91,8 +91,7 @@ public class MemberService(AppDbContext dbContext, IPasswordService passwordServ
             throw new DuplicateException(nameof(dto.Email));
         }
 
-        if (!string.IsNullOrWhiteSpace(dto.PhoneNumber) &&
-            await dbContext.Users.AnyAsync(u => u.PhoneNumber == dto.PhoneNumber && u.UserId != id, ct))
+        if (await dbContext.Users.AnyAsync(u => u.PhoneNumber == dto.PhoneNumber && u.UserId != id, ct))
         {
             throw new DuplicateException(nameof(dto.PhoneNumber));
         }

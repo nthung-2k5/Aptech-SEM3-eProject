@@ -4,37 +4,35 @@
     <h4 class="font-bold text-[#1C1A17] mb-4">@(Model.Id.HasValue ? "Edit Member" : "Add Member")</h4>
     <div class="grid md:grid-cols-2 gap-4 mb-4">
         <div>
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Full Name <span class="text-red-500">*</span></label>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Full Name</label>
             <input type="text" asp-for="Form.FullName" bind required class="input w-full"/>
             <span asp-validation-for="Form.FullName"></span>
         </div>
         <div>
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Email <span
-                    class="text-red-500">*</span></label>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Email</label>
             <input type="email" asp-for="Form.Email" bind required class="input w-full"/>
             <span asp-validation-for="Form.Email"></span>
         </div>
         <div>
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1 @(!Model.Id.HasValue ? "required" : "")">
                 Password
-                @if (!Model.Id.HasValue) { <span class="text-red-500">*</span> }
-                else { <span class="text-xs text-[#6B6459] font-normal">(leave blank to keep current)</span> }
+                @if (Model.Id.HasValue) { <span class="text-xs text-[#6B6459] font-normal">(leave blank to keep current)</span> }
             </label>
             <input type="password" asp-for="Form.Password" bind autocomplete="new-password" class="input w-full" value="@Model.Form.Password"/>
             <span asp-validation-for="Form.Password"></span>
         </div>
         <div>
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Phone Number</label>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Phone Number</label>
             <input type="text" asp-for="Form.PhoneNumber" bind placeholder="0912345678" class="input w-full"/>
             <span asp-validation-for="Form.PhoneNumber"></span>
         </div>
         <div>
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Date of Birth</label>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Date of Birth</label>
             <input type="date" asp-for="Form.DateOfBirth" bind class="input w-full"/>
             <span asp-validation-for="Form.DateOfBirth"></span>
         </div>
         <div>
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Occupation</label>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Occupation</label>
             <input type="text" asp-for="Form.Occupation" bind placeholder="e.g. Engineer, Student..." class="input w-full"/>
             <span asp-validation-for="Form.Occupation"></span>
         </div>

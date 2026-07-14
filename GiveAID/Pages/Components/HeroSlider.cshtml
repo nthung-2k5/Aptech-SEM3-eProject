@@ -10,7 +10,6 @@
     <style>
         .hero-slider-wrap {
             position: relative;
-            height: 92vh;
             overflow: hidden;
             background-color: #1A5C6B;
             display: flex;
@@ -60,7 +59,6 @@
 
         /* All content sits above the overlay */
         .hero-slider-content {
-            position: relative;
             z-index: 3;
             flex: 1;
             display: flex;
@@ -69,7 +67,6 @@
 
         /* Stats bar pinned to the very bottom of the section */
         .hero-slider-stats {
-            position: absolute;
             bottom: 0;
             left: 0;
             right: 0;
@@ -138,21 +135,6 @@
                                 Manage Platform <i class="ph ph-gear ml-1"></i>
                             </a>
                         }
-                        else if (User.Identity?.IsAuthenticated == true)
-                        {
-                            <a asp-page="/Donate/Index" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
-                                Donate Now <i class="ph ph-arrow-right ml-1"></i>
-                            </a>
-                        }
-                        else
-                        {
-                            <a asp-page="/Register/Index" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
-                                Donate Now <i class="ph ph-arrow-right ml-1"></i>
-                            </a>
-                        }
-                        <a asp-page="/Programmes/Index" class="btn btn-outline text-white hover:bg-white hover:text-[#1A5C6B] border-white/30 hover:border-white px-8 h-14 rounded transition-colors font-semibold text-base">
-                            Our Programmes
-                        </a>
                     </div>
                 </div>
 
@@ -160,7 +142,7 @@
                 <div class="hidden md:flex justify-end w-full">
                     <div class="card bg-white text-neutral shadow-2xl max-w-sm w-full rounded-2xl ml-auto">
                         <div class="card-body p-8">
-                            @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
+                            @if (User.IsInRole(nameof(UserRole.Admin)))
                             {
                                 <h3 class="font-['Playfair_Display',serif] text-2xl font-bold text-[#1C1A17] mb-1">Administration</h3>
                                 <p class="text-sm text-[#6B6459] mb-6">Oversee causes and platform activity.</p>
@@ -178,23 +160,16 @@
                                         Manage Causes <i class="ph ph-list-dashes"></i>
                                     </a>
                                 }
-                                else if (User.Identity?.IsAuthenticated == true)
-                                {
-                                    <a asp-page="/Donate/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
-                                        Proceed to Donate <i class="ph ph-arrow-right"></i>
-                                    </a>
-                                }
                                 else
                                 {
-                                    <a asp-page="/Register/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
-                                        Proceed to Donate <i class="ph ph-arrow-right"></i>
+                                    <a asp-page="/Programmes/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
+                                        Proceed to Programmes <i class="ph ph-arrow-right"></i>
                                     </a>
                                 }
                             </div>
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 

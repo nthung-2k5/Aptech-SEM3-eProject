@@ -3,18 +3,20 @@ using GiveAID.Dtos;
 using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GiveAID.Pages.Register;
 
 public class RegisterForm(
     IMemberService memberService,
+    IAuthService authService,
     IValidator<RegisterForm> validator) : HydroComponent
 {
     public string Name { get; set; }
     public string Email { get; set; }
     public string Phone { get; set; }
-    public string DateOfBirth { get; set; }
-    public string? Occupation { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
+    public string Occupation { get; set; }
     public string? Address { get; set; }
     public string Password { get; set; }
     public string ConfirmPassword { get; set; }
@@ -30,15 +32,28 @@ public class RegisterForm(
             Name,
             Email,
             Password,
-            DateOnly.Parse(DateOfBirth),
+            DateOfBirth.Value,
             Address ?? string.Empty,
             Phone,
-            Occupation ?? string.Empty);
+            Occupation);
 
         try
         {
             await memberService.CreateMemberAsync(user);
-            IsSuccess = true;
+            await authService.LoginAsync(Email, Password);
+            
+            var result = await authService.LoginAsync(Email, Password);
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTimeOffset.UtcNow.AddHours(24)
+            };
+
+            HttpContext.Response.Cookies.Append("jwt_token", result.Token, cookieOptions);
+            
+            Redirect(Url.Page("/Index"));
         }
         catch (DuplicateException ex) when (ex.FieldName == nameof(Email))
         {
@@ -69,8 +84,8 @@ public class RegisterForm(
 
             RuleFor(x => x.DateOfBirth)
                 .NotEmpty().WithMessage("Date of Birth is required")
-                .LessThan(DateTime.Today.ToString("yyyy-MM-dd")).WithMessage("Date of Birth must be in the past");
-
+                .LessThan(DateOnly.FromDateTime(DateTime.Today)).WithMessage("Date of Birth must be in the past");
+            
             RuleFor(x => x.Occupation)
                 .NotEmpty().WithMessage("Occupation is required")
                 .MaximumLength(50).WithMessage("Occupation cannot exceed 50 characters");
