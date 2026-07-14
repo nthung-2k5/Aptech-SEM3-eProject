@@ -1,3 +1,4 @@
+@using GiveAID.Models
 @model HeroSlider
 
 @{
@@ -131,25 +132,25 @@
                     </div>
 
                     <div class="flex flex-wrap gap-4">
-                        @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
+                        @if (User.IsInRole(nameof(UserRole.Admin)))
                         {
-                            <a href="/Admin" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
+                            <a asp-page="/Admin/Index" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
                                 Manage Platform <i class="ph ph-gear ml-1"></i>
                             </a>
                         }
                         else if (User.Identity?.IsAuthenticated == true)
                         {
-                            <a href="/Donate/Index" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
+                            <a asp-page="/Donate/Index" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
                                 Donate Now <i class="ph ph-arrow-right ml-1"></i>
                             </a>
                         }
                         else
                         {
-                            <a href="/Register/Index" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
+                            <a asp-page="/Register/Index" class="btn btn-primary bg-[#C97C2E] hover:bg-[#B06B20] border-none text-white px-8 h-14 rounded transition-all hover:gap-3 font-semibold text-base">
                                 Donate Now <i class="ph ph-arrow-right ml-1"></i>
                             </a>
                         }
-                        <a href="/Programmes" class="btn btn-outline text-white hover:bg-white hover:text-[#1A5C6B] border-white/30 hover:border-white px-8 h-14 rounded transition-colors font-semibold text-base">
+                        <a asp-page="/Programmes/Index" class="btn btn-outline text-white hover:bg-white hover:text-[#1A5C6B] border-white/30 hover:border-white px-8 h-14 rounded transition-colors font-semibold text-base">
                             Our Programmes
                         </a>
                     </div>
@@ -171,21 +172,21 @@
                             }
 
                             <div class="card-actions w-full mt-2">
-                                @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
+                                @if (User.IsInRole(nameof(UserRole.Admin)))
                                 {
-                                    <a href="/Admin/DonationCause" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
+                                    <a asp-page="/Admin/DonationCause/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
                                         Manage Causes <i class="ph ph-list-dashes"></i>
                                     </a>
                                 }
                                 else if (User.Identity?.IsAuthenticated == true)
                                 {
-                                    <a href="/Donate/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
+                                    <a asp-page="/Donate/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
                                         Proceed to Donate <i class="ph ph-arrow-right"></i>
                                     </a>
                                 }
                                 else
                                 {
-                                    <a href="/Register/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
+                                    <a asp-page="/Register/Index" class="btn btn-block bg-[#1A5C6B] hover:bg-[#154D5A] text-white border-none rounded-lg h-12 flex items-center justify-center gap-2 font-semibold text-base">
                                         Proceed to Donate <i class="ph ph-arrow-right"></i>
                                     </a>
                                 }

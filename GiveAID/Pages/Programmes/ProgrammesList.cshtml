@@ -97,7 +97,7 @@
                     int progress = p.TargetAmount is > 0 ? (int)(p.RaisedAmount / p.TargetAmount.Value * 100) : 0;
                     if (progress > 100) progress = 100;
 
-                    <a href="/Programmes/@p.Id"
+                    <a asp-page="/Programmes/Details" asp-route-id="@p.Id"
                        class="block bg-white border border-[#E3DDD3] rounded-2xl overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group no-underline text-inherit flex flex-col h-full">
                         <div class="h-52 overflow-hidden relative">
                             <img src="@(string.IsNullOrWhiteSpace(p.ImageUrl) ? "/images/programme-placeholder.png" : p.ImageUrl)"

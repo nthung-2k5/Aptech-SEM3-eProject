@@ -24,7 +24,7 @@
                 <label class="input w-full">
                     <i class="ph ph-lock"></i>
                     <input asp-for="Password" bind type="password" autocomplete="current-password"
-                           placeholder="••••••••">
+                           placeholder="••••••••" value="@Model.Password">
                 </label>
                 <span asp-validation-for="Password"></span>
                 @* <span class="text-red-500 text-xs mt-1 block" hydro-error="Password"></span> *@

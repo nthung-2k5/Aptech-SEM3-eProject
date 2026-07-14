@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Services;
 
-public class DonationService(AppDbContext dbContext) : IDonationService
+public class DonationService(AppDbContext dbContext, INotificationService notificationService) : IDonationService
 {
     public async Task<PagedResult<DonationDto>> GetDonationsPagedAsync(DonationQueryParameters query, CancellationToken ct = default)
     {
@@ -70,13 +70,20 @@ public class DonationService(AppDbContext dbContext) : IDonationService
                 throw new MissingForeignEntityException(nameof(donation.Target));
             }
         }
-
+        
         var entity = donation.ToEntity();
 
         await dbContext.Donations.AddAsync(entity, ct);
         await dbContext.SaveChangesAsync(ct);
+        
+        await notificationService.CreateNotificationAsync(donation.UserId, $"Your donation of ${donation.Amount:N0} was successfully received. Thank you for your generosity!", ct);
 
-        return entity.ToDto();
+        return await dbContext.Donations
+                .Include(d => d.Ngo)
+                .Include(d => d.Cause)
+                .Include(d => d.Programme)
+                .Where(d => d.DonationId == entity.DonationId)
+                .ProjectToDto().FirstOrDefaultAsync(ct);
     }
 
     public async Task VoidDonationAsync(Guid donationId, CancellationToken ct = default)

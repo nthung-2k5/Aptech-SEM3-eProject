@@ -38,7 +38,7 @@
                     {
                         var cause = Model.Causes[i];
                         var theme = themes[i % themes.Length];
-                        <a href="/Programmes" onclick="localStorage.setItem('activeCause', '@cause.Id')"
+                        <a asp-page="/Programmes/Index" onclick="localStorage.setItem('activeCause', '@cause.Id')"
                            class="btn border-none @theme rounded-full px-8 h-12 font-bold transition-all duration-300 snap-align-start shrink-0 no-underline shadow-sm hover:shadow-md hover:-translate-y-0.5">
                             @cause.Name
                         </a>

@@ -13,4 +13,4 @@ public record GalleryImageSaveDto(
     Guid? AssociatedProgrammeId
 );
 
-public record GalleryImageDto(Guid Id, Uri ImageUri, string Caption, (Guid Id, string Name)? AssociatedProgramme);
+public record GalleryImageDto(Guid Id, string ImageUri, string Caption, (Guid Id, string Name)? AssociatedProgramme);

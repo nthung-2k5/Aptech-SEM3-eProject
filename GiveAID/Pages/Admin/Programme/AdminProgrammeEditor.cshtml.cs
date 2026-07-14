@@ -29,11 +29,15 @@ public class AdminProgrammeEditor(
         public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow;
         public DateTimeOffset? EndTime { get; set; }
         public decimal? MaxDonation { get; set; }
+        public string? NewImageExtension { get; set; }
     }
 
     public FormModel Form { get; set; } = new();
     public NgoSummaryDto[] AvailableNgos { get; set; } = [];
     public DonationCauseDto[] AvailableCauses { get; set; } = [];
+
+    /// <summary>Preview data-URL shown below the file picker. Set in BindAsync; not persisted in Hydro state.</summary>
+    public string? PreviewImageSource { get; set; }
 
     [Transient]
     public IFormFile? ImageFile { get; set; }
@@ -60,6 +64,7 @@ public class AdminProgrammeEditor(
                     EndTime = p.EndTime,
                     MaxDonation = p.MaxDonation
                 };
+                PreviewImageSource = p.ImageUrl;
             }
         }
     }
@@ -69,10 +74,19 @@ public class AdminProgrammeEditor(
         if (property.Name == nameof(ImageFile))
         {
             var image = (IFormFile)value;
-            using var ms = new MemoryStream();
-            await image.CopyToAsync(ms);
+            PreviewImageSource = await image.ToDataUrlAsync();
+            Form.NewImageExtension = Path.GetExtension(image.FileName);
+        }
+    }
 
-            var extension = Path.GetExtension(image.FileName);
+    public async Task Save()
+    {
+        if (!this.Validate(validator)) { return; }
+
+        if (Form.NewImageExtension != null)
+        {
+            string base64Data = PreviewImageSource!.Split(',')[1];
+            byte[] bytes = Convert.FromBase64String(base64Data);
 
             if (Id.HasValue && Id.Value != Guid.Empty && Form.ImageUrl.Contains("127.0.0.1:9000"))
             {
@@ -81,14 +95,9 @@ public class AdminProgrammeEditor(
 
             Form.ImageUrl = await imageService.UploadImageAsync(
                 "programmes",
-                $"{Guid.NewGuid()}{extension}",
-                ms.ToArray());
+                $"{Guid.NewGuid()}{Form.NewImageExtension}",
+                bytes);
         }
-    }
-
-    public async Task Save()
-    {
-        if (!this.Validate(validator)) { return; }
 
         var saveDto = new ProgrammeSaveDto(
             Form.NgoId,
@@ -132,11 +141,10 @@ public class AdminProgrammeEditor(
 
             RuleFor(x => x.Form.Description)
                 .NotEmpty().WithMessage("Description is required");
-
-            RuleFor(x => x.Form.ImageUrl)
-                .NotEmpty().WithMessage("Image file is required")
-                .OverridePropertyName(nameof(ImageFile))
-                .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
+            //
+            // RuleFor(x => x.ImageFile)
+            //     .NotNull().WithMessage("Image file is required")
+            //     .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
 
             RuleFor(x => x.Form.Location)
                 .MaximumLength(255).WithMessage("Location cannot exceed 255 characters");
