@@ -52,25 +52,47 @@ public class AdminMemberEditor(
             if (Id.HasValue && Id.Value != Guid.Empty)
             {
                 var updateDto = new MemberUpdateDto(
-                    Form.FullName, Form.Email, Form.Password, Form.DateOfBirth,
-                    Form.Address, Form.PhoneNumber, Form.Occupation);
+                    Form.FullName,
+                    Form.Email,
+                    Form.Password,
+                    Form.DateOfBirth,
+                    Form.Address,
+                    Form.PhoneNumber,
+                    Form.Occupation);
+
                 await memberService.UpdateMemberAsync(Id.Value, updateDto);
             }
             else
             {
                 var createDto = new MemberCreateDto(
-                    Form.FullName, Form.Email, Form.Password!, Form.DateOfBirth,
-                    Form.Address, Form.PhoneNumber, Form.Occupation);
+                    Form.FullName,
+                    Form.Email,
+                    Form.Password!,
+                    Form.DateOfBirth,
+                    Form.Address,
+                    Form.PhoneNumber,
+                    Form.Occupation);
+
                 await memberService.CreateMemberAsync(createDto);
             }
+
+            Redirect(Url.Page("/Admin/Member/Index"));
         }
         catch (DuplicateException ex)
         {
-            ModelState.AddModelError($"Form.{ex.FieldName}", $"{ex.FieldName} is already in use.");
-            return;
+            switch (ex.FieldName)
+            {
+                case nameof(FormModel.Email):
+                    ModelState.AddModelError($"Form.{nameof(FormModel.Email)}", "An account with this email already exists.");
+                    break;
+                case nameof(FormModel.PhoneNumber):
+                    ModelState.AddModelError($"Form.{nameof(FormModel.PhoneNumber)}", "An account with this phone number already exists.");
+                    break;
+                default:
+                    ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message);
+                    break;
+            }
         }
-
-        Redirect(Url.Page("/Admin/Member/Index"));
     }
 
     public class Validator : AbstractValidator<AdminMemberEditor>
@@ -87,8 +109,8 @@ public class AdminMemberEditor(
                 .MaximumLength(255).WithMessage("Email cannot exceed 255 characters");
 
             RuleFor(x => x.Form.PhoneNumber)
-                .PhoneNumber().WithMessage("Phone number must be in E.164 format")
-                .When(x => !string.IsNullOrWhiteSpace(x.Form.PhoneNumber));
+                .NotEmpty().WithMessage("Phone number is required")
+                .PhoneNumber().WithMessage("Phone number must be in E.164 format");
 
             RuleFor(x => x.Form.Address)
                 .MaximumLength(255).WithMessage("Address cannot exceed 255 characters");
@@ -105,6 +127,7 @@ public class AdminMemberEditor(
                 .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
 
             RuleFor(x => x.Form.DateOfBirth)
+                .NotEmpty().WithMessage("Date of Birth is required")
                 .LessThan(DateOnly.FromDateTime(DateTime.Today))
                 .WithMessage("Date of birth must be in the past");
         }

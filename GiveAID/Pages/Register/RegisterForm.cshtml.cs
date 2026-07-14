@@ -40,7 +40,7 @@ public class RegisterForm(
         try
         {
             await memberService.CreateMemberAsync(user);
-            await authService.LoginAsync(Email, Password);
+            IsSuccess = true;
             
             var result = await authService.LoginAsync(Email, Password);
             var cookieOptions = new CookieOptions

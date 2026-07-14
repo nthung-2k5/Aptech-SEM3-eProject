@@ -86,8 +86,8 @@ public class DonateForm(
         }
 
         var donationSave = new DonationSaveDto(UserId, target, Amount, transaction.TransactionId);
+        
         await donationService.CreateDonationAsync(donationSave);
-
         Location($"/Donate/Success?transactionId={transaction.TransactionId}");
     }
 

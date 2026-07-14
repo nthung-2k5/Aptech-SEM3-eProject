@@ -27,11 +27,11 @@ public class ProfileModel(AppDbContext context, IValidator<ProfileModel.InputMod
     {
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Register/Index"); }
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
 
         var user = await context.Users.FindAsync(userId);
 
-        if (user == null) { return RedirectToPage("/Register/Index"); }
+        if (user == null) { return RedirectToPage("/Login/Index"); }
 
         Input = new InputModel
         {
@@ -62,11 +62,11 @@ public class ProfileModel(AppDbContext context, IValidator<ProfileModel.InputMod
 
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Register/Index"); }
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
 
         var user = await context.Users.FindAsync(userId);
 
-        if (user == null) { return RedirectToPage("/Register/Index"); }
+        if (user == null) { return RedirectToPage("/Login/Index"); }
 
         user.FullName = Input.FullName;
         user.PhoneNumber = Input.PhoneNumber;
@@ -88,10 +88,6 @@ public class ProfileModel(AppDbContext context, IValidator<ProfileModel.InputMod
             RuleFor(x => x.FullName)
                 .NotEmpty().WithMessage("Full name is required")
                 .MaximumLength(100).WithMessage("Full name cannot exceed 100 characters");
-
-            RuleFor(x => x.PhoneNumber)
-                .PhoneNumber().WithMessage("Phone number must be in E.164 format")
-                .When(x => !string.IsNullOrWhiteSpace(x.PhoneNumber));
 
             RuleFor(x => x.DateOfBirth)
                 .NotEmpty().WithMessage("Date of birth is required")

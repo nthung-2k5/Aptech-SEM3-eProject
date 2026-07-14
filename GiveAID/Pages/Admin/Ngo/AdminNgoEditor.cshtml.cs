@@ -71,14 +71,17 @@ public class AdminNgoEditor(
         {
             if (Id.HasValue && Id.Value != Guid.Empty) { await ngoService.UpdateNgoAsync(Id.Value, saveDto); }
             else { await ngoService.CreateNgoAsync(saveDto); }
-        }
-        catch (DuplicateException)
-        {
-            ModelState.AddModelError("Form.Name", "An NGO with this name already exists.");
-            return;
-        }
 
-        Redirect(Url.Page("/Admin/Ngo/Index"));
+            Redirect(Url.Page("/Admin/Ngo/Index"));
+        }
+        catch (DuplicateException ex)
+        {
+            if (ex.FieldName == nameof(NgoSaveDto.Name))
+            {
+                ModelState.AddModelError($"Form.{nameof(Form.Name)}", "An NGO with this name already exists");
+            }
+            else { ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message); }
+        }
     }
 
     public class Validator : AbstractValidator<AdminNgoEditor>
@@ -93,14 +96,14 @@ public class AdminNgoEditor(
                 .NotEmpty().WithMessage("Description is required");
 
             RuleFor(x => x.Form.Address)
+                .NotEmpty().WithMessage("Address is required")
                 .MaximumLength(255).WithMessage("Address cannot exceed 255 characters");
 
             RuleFor(x => x.Form.Website)
                 .MaximumLength(1024).WithMessage("Website cannot exceed 1024 characters");
 
             RuleFor(x => x.Form.PhoneNumber)
-                    .PhoneNumber().WithMessage("Phone number must be in E.164 format")
-                    .When(x => !string.IsNullOrWhiteSpace(x.Form.PhoneNumber));
+                    .PhoneNumber().WithMessage("Phone number must be in E.164 format");
         }
     }
 }

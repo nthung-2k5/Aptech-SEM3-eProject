@@ -9,12 +9,11 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
     public string SearchTerm { get; set; } = string.Empty;
     public string? CauseId { get; set; }
     public string? NgoId { get; set; }
-    public DateTime? DateFilter { get; set; }
+    public string SortOption { get; set; } = "startdate_desc";
     public int PageNumber { get; set; } = 1;
 
-    public ProgrammeDto[] Programmes { get; set; } = [];
-    public int TotalPages { get; set; } = 1;
-    public int TotalCount { get; set; } = 0;
+    public PagedResult<ProgrammeDto> Programmes { get; set; } = new();
+    public int TotalPages => Programmes.TotalPages;
 
     public override async Task MountAsync() { await LoadProgrammesAsync(); }
 
@@ -35,25 +34,27 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
         SearchTerm = string.Empty;
         CauseId = null;
         NgoId = null;
-        DateFilter = null;
+        SortOption = "startdate_desc";
         PageNumber = 1;
         await LoadProgrammesAsync();
     }
 
     private async Task LoadProgrammesAsync()
     {
+        string[] sortParts = SortOption.Split('_');
+        string sortBy = sortParts.Length > 0 ? sortParts[0] : "startdate";
+        bool sortDesc = sortParts.Length <= 1 || sortParts[1] == "desc";
+
         var query = new ProgrammeQueryParameters
         {
             SearchTerm = SearchTerm,
             CauseId = !string.IsNullOrEmpty(CauseId) ? Guid.Parse(CauseId) : null,
             NgoId = !string.IsNullOrEmpty(NgoId) ? Guid.Parse(NgoId) : null,
-            DateFilter = DateFilter,
+            SortBy = sortBy,
+            SortDescending = sortDesc,
             PageNumber = PageNumber,
             PageSize = 6
         };
-        var result = await programmeService.GetAllProgrammesPagedAsync(query);
-        Programmes = result.Items;
-        TotalPages = result.TotalPages;
-        TotalCount = result.TotalCount;
+        Programmes = await programmeService.GetAllProgrammesPagedAsync(query);
     }
 }

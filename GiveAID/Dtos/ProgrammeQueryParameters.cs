@@ -11,6 +11,10 @@ public class ProgrammeQueryParameters
     public string? StatusFilter { get; set; } // "Active", "Upcoming", "Ended"
     public DateTime? DateFilter { get; set; }
 
+    // Sorting
+    public string? SortBy { get; set; }
+    public bool SortDescending { get; set; } = true;
+
     // Pagination
     private const int MaxPageSize = 50;
     public int PageNumber { get; set; } = 1;

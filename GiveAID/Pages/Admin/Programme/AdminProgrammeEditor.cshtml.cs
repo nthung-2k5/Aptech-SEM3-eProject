@@ -88,15 +88,17 @@ public class AdminProgrammeEditor(
             string base64Data = PreviewImageSource!.Split(',')[1];
             byte[] bytes = Convert.FromBase64String(base64Data);
 
-            if (Id.HasValue && Id.Value != Guid.Empty && Form.ImageUrl.Contains("127.0.0.1:9000"))
+            if (Id.HasValue && Id.Value != Guid.Empty)
             {
-                await imageService.DeleteImageAsync(new Uri(Form.ImageUrl));
+                Form.ImageUrl = await imageService.UpdateImageAsync(new Uri(Form.ImageUrl), bytes);
             }
-
-            Form.ImageUrl = await imageService.UploadImageAsync(
-                "programmes",
-                $"{Guid.NewGuid()}{Form.NewImageExtension}",
-                bytes);
+            else
+            {
+                Form.ImageUrl = await imageService.UploadImageAsync(
+                    "programmes",
+                    $"{Guid.NewGuid()}{Form.NewImageExtension}",
+                    bytes);
+            }
         }
 
         var saveDto = new ProgrammeSaveDto(
@@ -115,14 +117,24 @@ public class AdminProgrammeEditor(
         {
             if (Id.HasValue && Id.Value != Guid.Empty) { await programmeService.UpdateProgrammeAsync(Id.Value, saveDto); }
             else { await programmeService.CreateProgrammeAsync(saveDto); }
+
+            Redirect(Url.Page("/Admin/Programme/Index"));
         }
         catch (MissingForeignEntityException ex)
         {
-            ModelState.AddModelError($"Form.{ex.ReferenceField}", $"The selected {ex.ReferenceField.Replace("Id", "")} is no longer available. Please select another.");
-            return;
+            switch (ex.ReferenceField)
+            {
+                case nameof(ProgrammeSaveDto.NgoId):
+                    ModelState.AddModelError($"Form.{ex.ReferenceField}", "Selected NGO does not exist");
+                    break;
+                case nameof(ProgrammeSaveDto.CauseId):
+                    ModelState.AddModelError($"Form.{ex.ReferenceField}", "Selected cause does not exist");
+                    break;
+                default:
+                    ModelState.AddModelError($"Form.{ex.ReferenceField}", ex.Message);
+                    break;
+            }
         }
-
-        Redirect(Url.Page("/Admin/Programme/Index"));
     }
 
     public class Validator : AbstractValidator<AdminProgrammeEditor>
@@ -141,28 +153,28 @@ public class AdminProgrammeEditor(
 
             RuleFor(x => x.Form.Description)
                 .NotEmpty().WithMessage("Description is required");
-            //
-            // RuleFor(x => x.ImageFile)
-            //     .NotNull().WithMessage("Image file is required")
-            //     .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
+
+            RuleFor(x => x.ImageFile)
+                .NotNull().WithMessage("Image file is required")
+                .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
 
             RuleFor(x => x.Form.Location)
                 .MaximumLength(255).WithMessage("Location cannot exceed 255 characters");
 
             RuleFor(x => x.Form.StartTime)
                 .GreaterThanOrEqualTo(x => DateTimeOffset.Now.Date)
-                .WithMessage("Start date cannot be in the past")
-                .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
-
+                .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty)
+                .WithMessage("Start date cannot be in the past");
+                
             RuleFor(x => x.Form.EndTime)
                 .GreaterThan(x => x.Form.StartTime)
-                .WithMessage("End time must be after start time")
-                .When(x => x.Form.EndTime.HasValue);
+                .When(x => x.Form.EndTime.HasValue)
+                .WithMessage("End time must be after start time");
 
             RuleFor(x => x.Form.MaxDonation)
                 .GreaterThan(0)
-                .WithMessage("Max donation must be a positive value")
-                .When(x => x.Form.MaxDonation.HasValue);
+                .When(x => x.Form.MaxDonation.HasValue)
+                .WithMessage("Max donation must be a positive value");
         }
     }
 }

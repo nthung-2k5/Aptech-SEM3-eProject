@@ -1,4 +1,5 @@
 using GiveAID.Dtos;
+using GiveAID.Exceptions;
 using GiveAID.Models;
 using GiveAID.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
@@ -32,9 +33,28 @@ public class EditorModel(IAboutUsSubpageService aboutUsService) : PageModel
     {
         var page = new AboutUsSubpageDto(slug, title, content);
 
-        if (!string.IsNullOrEmpty(originalSlug)) { await aboutUsService.UpdateSubpageAsync(page, ct); }
-        else { await aboutUsService.AddSubpageAsync(page, ct); }
+        try
+        {
+            if (!string.IsNullOrEmpty(originalSlug)) { await aboutUsService.UpdateSubpageAsync(page, ct); }
+            else { await aboutUsService.AddSubpageAsync(page, ct); }
 
-        return RedirectToPage("/AboutUs/Index", new { slug });
+            return RedirectToPage("/AboutUs/Index", new { slug });
+        }
+        catch (DuplicateException ex)
+        {
+            switch (ex.FieldName)
+            {
+                case nameof(AboutUsSubpageDto.Title):
+                    ModelState.AddModelError(nameof(title), ex.Message);
+                    break;
+                default:
+                    ModelState.AddModelError(ex.FieldName, ex.Message);
+                    break;
+            }
+            
+            IsEditMode = !string.IsNullOrEmpty(originalSlug);
+            CurrentPage = page;
+            return Page();
+        }
     }
 }

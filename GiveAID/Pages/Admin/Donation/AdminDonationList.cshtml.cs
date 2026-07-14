@@ -5,12 +5,20 @@ using Hydro;
 
 namespace GiveAID.Pages.Admin.Donation;
 
-public class AdminDonationList(IDonationService donationService, IMemberService memberService) : HydroComponent
+public class AdminDonationList(
+    IDonationService donationService, 
+    IMemberService memberService,
+    IProgrammeService programmeService,
+    INgoService ngoService,
+    IDonationCauseService causeService) : HydroComponent
 {
     // Filter / Search state
     public string? DateFrom { get; set; }
     public string? DateTo { get; set; }
     public string StatusFilter { get; set; } = string.Empty; // "" | "Completed" | "Void"
+    public string? ProgrammeId { get; set; }
+    public string? NgoId { get; set; }
+    public string? CauseId { get; set; }
     public int PageNumber { get; set; } = 1;
     private const int PageSize = 10;
 
@@ -20,8 +28,19 @@ public class AdminDonationList(IDonationService donationService, IMemberService 
     public int TotalPages => TotalCount == 0 ? 1 : (int)Math.Ceiling((double)TotalCount / PageSize);
     public bool HasPreviousPage => PageNumber > 1;
     public bool HasNextPage => PageNumber < TotalPages;
+    public decimal TotalAmount => Donations.Sum(d => d.Amount);
 
-    public override async Task MountAsync() { await LoadDataAsync(); }
+    public ProgrammeDto[] AvailableProgrammes { get; set; } = [];
+    public NgoSummaryDto[] AvailableNgos { get; set; } = [];
+    public DonationCauseDto[] AvailableCauses { get; set; } = [];
+
+    public override async Task MountAsync() 
+    { 
+        AvailableProgrammes = (await programmeService.GetAllProgrammesPagedAsync(new ProgrammeQueryParameters { PageSize = 1000 })).Items;
+        AvailableNgos = await ngoService.GetAllNgosAsync();
+        AvailableCauses = await causeService.GetAllDonationCausesAsync();
+        await LoadDataAsync(); 
+    }
 
     public async Task Search()
     {
@@ -65,6 +84,9 @@ public class AdminDonationList(IDonationService donationService, IMemberService 
                 "Void" => DonationStatus.Void,
                 _ => null
             },
+            ProgrammeId = !string.IsNullOrEmpty(ProgrammeId) ? Guid.Parse(ProgrammeId) : null,
+            NgoId = !string.IsNullOrEmpty(NgoId) ? Guid.Parse(NgoId) : null,
+            CauseId = !string.IsNullOrEmpty(CauseId) ? Guid.Parse(CauseId) : null,
             PageNumber = PageNumber,
             PageSize = PageSize
         };

@@ -9,6 +9,9 @@ public class DonationQueryParameters
     public DateOnly? DateFrom { get; set; }
     public DateOnly? DateTo { get; set; }
     public DonationStatus? Status { get; set; }
+    public Guid? ProgrammeId { get; set; }
+    public Guid? NgoId { get; set; }
+    public Guid? CauseId { get; set; }
     public int PageNumber { get; set; } = 1;
 
     public int PageSize

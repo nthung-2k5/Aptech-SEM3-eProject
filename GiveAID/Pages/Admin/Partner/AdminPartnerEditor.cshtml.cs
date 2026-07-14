@@ -21,9 +21,13 @@ public class AdminPartnerEditor(
         /// <summary>Either typed manually or populated when a file is uploaded via BindAsync.</summary>
         public string LogoUrl { get; set; } = "";
         public string WebsiteLink { get; set; } = "";
+        public string? NewImageExtension { get; set; }
     }
 
     public FormModel Form { get; set; } = new();
+
+    /// <summary>Preview data-URL shown below the file picker. Set in BindAsync; not persisted in Hydro state.</summary>
+    public string? PreviewImageSource { get; set; }
 
     [Transient]
     public IFormFile? ImageFile { get; set; }
@@ -42,6 +46,7 @@ public class AdminPartnerEditor(
                     LogoUrl = p.LogoUrl,
                     WebsiteLink = p.WebsiteLink
                 };
+                PreviewImageSource = p.LogoUrl;
             }
         }
     }
@@ -51,20 +56,8 @@ public class AdminPartnerEditor(
         if (property.Name == nameof(ImageFile))
         {
             var image = (IFormFile)value;
-            using var ms = new MemoryStream();
-            await image.CopyToAsync(ms);
-            
-            var extension = Path.GetExtension(image.FileName);
-            
-            if (Id.HasValue && Id.Value != Guid.Empty && Form.LogoUrl.Contains("127.0.0.1:9000"))
-            {
-                await imageService.DeleteImageAsync(new Uri(Form.LogoUrl));
-            }
-            
-            Form.LogoUrl = await imageService.UploadImageAsync(
-                "partners",
-                $"{Guid.NewGuid()}{extension}",
-                ms.ToArray());
+            PreviewImageSource = await image.ToDataUrlAsync();
+            Form.NewImageExtension = Path.GetExtension(image.FileName);
         }
     }
 
@@ -72,20 +65,41 @@ public class AdminPartnerEditor(
     {
         if (!this.Validate(validator)) { return; }
 
+        if (Form.NewImageExtension != null)
+        {
+            string base64Data = PreviewImageSource!.Split(',')[1];
+            byte[] bytes = Convert.FromBase64String(base64Data);
+            
+            if (Id.HasValue && Id.Value != Guid.Empty)
+            {
+                Form.LogoUrl = await imageService.UpdateImageAsync(new Uri(Form.LogoUrl), bytes);
+            }
+            else
+            {
+                Form.LogoUrl = await imageService.UploadImageAsync(
+                    "partners",
+                    $"{Guid.NewGuid()}{Form.NewImageExtension}",
+                    bytes);
+            }
+        }
+
         var saveDto = new PartnerSaveDto(Form.Name, Form.LogoUrl, Form.WebsiteLink);
 
         try
         {
             if (Id.HasValue && Id.Value != Guid.Empty) { await partnerService.UpdatePartnerAsync(Id.Value, saveDto); }
             else { await partnerService.CreatePartnerAsync(saveDto); }
-        }
-        catch (DuplicateException)
-        {
-            ModelState.AddModelError("Form.Name", "A partner with this name already exists.");
-            return;
-        }
 
-        Redirect(Url.Page("/Admin/Partner/Index"));
+            Redirect(Url.Page("/Admin/Partner/Index"));
+        }
+        catch (DuplicateException ex)
+        {
+            if (ex.FieldName == nameof(PartnerSaveDto.Name))
+            {
+                ModelState.AddModelError($"Form.{nameof(Form.Name)}", "A partner with this name already exists");
+            }
+            else { ModelState.AddModelError($"Form.{ex.FieldName}", ex.Message); }
+        }
     }
 
     public class Validator : AbstractValidator<AdminPartnerEditor>
@@ -96,9 +110,8 @@ public class AdminPartnerEditor(
                 .NotEmpty().WithMessage("Partner name is required")
                 .MaximumLength(255).WithMessage("Name cannot exceed 255 characters");
 
-            RuleFor(x => x.Form.LogoUrl)
-                .NotEmpty().WithMessage("Logo file is required")
-                .OverridePropertyName(nameof(ImageFile))
+            RuleFor(x => x.ImageFile)
+                .NotNull().WithMessage("Logo file is required")
                 .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
 
             RuleFor(x => x.Form.WebsiteLink)

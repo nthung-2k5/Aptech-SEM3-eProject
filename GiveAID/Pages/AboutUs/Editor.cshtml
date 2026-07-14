@@ -22,7 +22,7 @@
                     <div>
                         <label class="block text-sm font-medium mb-1">Slug (URL)</label>
                         <input type="text" name="slug" value="@Model.CurrentPage?.Slug"
-                               class="input input-bordered w-full" readonly="@(!string.IsNullOrEmpty(Model.CurrentPage?.Slug))" required/>
+                               class="input input-bordered w-full" disabled="@(!string.IsNullOrEmpty(Model.CurrentPage?.Slug))" required/>
                     </div>
                     <div>
                         <label class="block text-sm font-medium mb-1">Content</label>

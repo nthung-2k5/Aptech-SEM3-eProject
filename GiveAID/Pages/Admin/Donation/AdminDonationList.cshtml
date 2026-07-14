@@ -10,6 +10,10 @@
               <span class="badge badge-lg bg-[#4A8B7F]/10 text-[#4A8B7F] border-0 font-semibold"><i class="ph ph-check-circle mr-1"></i> @Model.Donations.Count(d => d.Status == DonationStatus.Completed) completed</span>
               <span class="badge badge-lg bg-[#D4183D]/10 text-[#D4183D] border-0 font-semibold"><i class="ph ph-x-circle mr-1"></i> @Model.Donations.Count(d => d.Status == DonationStatus.Void) void</span>
             </div>
+            <div class="flex items-center gap-2">
+                <span class="badge badge-neutral text-sm font-medium">Total Amount: @Model.TotalAmount.ToUsCurrencyString()</span>
+                <span class="badge badge-ghost text-sm font-medium">@Model.TotalCount Donations</span>
+            </div>
         </div>
 
         <div class="flex flex-wrap gap-3 items-end">
@@ -31,6 +35,42 @@
                     <option value="">All Statuses</option>
                     <option value="Completed">Completed</option>
                     <option value="Void">Void</option>
+                </select>
+            </div>
+            <div>
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Programme</label>
+                <select asp-for="ProgrammeId" bind on:change="@(() => Model.Search())" 
+                        class="select select-bordered select-sm max-w-[200px]" 
+                        disabled="@(!string.IsNullOrEmpty(Model.NgoId) || !string.IsNullOrEmpty(Model.CauseId))">
+                    <option value="">All Programmes</option>
+                    @foreach (var prog in Model.AvailableProgrammes)
+                    {
+                        <option value="@prog.Id.ToString()">@prog.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">NGO</label>
+                <select asp-for="NgoId" bind on:change="@(() => Model.Search())" 
+                        class="select select-bordered select-sm max-w-[200px]"
+                        disabled="@(!string.IsNullOrEmpty(Model.ProgrammeId))">
+                    <option value="">All NGOs</option>
+                    @foreach (var ngo in Model.AvailableNgos)
+                    {
+                        <option value="@ngo.Id.ToString()">@ngo.Name</option>
+                    }
+                </select>
+            </div>
+            <div>
+                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Cause</label>
+                <select asp-for="CauseId" bind on:change="@(() => Model.Search())" 
+                        class="select select-bordered select-sm max-w-[200px]"
+                        disabled="@(!string.IsNullOrEmpty(Model.ProgrammeId))">
+                    <option value="">All Causes</option>
+                    @foreach (var cause in Model.AvailableCauses)
+                    {
+                        <option value="@cause.Id.ToString()">@cause.Name</option>
+                    }
                 </select>
             </div>
         </div>
