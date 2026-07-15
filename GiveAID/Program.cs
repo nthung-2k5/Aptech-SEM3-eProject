@@ -6,6 +6,7 @@ using GiveAID.Data;
 using GiveAID.Models;
 using GiveAID.Services;
 using GiveAID.Services.Abstractions;
+using GiveAID.Utils;
 using Hydro.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Localization;
@@ -84,6 +85,12 @@ builder.Services.AddScoped<IPaymentService, FakePaymentService>();
 builder.Services.AddScoped<IProgrammeService, ProgrammeService>();
 builder.Services.AddScoped<IUserInterestService, UserInterestService>();
 builder.Services.AddScoped<IUserQueryService, UserQueryService>();
+
+// Đăng ký Queue dưới dạng Singleton (chỉ có 1 cái giỏ đựng duy nhất)
+builder.Services.AddSingleton<IBackgroundTaskQueue, DefaultBackgroundTaskQueue>();
+
+// Đăng ký Background Service chạy ngầm
+builder.Services.AddHostedService<QueuedHostedService>();
 
 var app = builder.Build();
 
