@@ -1,9 +1,28 @@
 @using System.Security.Claims
 @using GiveAID.Services.Abstractions
-<!DOCTYPE html>
-<html lang="en">
 @inject IAboutUsSubpageService AboutUsSubpageService
 @inject INotificationService NotificationService
+@{
+    var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+    string IsActive(params string[] prefixes)
+    {
+        foreach (var prefix in prefixes)
+        {
+            if (prefix == "/Index")
+            {
+                if (currentPage.Equals("/Index", StringComparison.OrdinalIgnoreCase))
+                    return "bg-white/20 text-white font-semibold";
+            }
+            else if (currentPage.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return "bg-white/20 text-white font-semibold";
+            }
+        }
+        return "";
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -59,12 +78,12 @@
 
             <!-- Nav -->
             <nav id="navbar">
-                <a asp-page="/Index" class="navbar-button">Home</a>
-                <a asp-page="/Programmes/Index" class="navbar-button">Programmes</a>
-                <a asp-page="/Ngo/Index" class="navbar-button">NGOs</a>
+                <a asp-page="/Index" class="navbar-button @IsActive("/Index")">Home</a>
+                <a asp-page="/Programmes/Index" class="navbar-button @IsActive("/Programmes")">Programmes</a>
+                <a asp-page="/Ngo/Index" class="navbar-button @IsActive("/Ngo")">NGOs</a>
 
                 <div class="relative group">
-                    <a asp-page="/AboutUs/Index" class="navbar-button">
+                    <a asp-page="/AboutUs/Index" class="navbar-button @IsActive("/AboutUs")">
                         About Us
                     </a>
                     <div
@@ -77,12 +96,12 @@
                     </div>
                 </div>
 
-                <a asp-page="/Gallery/Index" class="navbar-button">Gallery</a>
+                <a asp-page="/Gallery/Index" class="navbar-button @IsActive("/Gallery")">Gallery</a>
 
                 @if (!User.IsInRole("Admin"))
                 {
                     <div class="relative group">
-                        <a href="#" class="navbar-button">
+                        <a href="#" class="navbar-button @IsActive("/Faq", "/Contact")">
                             Help Centre
                         </a>
                         <div
@@ -117,7 +136,7 @@
                                 <div class="indicator-item status bg-red-500 text-red-500"></div>
                             }
                             <button @@click="open = !open" @@click.outside="open = false"
-                                    class="navbar-button flex items-center gap-1 relative">
+                                    class="navbar-button flex items-center gap-1 relative @IsActive("/Notifications")">
                                 <i class="ph-fill ph-bell text-lg"></i>
                             </button>
                             <div x-show="open" style="display: none;"
@@ -167,7 +186,7 @@
                         <!-- Member Dropdown -->
                         <div class="relative group" x-data="{ open: false }">
                             <button @@click="open = !open" @@click.outside="open = false"
-                                    class="navbar-button flex items-center gap-1">
+                                    class="navbar-button flex items-center gap-1 @IsActive("/Member")">
                                 <i class="ph-fill ph-user-circle text-xl"></i> @userName
                                 <i class="ph ph-caret-down text-xs ml-1"></i>
                             </button>
