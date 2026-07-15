@@ -31,7 +31,7 @@ builder.Services.AddAuthentication(options =>
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultSignOutScheme = "Cookies";
-}).AddCookie("Cookies", options => { options.LoginPath = "/Login"; }).AddJwtBearer(options =>
+}).AddCookie("Cookies", options => { options.LoginPath = "/Register/Index"; }).AddJwtBearer(options =>
 {
     var jwtSettings = builder.Configuration.GetSection("JwtSettings");
     string secretKey = jwtSettings["Secret"] ?? "super_secret_default_key_replace_me_in_production_over_32_chars";
@@ -70,7 +70,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
-builder.Services.AddSingleton<IImageService, S3ImageService>();
+builder.Services.AddSingleton<IImageService, ImageService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.AddScoped<IAboutUsSubpageService, AboutUsSubpageService>();
@@ -101,9 +101,6 @@ using (var scope = app.Services.CreateScope())
 
     var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
     await DbSeeder.SeedAsync(db, passwordService);
-
-    var s3 = scope.ServiceProvider.GetRequiredService<IImageService>();
-    await s3.EnsureBucketExists();
 }
 
 // Configure the HTTP request pipeline.

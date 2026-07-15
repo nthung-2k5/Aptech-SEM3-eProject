@@ -421,8 +421,8 @@ namespace GiveAID.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTimeOffset?>("EndTime")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly?>("EndDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("ImageUrl")
                         .IsRequired()
@@ -448,8 +448,8 @@ namespace GiveAID.Migrations
                     b.Property<Guid>("NgoId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTimeOffset>("StartTime")
-                        .HasColumnType("datetimeoffset");
+                    b.Property<DateOnly>("StartDate")
+                        .HasColumnType("date");
 
                     b.HasKey("ProgrammeId");
 

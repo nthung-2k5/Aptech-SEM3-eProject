@@ -3,6 +3,7 @@ using GiveAID.Dtos;
 using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GiveAID.Pages.Register;
 
@@ -14,9 +15,9 @@ public class RegisterForm(
     public string Name { get; set; }
     public string Email { get; set; }
     public string Phone { get; set; }
-    public string DateOfBirth { get; set; }
-    public string? Occupation { get; set; }
-    public string Address { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
+    public string Occupation { get; set; }
+    public string? Address { get; set; }
     public string Password { get; set; }
     public string ConfirmPassword { get; set; }
     public bool Agree { get; set; }
@@ -31,10 +32,10 @@ public class RegisterForm(
             Name,
             Email,
             Password,
-            DateOnly.Parse(DateOfBirth),
-            Address,
+            DateOfBirth.Value,
+            Address ?? string.Empty,
             Phone,
-            Occupation ?? string.Empty);
+            Occupation);
 
         try
         {
@@ -51,16 +52,16 @@ public class RegisterForm(
             };
 
             HttpContext.Response.Cookies.Append("jwt_token", result.Token, cookieOptions);
-
-            Redirect("/");
+            
+            Redirect(Url.Page("/Index"));
         }
-        catch (DuplicateException ex)
+        catch (DuplicateException ex) when (ex.FieldName == nameof(Email))
         {
-            ModelState.AddModelError(ex.FieldName, ex.Message);
+            ModelState.AddModelError(nameof(Email), "An account with this email already exists.");
         }
-        catch (MissingForeignEntityException ex)
+        catch (DuplicateException ex) when (ex.FieldName == nameof(Phone))
         {
-            ModelState.AddModelError(ex.ReferenceField, ex.Message);
+            ModelState.AddModelError(nameof(Phone), "An account with this phone number already exists.");
         }
     }
 
@@ -82,8 +83,9 @@ public class RegisterForm(
                 .PhoneNumber().WithMessage("Phone number must be in E.164 format");
 
             RuleFor(x => x.DateOfBirth)
-                .NotEmpty().WithMessage("Date of Birth is required");
-
+                .NotEmpty().WithMessage("Date of Birth is required")
+                .LessThan(DateOnly.FromDateTime(DateTime.Today)).WithMessage("Date of Birth must be in the past");
+            
             RuleFor(x => x.Occupation)
                 .NotEmpty().WithMessage("Occupation is required")
                 .MaximumLength(50).WithMessage("Occupation cannot exceed 50 characters");

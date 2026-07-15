@@ -13,7 +13,8 @@ public class AdminProgrammeEditor(
     INgoService ngoService,
     IDonationCauseService causeService,
     IImageService imageService,
-    IValidator<AdminProgrammeEditor> validator) : HydroComponent
+    IValidator<AdminProgrammeEditor> validator
+) : HydroComponent
 {
     public Guid? Id { get; set; }
 
@@ -23,11 +24,13 @@ public class AdminProgrammeEditor(
         public Guid NgoId { get; set; }
         public Guid CauseId { get; set; }
         public string Description { get; set; } = "";
+
         /// <summary>Either typed manually or populated by BindAsync when a file is selected.</summary>
         public string ImageUrl { get; set; } = "";
+
         public string? Location { get; set; }
-        public DateTimeOffset StartTime { get; set; } = DateTimeOffset.UtcNow;
-        public DateTimeOffset? EndTime { get; set; }
+        public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now).AddDays(1);
+        public DateOnly? EndDate { get; set; }
         public decimal? MaxDonation { get; set; }
         public string? NewImageExtension { get; set; }
     }
@@ -50,6 +53,7 @@ public class AdminProgrammeEditor(
         if (Id.HasValue && Id.Value != Guid.Empty)
         {
             var p = await programmeService.GetProgrammeSaveDtoByIdAsync(Id.Value);
+
             if (p != null)
             {
                 Form = new FormModel
@@ -60,8 +64,8 @@ public class AdminProgrammeEditor(
                     Description = p.Description,
                     ImageUrl = p.ImageUrl,
                     Location = p.Location,
-                    StartTime = p.StartTime,
-                    EndTime = p.EndTime,
+                    StartDate = p.StartDate,
+                    EndDate = p.EndDate,
                     MaxDonation = p.MaxDonation
                 };
                 PreviewImageSource = p.ImageUrl;
@@ -88,15 +92,11 @@ public class AdminProgrammeEditor(
             string base64Data = PreviewImageSource!.Split(',')[1];
             byte[] bytes = Convert.FromBase64String(base64Data);
 
-            if (Id.HasValue && Id.Value != Guid.Empty && Form.ImageUrl.Contains("127.0.0.1:9000"))
+            if (Id.HasValue && Id.Value != Guid.Empty && PreviewImageSource.StartsWith("data:"))
             {
-                await imageService.DeleteImageAsync(new Uri(Form.ImageUrl));
+                Form.ImageUrl = await imageService.UpdateImageAsync(Form.ImageUrl, bytes);
             }
-
-            Form.ImageUrl = await imageService.UploadImageAsync(
-                "programmes",
-                $"{Guid.NewGuid()}{Form.NewImageExtension}",
-                bytes);
+            else { Form.ImageUrl = await imageService.UploadImageAsync("programmes", Form.NewImageExtension, bytes); }
         }
 
         var saveDto = new ProgrammeSaveDto(
@@ -105,18 +105,20 @@ public class AdminProgrammeEditor(
             Form.Name,
             Form.ImageUrl,
             Form.Description,
-            Form.StartTime,
-            Form.EndTime,
+            Form.StartDate,
+            Form.EndDate,
             Form.MaxDonation,
-            Form.Location
-        );
+            Form.Location);
 
         try
         {
-            if (Id.HasValue && Id.Value != Guid.Empty) { await programmeService.UpdateProgrammeAsync(Id.Value, saveDto); }
+            if (Id.HasValue && Id.Value != Guid.Empty)
+            {
+                await programmeService.UpdateProgrammeAsync(Id.Value, saveDto);
+            }
             else { await programmeService.CreateProgrammeAsync(saveDto); }
 
-            Redirect(Url.Page("/Admin/Programme/Index"));
+            Client.ExecuteJs($"Swal.fire('Success', 'Programme saved successfully', 'success').then(() => window.location.href = '{Url.Page("/Admin/Programme/Index")}');");
         }
         catch (MissingForeignEntityException ex)
         {
@@ -152,16 +154,21 @@ public class AdminProgrammeEditor(
             RuleFor(x => x.Form.Description)
                 .NotEmpty().WithMessage("Description is required");
 
-            RuleFor(x => x.ImageFile)
-                .NotNull().WithMessage("Image file is required")
-                .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
+            RuleFor(x => x.PreviewImageSource)
+                .NotEmpty().WithMessage("Image file is required")
+                .OverridePropertyName(nameof(ImageFile));
 
             RuleFor(x => x.Form.Location)
                 .MaximumLength(255).WithMessage("Location cannot exceed 255 characters");
 
-            RuleFor(x => x.Form.EndTime)
-                .GreaterThan(x => x.Form.StartTime)
-                .When(x => x.Form.EndTime.HasValue)
+            RuleFor(x => x.Form.StartDate)
+                .GreaterThanOrEqualTo(x => DateOnly.FromDateTime(DateTime.Now))
+                .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty)
+                .WithMessage("Start date cannot be in the past");
+                
+            RuleFor(x => x.Form.EndDate)
+                .GreaterThan(x => x.Form.StartDate)
+                .When(x => x.Form.EndDate.HasValue)
                 .WithMessage("End time must be after start time");
 
             RuleFor(x => x.Form.MaxDonation)

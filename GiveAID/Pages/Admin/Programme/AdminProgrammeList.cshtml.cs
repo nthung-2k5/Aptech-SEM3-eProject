@@ -48,6 +48,7 @@ public class AdminProgrammeList(IProgrammeService programmeService, INgoService 
     {
         await programmeService.DeleteProgrammeAsync(id);
         await LoadDataAsync();
+        Client.ExecuteJs("Swal.fire('Deleted!', 'The record has been deleted.', 'success');");
     }
 
     private async Task LoadDataAsync()

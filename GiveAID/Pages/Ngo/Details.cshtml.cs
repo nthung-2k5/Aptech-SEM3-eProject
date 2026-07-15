@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;
 using Microsoft.AspNetCore.Mvc;
@@ -51,7 +51,7 @@ public class DetailsModel(
     {
         if (User.Identity?.IsAuthenticated != true || !User.IsInRole("Member"))
         {
-            return RedirectToPage("/Login/Index");
+            return RedirectToPage("/Register/Index");
         }
 
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);

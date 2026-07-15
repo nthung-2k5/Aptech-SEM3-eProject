@@ -76,7 +76,7 @@ public class AdminMemberEditor(
                 await memberService.CreateMemberAsync(createDto);
             }
 
-            Redirect(Url.Page("/Admin/Member/Index"));
+            Client.ExecuteJs($"Swal.fire('Success', 'Member saved successfully', 'success').then(() => window.location.href = '{Url.Page("/Admin/Member/Index")}');");
         }
         catch (DuplicateException ex)
         {
@@ -127,7 +127,7 @@ public class AdminMemberEditor(
                 .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
 
             RuleFor(x => x.Form.DateOfBirth)
-                .NotEmpty().WithMessage("Date of birth is required")
+                .NotEmpty().WithMessage("Date of Birth is required")
                 .LessThan(DateOnly.FromDateTime(DateTime.Today))
                 .WithMessage("Date of birth must be in the past");
         }

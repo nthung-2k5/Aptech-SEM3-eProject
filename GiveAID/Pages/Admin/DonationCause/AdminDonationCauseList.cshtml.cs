@@ -36,9 +36,66 @@ public class AdminDonationCauseList(IDonationCauseService donationCauseService) 
         }
         else
         {
-            Causes = allCauses;
+            await causeService.CreateDonationCauseAsync(new DonationCauseSaveDto(NewCauseName.Trim()));
+            IsCreating = false;
+            NewCauseName = string.Empty;
+            ModelState.Clear();
+            await LoadDataAsync();
+            Client.ExecuteJs("Swal.fire('Success', 'Donation cause added successfully', 'success');");
         }
-        
-        TotalCount = Causes.Length;
+        catch (DuplicateException ex)
+        {
+            if (ex.FieldName == nameof(DonationCauseSaveDto.Name))
+            {
+                ModelState.AddModelError(nameof(NewCauseName), "The cause name already exists.");
+            }
+        }
+    }
+
+    public void StartEdit(Guid id, string currentName)
+    {
+        EditingId = id;
+        EditingName = currentName;
+        IsCreating = false;
+        ModelState.Clear();
+    }
+
+    public void CancelEdit()
+    {
+        EditingId = null;
+        EditingName = string.Empty;
+        ModelState.Clear();
+    }
+
+    public async Task SaveEdit()
+    {
+        if (EditingId == null || string.IsNullOrWhiteSpace(EditingName))
+        {
+            return;
+        }
+
+        try
+        {
+            await causeService.UpdateDonationCauseAsync(EditingId.Value, new DonationCauseSaveDto(EditingName.Trim()));
+            EditingId = null;
+            EditingName = string.Empty;
+            ModelState.Clear();
+            await LoadDataAsync();
+            Client.ExecuteJs("Swal.fire('Success', 'Donation cause updated successfully', 'success');");
+        }
+        catch (DuplicateException ex)
+        {
+            if (ex.FieldName == nameof(DonationCauseSaveDto.Name))
+            {
+                ModelState.AddModelError(nameof(EditingName), "The cause name already exists.");
+            }
+        }
+    }
+
+    public async Task Delete(Guid id)
+    {
+        await causeService.DeleteDonationCauseAsync(id);
+        await LoadDataAsync();
+        Client.ExecuteJs("Swal.fire('Deleted!', 'The record has been deleted.', 'success');");
     }
 }

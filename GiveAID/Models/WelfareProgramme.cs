@@ -23,9 +23,9 @@ public class WelfareProgramme : IHasCreatedAt
 
     public string Description { get; set; } = string.Empty;
 
-    public DateTimeOffset StartTime { get; set; }
+    public DateOnly StartDate { get; set; }
 
-    public DateTimeOffset? EndTime { get; set; }
+    public DateOnly? EndDate { get; set; }
 
     [Precision(18, 2)]
     public decimal? MaxDonation { get; set; }

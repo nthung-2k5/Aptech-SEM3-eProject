@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Data;
 
-public class AppDbContext(DbContextOptions<AppDbContext> opts): DbContext(opts)
+public class AppDbContext(DbContextOptions<AppDbContext> opts) : DbContext(opts)
 {
     public DbSet<User> Users => Set<User>();
     public DbSet<Ngo> Ngos => Set<Ngo>();
@@ -19,18 +19,18 @@ public class AppDbContext(DbContextOptions<AppDbContext> opts): DbContext(opts)
     public DbSet<AboutUsSubpage> AboutUsSubpages => Set<AboutUsSubpage>();
     public DbSet<Donation> Donations => Set<Donation>();
     public DbSet<GalleryImage> GalleryImages => Set<GalleryImage>();
-    
+
     public IQueryable<User> Members => Users.Where(u => u.Role == UserRole.Member);
     public IQueryable<User> ActiveMembers => Members.Where(u => !u.IsDeleted);
-    
+
     public IQueryable<Ngo> ActiveNgos => Ngos.Where(u => !u.IsDeleted);
     public IQueryable<DonationCause> ActiveDonationCauses => DonationCauses.Where(u => !u.IsDeleted);
-    
+
     public IQueryable<WelfareProgramme> ActiveWelfareProgrammes => WelfareProgrammes.Where(u => !u.IsDeleted);
-    public IQueryable<WelfareProgramme> AvailableWelfareProgrammes => ActiveWelfareProgrammes.Where(u => u.StartTime >= DateTimeOffset.UtcNow || u.EndTime >= DateTimeOffset.UtcNow);
+    public IQueryable<WelfareProgramme> AvailableWelfareProgrammes => ActiveWelfareProgrammes.Where(u => u.StartDate <= DateOnly.FromDateTime(DateTime.UtcNow) && (!u.EndDate.HasValue || u.EndDate >= DateOnly.FromDateTime(DateTime.UtcNow)));
 
     public IQueryable<Donation> ValidDonations => Donations.Where(u => u.Status == DonationStatus.Completed);
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

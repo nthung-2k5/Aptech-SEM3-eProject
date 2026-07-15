@@ -41,9 +41,9 @@ public class ProgrammesList(IProgrammeService programmeService) : HydroComponent
 
     private async Task LoadProgrammesAsync()
     {
-        var sortParts = SortOption.Split('_');
-        var sortBy = sortParts.Length > 0 ? sortParts[0] : "startdate";
-        var sortDesc = sortParts.Length > 1 ? sortParts[1] == "desc" : true;
+        string[] sortParts = SortOption.Split('_');
+        string sortBy = sortParts.Length > 0 ? sortParts[0] : "startdate";
+        bool sortDesc = sortParts.Length <= 1 || sortParts[1] == "desc";
 
         var query = new ProgrammeQueryParameters
         {

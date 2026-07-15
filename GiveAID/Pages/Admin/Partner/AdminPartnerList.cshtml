@@ -57,15 +57,16 @@
                         else { <span class="text-[#6B6459] text-sm italic">Not provided</span> }
                     </td>
                     <td class="py-4 pr-6">
-                        <div class="flex items-center justify-end gap-1">
+                        <div class="flex items-center justify-end gap-1" x-data="{ confirmDelete() { Swal.fire({ title: 'Are you sure?', text: 'This action cannot be undone.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete it!' }).then((result) => { if (result.isConfirmed) { $refs.deleteBtn.click(); } }) } }">
                             <a asp-page="/Admin/Partner/Editor" asp-route-id="@p.Id" asp-route-mode="view" class="btn btn-ghost btn-sm text-[#1A5C6B] hover:bg-[#1A5C6B]/10" title="View details">
                                 <i class="ph ph-eye text-lg"></i>
                             </a>
                             <a asp-page="/Admin/Partner/Editor" asp-route-id="@p.Id" class="btn btn-ghost btn-sm text-[#C97C2E] hover:bg-[#C97C2E]/10" title="Edit">
                                 <i class="ph ph-pencil-simple text-lg"></i>
                             </a>
-                            <button on:click="@(() => Model.Delete(p.Id))" class="btn btn-ghost btn-sm text-red-500 hover:bg-red-50"
+                            <button @@click.prevent="confirmDelete()" class="btn btn-ghost btn-sm text-red-500 hover:bg-red-50"
                                     title="Delete"><i class="ph ph-trash text-lg"></i></button>
+                            <button x-ref="deleteBtn" on:click="@(() => Model.Delete(p.Id))" style="display:none;"></button>
                         </div>
                     </td>
                 </tr>

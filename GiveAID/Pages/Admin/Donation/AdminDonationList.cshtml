@@ -6,9 +6,10 @@
         <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
             <h3 class="text-[#1C1A17]">Donation Records</h3>
             <div class="flex flex-wrap gap-2">
-              <span class="badge badge-lg bg-[#1A5C6B]/10 text-[#1A5C6B] border-0 font-semibold"><i class="ph ph-receipt mr-1"></i> @Model.TotalCount total</span>
-              <span class="badge badge-lg bg-[#4A8B7F]/10 text-[#4A8B7F] border-0 font-semibold"><i class="ph ph-check-circle mr-1"></i> @Model.Donations.Count(d => d.Status == DonationStatus.Completed) completed</span>
-              <span class="badge badge-lg bg-[#D4183D]/10 text-[#D4183D] border-0 font-semibold"><i class="ph ph-x-circle mr-1"></i> @Model.Donations.Count(d => d.Status == DonationStatus.Void) void</span>
+                <span class="badge badge-lg badge-success text-white border-0 font-semibold">Total Amount: @Model.TotalAmount.ToUsCurrencyString()</span>
+                <span class="badge badge-lg bg-[#1A5C6B]/10 text-[#1A5C6B] border-0 font-semibold"><i class="ph ph-receipt mr-1"></i> @Model.TotalCount total</span>
+                <span class="badge badge-lg bg-[#4A8B7F]/10 text-[#4A8B7F] border-0 font-semibold"><i class="ph ph-check-circle mr-1"></i> @Model.Donations.Count(d => d.Status == DonationStatus.Completed) completed</span>
+                <span class="badge badge-lg bg-[#D4183D]/10 text-[#D4183D] border-0 font-semibold"><i class="ph ph-x-circle mr-1"></i> @Model.Donations.Count(d => d.Status == DonationStatus.Void) void</span>
             </div>
         </div>
 
@@ -129,10 +130,13 @@
                     <td>
                         @if (d.Status == DonationStatus.Completed)
                         {
-                            <button on:click="@(() => Model.Void(d.Id))" class="btn btn-outline btn-error btn-xs"
-                                    title="Void this donation">
-                                <i class="ph ph-x-circle"></i> Void
-                            </button>
+                            <div x-data="{ confirmVoid() { Swal.fire({ title: 'Are you sure?', text: 'This action cannot be undone.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, void it!' }).then((result) => { if (result.isConfirmed) { $refs.voidBtn.click(); } }) } }" class="inline-block">
+                                <button @@click.prevent="confirmVoid()" class="btn btn-outline btn-error btn-xs"
+                                        title="Void this donation">
+                                    <i class="ph ph-x-circle"></i> Void
+                                </button>
+                                <button x-ref="voidBtn" on:click="@(() => Model.Void(d.Id))" style="display:none;"></button>
+                            </div>
                         }
                         else { <span class="text-[#6B6459] text-xs">—</span> }
                     </td>

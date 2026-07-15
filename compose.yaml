@@ -32,26 +32,5 @@
       - ./init.sql:/init.sql
     entrypoint: /bin/bash -c "/opt/mssql-tools18/bin/sqlcmd -S sqlserver -U sa -P GiveAID@123 -i /init.sql -C"
     
-  rustfs:
-    image: rustfs/rustfs:latest
-    restart: unless-stopped
-    ports:
-      - "9000:9000"       # S3 API
-      - "9001:9001"       # Web console
-    environment:
-      RUSTFS_ROOT_USER: giveaid
-      RUSTFS_ROOT_PASSWORD: GiveAID@123
-      RUSTFS_ACCESS_KEY: rustfsadmin
-      RUSTFS_SECRET_KEY: rustfsadmin
-    command: [ "server", "/data", "--console-address", ":9001" ]
-    volumes:
-      - rustfs-data:/data
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
 volumes:
   mssql-data:
-  rustfs-data:

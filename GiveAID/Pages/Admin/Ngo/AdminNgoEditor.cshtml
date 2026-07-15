@@ -6,28 +6,27 @@
     <fieldset disabled="@isViewMode">
         <div class="grid md:grid-cols-2 gap-4 mb-4">
         <div>
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Name <span
-                    class="text-red-500">*</span></label>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Name</label>
             <input type="text" asp-for="Form.Name" bind required class="input w-full"/>
             <span asp-validation-for="Form.Name"></span>
         </div>
         <div>
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Phone Number</label>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Phone Number</label>
             <input type="text" asp-for="Form.PhoneNumber" bind placeholder="Phone number" class="input w-full"/>
             <span asp-validation-for="Form.PhoneNumber"></span>
         </div>
         <div>
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Address</label>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Address</label>
             <input type="text" asp-for="Form.Address" bind placeholder="Location / Address" class="input w-full"/>
             <span asp-validation-for="Form.Address"></span>
         </div>
         <div>
             <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Website</label>
-            <input type="url" asp-for="Form.Website" bind placeholder="https://example.org" class="input w-full"/>
+            <input type="text" asp-for="Form.Website" bind placeholder="https://example.org" class="input w-full"/>
             <span asp-validation-for="Form.Website"></span>
         </div>
         <div class="md:col-span-2">
-            <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Description</label>
+            <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Description</label>
             <textarea asp-for="Form.Description" bind rows="3" placeholder="Describe the NGO's mission and focus areas..."
                       class="textarea w-full"></textarea>
             <span asp-validation-for="Form.Description"></span>
@@ -37,7 +36,7 @@
             <div class="border border-[#E3DDD3] rounded-lg p-3 max-h-48 overflow-y-auto space-y-2">
                 @if (Model.AvailablePartners.Length == 0)
                 {
-                    <p class="text-sm text-[#6B6459]">No partners available. <a href="/Admin/Partner/Editor"
+                    <p class="text-sm text-[#6B6459]">No partners available. <a asp-page="/Admin/Partner/Editor"
                                                                                 class="text-[#1A5C6B] hover:underline">Create
                             one</a></p>
                 }

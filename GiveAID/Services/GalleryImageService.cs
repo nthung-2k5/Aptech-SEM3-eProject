@@ -21,7 +21,7 @@ public class GalleryImageService(AppDbContext dbContext, IImageService imageServ
 
         return rows.Select(i => new GalleryImageDto(
             i.ImageId,
-            ParseUri(i.ImageUrl),
+            i.ImageUrl,
             i.Caption ?? string.Empty,
             i.Programme != null ? (i.Programme.ProgrammeId, i.Programme.Name) : null)).ToArray();
     }
@@ -40,7 +40,7 @@ public class GalleryImageService(AppDbContext dbContext, IImageService imageServ
 
         return new GalleryImageDto(
             row.ImageId,
-            ParseUri(row.ImageUrl),
+            row.ImageUrl,
             row.Caption ?? string.Empty,
             row.Programme != null ? (row.Programme.ProgrammeId, row.Programme.Name) : null);
     }
@@ -59,7 +59,7 @@ public class GalleryImageService(AppDbContext dbContext, IImageService imageServ
 
         var entity = new GalleryImage
         {
-            ImageUrl = image.ImageUri.ToString(),
+            ImageUrl = image.ImageUri,
             Caption = image.Caption,
             ProgrammeId = image.AssociatedProgrammeId
         };
@@ -84,7 +84,7 @@ public class GalleryImageService(AppDbContext dbContext, IImageService imageServ
 
         if (entity == null) { return false; }
 
-        entity.ImageUrl = image.ImageUri.ToString();
+        entity.ImageUrl = image.ImageUri;
         entity.Caption = image.Caption;
         entity.ProgrammeId = image.AssociatedProgrammeId;
 
@@ -96,7 +96,7 @@ public class GalleryImageService(AppDbContext dbContext, IImageService imageServ
     {
         string? imageUrl = await dbContext.GalleryImages.AsNoTracking().Where(i => i.ImageId == id).Select(i => i.ImageUrl).FirstOrDefaultAsync(ct);
 
-        if (!string.IsNullOrEmpty(imageUrl)) { await imageService.DeleteImageAsync(new Uri(imageUrl)); }
+        if (!string.IsNullOrEmpty(imageUrl)) { await imageService.DeleteImageAsync(imageUrl); }
 
         // Hard delete — GalleryImage has no IsDeleted field
         return await dbContext.GalleryImages.Where(i => i.ImageId == id).ExecuteDeleteAsync(ct) > 0;

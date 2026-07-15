@@ -17,7 +17,7 @@ public class NotificationsModel(INotificationService notificationService) : Page
     {
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Register/Index"); }
 
         Notifications = await notificationService.GetUserNotificationsAsync(userId, 50);
         UnreadCount = Notifications.Count(n => !n.IsRead);

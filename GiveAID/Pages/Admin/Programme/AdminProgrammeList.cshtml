@@ -72,7 +72,7 @@
             <tbody>
             @foreach (var p in Model.Programmes)
             {
-                var now = DateTimeOffset.UtcNow;
+                var now = DateOnly.FromDateTime(DateTime.Now);
                 string statusLabel = p.EndDate.HasValue && p.EndDate < now ? "Ended"
                     : p.StartDate > now ? "Upcoming"
                     : "Active";
@@ -102,24 +102,25 @@
                         }
                     </td>
                     <td class="text-sm text-[#6B6459]">
-                        @p.StartDate.Date.ToShortDateString()<br/>
-                        @(p.EndDate.HasValue ? "→ " + p.EndDate.Value.Date.ToShortDateString() : "→ ongoing")
+                        @p.StartDate.ToShortDateString()<br/>
+                        @(p.EndDate.HasValue ? "→ " + p.EndDate.Value.ToShortDateString() : "→ ongoing")
                     </td>
                     <td>
                         <span class="badge @badgeCss">@statusLabel</span>
                     </td>
                     <td>
-                        <div class="flex gap-1">
-                            <a href="/Admin/Programme/Editor/@p.Id?mode=view" class="btn btn-ghost btn-xs text-[#1A5C6B]" title="View details">
+                        <div class="flex gap-1" x-data="{ confirmDelete() { Swal.fire({ title: 'Are you sure?', text: 'This action cannot be undone.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete it!' }).then((result) => { if (result.isConfirmed) { $refs.deleteBtn.click(); } }) } }">
+                            <a asp-page="/Admin/Programme/Editor" asp-route-id="@p.Id" asp-route-mode="view" class="btn btn-ghost btn-xs text-[#1A5C6B]" title="View details">
                                 <i class="ph ph-eye text-lg"></i>
                             </a>
-                            <a href="/Admin/Programme/Editor/@p.Id" class="btn btn-ghost btn-xs text-[#C97C2E]" title="Edit">
+                            <a asp-page="/Admin/Programme/Editor" asp-route-id="@p.Id" class="btn btn-ghost btn-xs text-[#C97C2E]" title="Edit">
                                 <i class="ph ph-pencil-simple text-lg"></i>
                             </a>
-                            <button on:click="@(() => Model.Delete(p.Id))" class="btn btn-ghost btn-xs text-error"
+                            <button @@click.prevent="confirmDelete()" class="btn btn-ghost btn-xs text-error"
                                     title="Delete">
                                 <i class="ph ph-trash text-lg"></i>
                             </button>
+                            <button x-ref="deleteBtn" on:click="@(() => Model.Delete(p.Id))" style="display:none;"></button>
                         </div>
                     </td>
                 </tr>

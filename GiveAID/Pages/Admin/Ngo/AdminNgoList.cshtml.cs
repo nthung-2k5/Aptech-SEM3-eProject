@@ -36,6 +36,7 @@ public class AdminNgoList(INgoService ngoService) : HydroComponent
     {
         await ngoService.DeleteNgoAsync(id);
         await LoadDataAsync();
+        Client.ExecuteJs("Swal.fire('Deleted!', 'The record has been deleted.', 'success');");
     }
 
     private async Task LoadDataAsync()

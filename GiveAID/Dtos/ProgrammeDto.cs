@@ -1,4 +1,5 @@
 using GiveAID.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Dtos;
 
@@ -10,8 +11,8 @@ public record ProgrammeDto(
     string NgoName,
     string NgoDescription,
     string ImageUrl,
-    DateTimeOffset StartDate,
-    DateTimeOffset? EndDate,
+    DateOnly StartDate,
+    DateOnly? EndDate,
     long DonationCount,
     decimal? TargetAmount,
     decimal RaisedAmount,
@@ -25,8 +26,8 @@ public record ProgrammeSaveDto(
     string Name,
     string ImageUrl,
     string Description,
-    DateTimeOffset StartTime,
-    DateTimeOffset? EndTime,
+    DateOnly StartDate,
+    DateOnly? EndDate,
     decimal? MaxDonation,
     string? Location
 );
@@ -41,8 +42,8 @@ public static class ProgrammeMapper
         programme.Ngo.Name,
         programme.Ngo.Description,
         programme.ImageUrl,
-        programme.StartTime,
-        programme.EndTime,
+        programme.StartDate,
+        programme.EndDate,
         programme.ValidDonations.Count(),
         programme.MaxDonation,
         programme.ValidDonations.Sum(d => d.Amount),
@@ -51,7 +52,11 @@ public static class ProgrammeMapper
     );
     
     public static IQueryable<ProgrammeDto> ProjectToDto(this IQueryable<WelfareProgramme> programmes) =>
-        programmes.Select(p => new ProgrammeDto(
+        programmes
+                .Include(p => p.Cause)
+                .Include(p => p.Ngo)
+                .Include(p => p.Donations)
+                .Select(p => new ProgrammeDto(
             p.ProgrammeId,
             p.Name,
             p.Cause.Name,
@@ -59,8 +64,8 @@ public static class ProgrammeMapper
             p.Ngo.Name,
             p.Ngo.Description,
             p.ImageUrl,
-            p.StartTime,
-            p.EndTime,
+            p.StartDate,
+            p.EndDate,
             p.Donations.Count(d => d.Status == DonationStatus.Completed),
             p.MaxDonation,
             p.Donations.Where(d => d.Status == DonationStatus.Completed).Sum(d => d.Amount),
@@ -75,8 +80,8 @@ public static class ProgrammeMapper
         Name = dto.Name,
         ImageUrl = dto.ImageUrl,
         Description = dto.Description,
-        StartTime = dto.StartTime,
-        EndTime = dto.EndTime,
+        StartDate = dto.StartDate,
+        EndDate = dto.EndDate,
         MaxDonation = dto.MaxDonation,
         Location = dto.Location
     };

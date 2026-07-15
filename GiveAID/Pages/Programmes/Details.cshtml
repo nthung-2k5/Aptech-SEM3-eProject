@@ -1,4 +1,5 @@
 @page "/Programmes/{id:guid}"
+@using GiveAID.Models
 @model ProgrammeDetailsModel
 @{
     ViewData["Title"] = Model.Programme?.Name ?? "Programme Details";
@@ -17,18 +18,19 @@
         </div>
         <script>
             setTimeout(() => {
-                var t = document.querySelector('.toast');
+                const t = document.querySelector('.toast');
                 if (t) t.remove();
             }, 3000);
         </script>
     }
 
-    var timeRemaining = p.EndDate - DateTimeOffset.Now;
-    bool isStarted = p.StartDate <= DateTimeOffset.Now;
+    var nowDay = DateOnly.FromDateTime(DateTimeOffset.Now.DateTime);
+    int? timeRemaining = p.EndDate.HasValue ? p.EndDate.Value.DayNumber - nowDay.DayNumber : null;
+    bool isStarted = p.StartDate <= nowDay;
     string? timeText = null;
 
-    if (!isStarted) { timeText = $"Starts in {(p.StartDate - DateTimeOffset.Now).Days} days"; }
-    else if (timeRemaining.HasValue) { timeText = timeRemaining.Value.TotalDays > 0 ? $"{timeRemaining.Value.Days} days left" : "Ended"; }
+    if (!isStarted) { timeText = $"Starts in {p.StartDate.DayNumber - nowDay.DayNumber} days"; }
+    else if (timeRemaining.HasValue) { timeText = timeRemaining.Value > 0 ? $"{timeRemaining.Value} days left" : "Ended"; }
 
     int progress = p.TargetAmount is > 0 ? (int)(p.RaisedAmount / p.TargetAmount.Value * 100) : 0;
     if (progress > 100) progress = 100;
@@ -36,12 +38,13 @@
     <div class="pb-12">
         <!-- Hero Section -->
         <div class="h-[40vh] min-h-[300px] max-h-[500px] relative">
-            <img src="@p.ImageUrl" alt="@p.Name" class="w-full h-full object-cover" />
+            <img src="@(string.IsNullOrWhiteSpace(p.ImageUrl) ? "/images/programme-placeholder.png" : p.ImageUrl)"
+                 onerror="this.onerror=null;this.src='/images/programme-placeholder.png'"
+                 alt="@p.Name" class="w-full h-full object-cover"/>
             <div class="absolute inset-0 bg-black/50"></div>
-
+            
             <div class="absolute top-6 left-6 md:left-12 z-10">
-                <a href="/Programmes"
-                   class="btn btn-sm bg-white/20 hover:bg-white/40 border-none text-white backdrop-blur-md rounded-full shadow-lg pr-4">
+                <a asp-page="/Programmes/Index" class="btn btn-sm bg-white/20 hover:bg-white/40 border-none text-white backdrop-blur-md rounded-full shadow-lg pr-4">
                     <i class="ph ph-arrow-left"></i> Back to Programmes
                 </a>
             </div>
@@ -60,7 +63,7 @@
                         <div class="flex items-center gap-2">
                             <i class="ph ph-calendar-blank text-xl"></i>
                             <span class="text-lg">
-                                @p.StartDate.ToString("MMM dd, yyyy") @(p.EndDate.HasValue ? $"-                           {p.EndDate.Value.ToString("MMM dd, yyyy")}" : "(Ongoing)")
+                                @p.StartDate.ToString("MMM dd, yyyy") @(p.EndDate.HasValue ? $"- {p.EndDate.Value.ToString("MMM dd, yyyy")}" : "(Ongoing)")
                             </span>
                         </div>
                         @if (timeText != null)
@@ -133,14 +136,13 @@
                         </div>
 
                         @{
-                            bool isEnded = p.EndDate.HasValue && p.EndDate.Value <= DateTimeOffset.Now;
+                            bool isEnded = p.EndDate.HasValue && p.EndDate.Value <= nowDay;
                             bool isQuotaReached = p.TargetAmount.HasValue && p.RaisedAmount >= p.TargetAmount.Value;
                         }
 
-                        @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
+                        @if (User.IsInRole(nameof(UserRole.Admin)))
                         {
-                            <a href="/Admin/Programme/Editor/@p.Id"
-                               class="btn bg-[#1A5C6B] hover:bg-[#154D5A] text-white btn-block btn-xl border-none">
+                            <a asp-page="/Admin/Programme/Editor" asp-route-id="@p.Id" class="btn bg-[#1A5C6B] hover:bg-[#154D5A] text-white btn-block btn-xl border-none">
                                 <i class="ph ph-pencil-simple text-xl"></i> Edit Programme
                             </a>
                         }
@@ -160,12 +162,11 @@
                             }
                             else
                             {
-                                <a asp-page="/Donate/Index" asp-route-programmeId="@p.Id"
-                                   class="btn btn-secondary btn-block btn-xl">
+                                <a asp-page="/Donate/Index" asp-route-programmeId="@p.Id" class="btn btn-secondary btn-block btn-xl">
                                     Donate Now
                                 </a>
                             }
-
+                            
                             <button class="btn btn-outline btn-block mt-4" onclick="inviteModal.showModal()">
                                 <i class="ph ph-envelope-simple text-xl"></i>
                                 Invite Friends

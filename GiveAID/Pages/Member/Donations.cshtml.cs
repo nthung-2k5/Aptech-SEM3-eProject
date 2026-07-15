@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using GiveAID.Data;
 using GiveAID.Dtos;
 using GiveAID.Services;
@@ -19,7 +19,7 @@ public class DonationsModel(IDonationService service) : PageModel
     {
         string? userIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Login/Index"); }
+        if (!Guid.TryParse(userIdStr, out var userId)) { return RedirectToPage("/Register/Index"); }
 
         Donations = await service.GetDonationsByUserAsync(userId, ct);
 

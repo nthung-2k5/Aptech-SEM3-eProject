@@ -36,10 +36,10 @@ public class UserInterestService(AppDbContext dbContext, INotificationService no
 
     public async Task NotifyInterestedUsersAsync(WelfareProgramme programme, CancellationToken ct = default)
     {
-        var interestedUsers = dbContext.UserInterests.AsNoTracking().Include(ui => ui.Ngo)
-                .Where(ui => ui.NgoId == programme.NgoId).Select(ui => new { ui.UserId, ui.Ngo }).AsAsyncEnumerable();
+        var interestedUsers = await dbContext.UserInterests.AsNoTracking().Include(ui => ui.Ngo)
+                .Where(ui => ui.NgoId == programme.NgoId).Select(ui => new { ui.UserId, ui.Ngo }).ToArrayAsync(ct);
 
-        await foreach (var interest in interestedUsers)
+        foreach (var interest in interestedUsers)
         {
             await notificationService.CreateNotificationAsync(
                 interest.UserId,

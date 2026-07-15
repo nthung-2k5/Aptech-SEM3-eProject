@@ -1,4 +1,4 @@
-﻿using GiveAID.Data;
+using GiveAID.Data;
 using GiveAID.Dtos;
 using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;

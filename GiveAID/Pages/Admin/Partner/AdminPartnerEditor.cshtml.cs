@@ -18,8 +18,10 @@ public class AdminPartnerEditor(
     public class FormModel
     {
         public string Name { get; set; } = "";
+
         /// <summary>Either typed manually or populated when a file is uploaded via BindAsync.</summary>
         public string LogoUrl { get; set; } = "";
+
         public string WebsiteLink { get; set; } = "";
         public string? NewImageExtension { get; set; }
     }
@@ -69,16 +71,12 @@ public class AdminPartnerEditor(
         {
             string base64Data = PreviewImageSource!.Split(',')[1];
             byte[] bytes = Convert.FromBase64String(base64Data);
-            
-            if (Id.HasValue && Id.Value != Guid.Empty && Form.LogoUrl.Contains("127.0.0.1:9000"))
+
+            if (Id.HasValue && Id.Value != Guid.Empty && PreviewImageSource.StartsWith("data:"))
             {
-                await imageService.DeleteImageAsync(new Uri(Form.LogoUrl));
+                Form.LogoUrl = await imageService.UpdateImageAsync(Form.LogoUrl, bytes);
             }
-            
-            Form.LogoUrl = await imageService.UploadImageAsync(
-                "partners",
-                $"{Guid.NewGuid()}{Form.NewImageExtension}",
-                bytes);
+            else { Form.LogoUrl = await imageService.UploadImageAsync("partners", Form.NewImageExtension, bytes); }
         }
 
         var saveDto = new PartnerSaveDto(Form.Name, Form.LogoUrl, Form.WebsiteLink);
@@ -88,7 +86,7 @@ public class AdminPartnerEditor(
             if (Id.HasValue && Id.Value != Guid.Empty) { await partnerService.UpdatePartnerAsync(Id.Value, saveDto); }
             else { await partnerService.CreatePartnerAsync(saveDto); }
 
-            Redirect(Url.Page("/Admin/Partner/Index"));
+            Client.ExecuteJs($"Swal.fire('Success', 'Partner saved successfully', 'success').then(() => window.location.href = '{Url.Page("/Admin/Partner/Index")}');");
         }
         catch (DuplicateException ex)
         {
@@ -108,12 +106,13 @@ public class AdminPartnerEditor(
                 .NotEmpty().WithMessage("Partner name is required")
                 .MaximumLength(255).WithMessage("Name cannot exceed 255 characters");
 
-            RuleFor(x => x.ImageFile)
+            RuleFor(x => x.PreviewImageSource)
                 .NotNull().WithMessage("Logo file is required")
-                .When(x => !x.Id.HasValue || x.Id.Value == Guid.Empty);
+                .OverridePropertyName(nameof(Form.LogoUrl));
 
             RuleFor(x => x.Form.WebsiteLink)
                 .NotEmpty().WithMessage("Website link is required")
+                .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _)).WithMessage("Invalid website link")
                 .MaximumLength(1024).WithMessage("Website link cannot exceed 1024 characters");
         }
     }

@@ -4,9 +4,7 @@ namespace GiveAID.Services.Abstractions;
 
 public interface IImageService
 {
-    Task EnsureBucketExists();
-    // Task<Uri> GetImageUriAsync(string key);
-    Task<string> UploadImageAsync(string folder, string filename, byte[] fileBytes);
-    Task UpdateImageAsync(Uri imageUrl, byte[] fileBytes);
-    Task DeleteImageAsync(Uri imageUrl);
+    Task<string> UploadImageAsync(string folder, string extension, byte[] fileBytes);
+    Task<string> UpdateImageAsync(string imageUrl, byte[] fileBytes);
+    Task DeleteImageAsync(string imageUrl);
 }

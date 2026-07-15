@@ -35,24 +35,63 @@
             </tr>
             </thead>
             <tbody>
-            @foreach (Dtos.DonationCauseDto c in Model.Causes)
-            {
-                <tr>
-                    <td class="font-semibold">@c.Name</td>
-                    <td>
-                        <div class="flex gap-1">
-                            <a asp-page="/Admin/DonationCause/Editor" asp-route-id="@c.Id" asp-route-mode="view" class="btn btn-ghost btn-xs text-[#1A5C6B]" title="View details">
-                                <i class="ph ph-eye text-lg"></i>
-                            </a>
-                            <a asp-page="/Admin/DonationCause/Editor" asp-route-id="@c.Id" class="btn btn-ghost btn-xs text-[#C97C2E]" title="Edit">
-                                <i class="ph ph-pencil-simple text-lg"></i>
-                            </a>
-                            <button on:click="@(() => Model.Delete(c.Id))" class="btn btn-ghost btn-xs text-error"
-                                    title="Delete"><i class="ph ph-trash text-lg"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            }
+                @if (Model.IsCreating)
+                {
+                    <tr class="bg-base-50">
+                        <td>
+                            <input type="text" asp-for="NewCauseName" bind class="input input-bordered input-sm w-full max-w-md" placeholder="Enter cause name..." autofocus />
+                            <span asp-validation-for="NewCauseName" class="text-error text-xs block mt-1"></span>
+                        </td>
+                        <td>
+                            <div class="flex gap-1">
+                                <button on:click="@(() => Model.SaveNew())" class="btn btn-success btn-xs" title="Save">
+                                    <i class="ph ph-check text-white"></i>
+                                </button>
+                                <button on:click="@(() => Model.CancelCreate())" class="btn btn-ghost btn-xs text-error" title="Cancel">
+                                    <i class="ph ph-x"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+
+                @foreach (var cause in Model.Causes)
+                {
+                    <tr>
+                        @if (Model.EditingId == cause.Id)
+                        {
+                            <td>
+                                <input type="text" asp-for="EditingName" bind class="input input-bordered input-sm w-full max-w-md" autofocus />
+                                <span asp-validation-for="EditingName" class="text-error text-xs block mt-1"></span>
+                            </td>
+                            <td>
+                                <div class="flex gap-1">
+                                    <button on:click="@(() => Model.SaveEdit())" class="btn btn-success btn-xs" title="Save">
+                                        <i class="ph ph-check text-white"></i>
+                                    </button>
+                                    <button on:click="@(() => Model.CancelEdit())" class="btn btn-ghost btn-xs text-error" title="Cancel">
+                                        <i class="ph ph-x"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        }
+                        else
+                        {
+                            <td class="font-medium">@cause.Name</td>
+                            <td>
+                                <div class="flex gap-1" x-data="{ confirmDelete() { Swal.fire({ title: 'Are you sure?', text: 'This action cannot be undone.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete it!' }).then((result) => { if (result.isConfirmed) { $refs.deleteBtn.click(); } }) } }">
+                                    <button on:click="@(() => Model.StartEdit(cause.Id, cause.Name))" class="btn btn-ghost btn-xs" title="Edit">
+                                        <i class="ph ph-pencil-simple"></i>
+                                    </button>
+                                    <button @@click.prevent="confirmDelete()" class="btn btn-ghost btn-xs text-error" title="Delete">
+                                        <i class="ph ph-trash"></i>
+                                    </button>
+                                    <button x-ref="deleteBtn" on:click="@(() => Model.Delete(cause.Id))" style="display:none;"></button>
+                                </div>
+                            </td>
+                        }
+                    </tr>
+                }
             </tbody>
         </table>
         @if (Model.Causes.Length == 0)

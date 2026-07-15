@@ -36,6 +36,7 @@ public class AdminMemberList(IMemberService memberService) : HydroComponent
     {
         await memberService.DeleteMemberAsync(id);
         await LoadDataAsync();
+        Client.ExecuteJs("Swal.fire('Deleted!', 'The record has been deleted.', 'success');");
     }
 
     public bool OpenModal { get; set; }

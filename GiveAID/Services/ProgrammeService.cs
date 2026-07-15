@@ -26,12 +26,12 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
 
         if (!string.IsNullOrWhiteSpace(query.StatusFilter))
         {
-            var now = DateTimeOffset.UtcNow;
+            var now = DateOnly.FromDateTime(DateTime.UtcNow);
             q = query.StatusFilter switch
             {
-                "Active" => q.Where(p => p.StartTime <= now && (!p.EndTime.HasValue || p.EndTime > now)),
-                "Upcoming" => q.Where(p => p.StartTime > now),
-                "Ended" => q.Where(p => p.EndTime.HasValue && p.EndTime < now),
+                "Active" => q.Where(p => p.StartDate <= now && (!p.EndDate.HasValue || p.EndDate > now)),
+                "Upcoming" => q.Where(p => p.StartDate > now),
+                "Ended" => q.Where(p => p.EndDate.HasValue && p.EndDate < now),
                 _ => q
             };
         }
@@ -42,9 +42,9 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
         {
             "name" => query.SortDescending ? q.OrderByDescending(p => p.Name) : q.OrderBy(p => p.Name),
             "target" => query.SortDescending ? q.OrderByDescending(p => p.MaxDonation) : q.OrderBy(p => p.MaxDonation),
-            "startdate" => query.SortDescending ? q.OrderByDescending(p => p.StartTime) : q.OrderBy(p => p.StartTime),
-            "enddate" => query.SortDescending ? q.OrderByDescending(p => p.EndTime) : q.OrderBy(p => p.EndTime),
-            _ => query.SortDescending ? q.OrderByDescending(p => p.StartTime) : q.OrderBy(p => p.StartTime)
+            "startdate" => query.SortDescending ? q.OrderByDescending(p => p.StartDate) : q.OrderBy(p => p.StartDate),
+            "enddate" => query.SortDescending ? q.OrderByDescending(p => p.EndDate) : q.OrderBy(p => p.EndDate),
+            _ => query.SortDescending ? q.OrderByDescending(p => p.StartDate) : q.OrderBy(p => p.StartDate)
         };
 
         var items = await q.Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
@@ -94,9 +94,9 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
         {
             "name" => parameters.SortDescending ? query.OrderByDescending(p => p.Name) : query.OrderBy(p => p.Name),
             "target" => parameters.SortDescending ? query.OrderByDescending(p => p.MaxDonation) : query.OrderBy(p => p.MaxDonation),
-            "startdate" => parameters.SortDescending ? query.OrderByDescending(p => p.StartTime) : query.OrderBy(p => p.StartTime),
-            "enddate" => parameters.SortDescending ? query.OrderByDescending(p => p.EndTime) : query.OrderBy(p => p.EndTime),
-            _ => parameters.SortDescending ? query.OrderByDescending(p => p.StartTime) : query.OrderBy(p => p.StartTime)
+            "startdate" => parameters.SortDescending ? query.OrderByDescending(p => p.StartDate) : query.OrderBy(p => p.StartDate),
+            "enddate" => parameters.SortDescending ? query.OrderByDescending(p => p.EndDate) : query.OrderBy(p => p.EndDate),
+            _ => parameters.SortDescending ? query.OrderByDescending(p => p.StartDate) : query.OrderBy(p => p.StartDate)
         };
 
         return query.Skip((parameters.PageNumber - 1) * parameters.PageSize).Take(parameters.PageSize);
@@ -112,7 +112,7 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
     {
         return await context.ActiveWelfareProgrammes.AsNoTracking()
             .Where(p => p.ProgrammeId == id)
-            .Select(p => new ProgrammeSaveDto(p.NgoId, p.CauseId, p.Name, p.ImageUrl, p.Description, p.StartTime, p.EndTime, p.MaxDonation, p.Location))
+            .Select(p => new ProgrammeSaveDto(p.NgoId, p.CauseId, p.Name, p.ImageUrl, p.Description, p.StartDate, p.EndDate, p.MaxDonation, p.Location))
             .FirstOrDefaultAsync(ct);
     }
 
@@ -137,7 +137,7 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
 
         await userInterestService.NotifyInterestedUsersAsync(programme, ct);
 
-        return programme.ToDto();
+        return await context.AvailableWelfareProgrammes.AsNoTracking().ProjectToDto().FirstAsync(ct);
     }
 
     public async Task UpdateProgrammeAsync(Guid id, ProgrammeSaveDto dto, CancellationToken ct = default)
@@ -163,8 +163,8 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
         programme.Name = dto.Name;
         programme.ImageUrl = dto.ImageUrl;
         programme.Description = dto.Description;
-        programme.StartTime = dto.StartTime;
-        programme.EndTime = dto.EndTime;
+        programme.StartDate = dto.StartDate;
+        programme.EndDate = dto.EndDate;
         programme.MaxDonation = dto.MaxDonation;
         programme.Location = dto.Location;
 

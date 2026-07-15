@@ -1,30 +1,114 @@
-﻿@page
+@page
 @model SuccessModel
 @{
     ViewData["Title"] = "Donation Successful";
 }
 
-<div class="py-20 bg-base-200 min-h-[70vh] flex items-center justify-center">
-    <div class="max-w-md mx-auto px-6 text-center">
-        <div class="card bg-base-100 shadow-xl border border-base-200">
-            <div class="card-body items-center">
-                <div class="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center mb-6">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-success" fill="none"
-                         viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+<style>
+    @@keyframes checkmark {
+        0% { transform: scale(0); opacity: 0; }
+        50% { transform: scale(1.2); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    @@keyframes slideUpFade {
+        0% { transform: translateY(20px); opacity: 0; }
+        100% { transform: translateY(0); opacity: 1; }
+    }
+    .animate-checkmark {
+        animation: checkmark 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+    .animate-slide-up-1 {
+        opacity: 0;
+        animation: slideUpFade 0.6s ease-out 0.2s forwards;
+    }
+    .animate-slide-up-2 {
+        opacity: 0;
+        animation: slideUpFade 0.6s ease-out 0.4s forwards;
+    }
+    .animate-slide-up-3 {
+        opacity: 0;
+        animation: slideUpFade 0.6s ease-out 0.6s forwards;
+    }
+    .success-bg-gradient {
+        background: radial-gradient(circle at center, rgba(34, 197, 94, 0.08) 0%, transparent 70%);
+    }
+</style>
+
+<div class="relative min-h-[80vh] flex items-center justify-center overflow-hidden py-6">
+    <!-- Decorative background elements -->
+    <div class="absolute inset-0 success-bg-gradient pointer-events-none"></div>
+    <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-success/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl pointer-events-none"></div>
+
+    <div class="relative w-full max-w-4xl mx-auto px-4 z-10">
+        <div class="card bg-base-100 shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-base-200/60 backdrop-blur-sm relative overflow-hidden">
+            <!-- Top decorative border -->
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-success to-primary"></div>
+            
+            <div class="card-body p-8 sm:p-12 items-center text-center">
+                <!-- Checkmark Icon -->
+                <div class="w-24 h-24 rounded-full bg-success/10 flex items-center justify-center mb-8 animate-checkmark ring-4 ring-success/20 ring-offset-4 ring-offset-base-100">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-success drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
 
-                <h1 class="text-3xl font-bold mb-2">Thank You!</h1>
-                <p class="text-base-content/80 mb-6">Your generous donation has been processed successfully.</p>
-
-                <div class="bg-base-200 rounded-box p-4 w-full mb-8 text-left border border-base-300">
-                    <span class="block text-sm font-semibold opacity-70 mb-1">Transaction ID</span>
-                    <span class="block font-mono text-sm break-all font-bold">@Model.TransactionId</span>
+                <div class="animate-slide-up-1 w-full mb-8">
+                    <h1 class="text-4xl font-extrabold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-success to-primary">Thank You!</h1>
+                    <p class="text-base-content/75 text-lg font-medium leading-relaxed">Your generous donation has been processed successfully. You're making a real difference!</p>
                 </div>
 
-                <a href="/" class="btn btn-primary w-full">Return Home</a>
+                <!-- Transaction Details Card -->
+                <div class="animate-slide-up-2 w-full bg-base-200/50 rounded-2xl p-6 mb-6 border border-base-300 shadow-inner relative overflow-hidden group hover:bg-base-200/80 transition-colors duration-300">
+                    <div class="absolute -right-6 -top-6 w-20 h-20 bg-success/10 rounded-full blur-2xl group-hover:bg-success/20 transition-colors duration-300"></div>
+                    <div class="flex flex-col items-center justify-center relative z-10">
+                        @if (Model.Donation != null)
+                        {
+                            <span class="text-xs uppercase tracking-widest font-bold text-base-content/50 mb-1">Amount Donated</span>
+                            <div class="text-4xl font-extrabold text-success tracking-tight mb-4 drop-shadow-sm">
+                                $@Model.Donation.Amount.ToString("0.00")
+                            </div>
+
+                            @if (Model.Donation.Ngo != null)
+                            {
+                                <div class="text-center">
+                                    <span class="text-sm font-semibold text-base-content/60">To NGO:</span>
+                                    <span class="font-bold ml-1 text-base-content">@Model.Donation.Ngo.Name</span>
+                                </div>
+                            }
+                            else if (Model.Donation.Programme != null)
+                            {
+                                <div class="text-center">
+                                    <span class="text-sm font-semibold text-base-content/60">For Programme:</span>
+                                    <span class="font-bold ml-1 text-base-content">@Model.Donation.Programme.Name</span>
+                                </div>
+                            }
+                            else if (Model.Donation.Cause != null)
+                            {
+                                <div class="text-center">
+                                    <span class="text-sm font-semibold text-base-content/60">For Cause:</span>
+                                    <span class="font-bold ml-1 text-base-content">@Model.Donation.Cause.Name</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+
+                <div class="animate-slide-up-3 w-full">
+                    <a asp-page="/Index" class="btn btn-primary btn-lg w-full font-bold tracking-wide">
+                        <i class="ph-fill ph-house"></i>
+                        Return Home
+                    </a>
+                </div>
             </div>
+        </div>
+        
+        <!-- Trust badge -->
+        <div class="text-center mt-8 animate-slide-up-3 opacity-60 flex justify-center items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-success" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-sm font-medium">Securely processed transaction</span>
         </div>
     </div>
 </div>

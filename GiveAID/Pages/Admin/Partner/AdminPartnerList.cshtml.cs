@@ -36,6 +36,7 @@ public class AdminPartnerList(IPartnerService partnerService) : HydroComponent
     {
         await partnerService.DeletePartnerAsync(id);
         await LoadDataAsync();
+        Client.ExecuteJs("Swal.fire('Deleted!', 'The record has been deleted.', 'success');");
     }
 
     private async Task LoadDataAsync()

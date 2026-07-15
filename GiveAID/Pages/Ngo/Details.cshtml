@@ -1,4 +1,5 @@
 @page "{id:guid}"
+@using GiveAID.Models
 @model DetailsModel
 @{
     ViewData["Title"] = Model.Ngo?.Name ?? "NGO Details";
@@ -183,9 +184,9 @@ else
                         <p class="text-sm text-[#6B6459] mb-6 leading-relaxed">
                             Help <strong class="text-[#1C1A17]">@Model.Ngo.Name</strong> continue their mission by making a direct donation today.
                         </p>
-                        @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
+                        @if (User.IsInRole(nameof(UserRole.Admin)))
                         {
-                            <a href="/Admin/Ngo/Editor/@Model.Ngo.Id"
+                            <a asp-page="/Admin/Ngo/Editor" asp-route-id="@Model.Ngo.Id"
                                class="w-full flex items-center justify-center gap-2 py-4 bg-[#1A5C6B] hover:bg-[#154D5A] text-white font-bold rounded-xl transition-colors text-base no-underline">
                                 <i class="ph-fill ph-pencil-simple text-xl"></i> Edit NGO details
                             </a>

@@ -20,12 +20,13 @@ public class GalleryBoard(
     public string Filter { get; set; } = "All";
 
     public GalleryImageDto[] FilteredImages =>
-        Filter == "All" 
-            ? Images 
-            : Images.Where(img => 
-                img.AssociatedProgramme.HasValue && 
-                Programmes.FirstOrDefault(p => p.Id == img.AssociatedProgramme.Value.Id)?.Cause == Filter
-              ).ToArray();
+            Filter == "All"
+                    ? Images
+                    : Images.Where(img =>
+                                    img.AssociatedProgramme.HasValue &&
+                                    Programmes.FirstOrDefault(p => p.Id == img.AssociatedProgramme.Value.Id)?.Cause ==
+                                    Filter)
+                            .ToArray();
 
     public bool IsModalOpen { get; set; }
     public Guid? EditingId { get; set; }
@@ -37,7 +38,7 @@ public class GalleryBoard(
         public Guid? AssociatedProgrammeId { get; set; }
         public string? NewImageExtension { get; set; }
     }
-        
+
     [Transient]
     public IFormFile? ImageFile { get; set; }
 
@@ -53,7 +54,7 @@ public class GalleryBoard(
     }
 
     public void SetFilter(string filter) { Filter = filter; }
-    
+
     public override async Task BindAsync(PropertyPath property, object value)
     {
         if (property.Name == nameof(ImageFile))
@@ -86,7 +87,7 @@ public class GalleryBoard(
                 Caption = image.Caption,
                 AssociatedProgrammeId = image.AssociatedProgramme?.Id
             };
-            PreviewImageSource = image.ImageUri.ToString();
+            PreviewImageSource = image.ImageUri;
             IsModalOpen = true;
         }
     }
@@ -98,28 +99,24 @@ public class GalleryBoard(
         if (!this.Validate(validator)) { return; }
 
         string imageUri = "";
-        
+
         if (EditingId.HasValue)
         {
             var existing = await galleryService.GetImageByIdAsync(EditingId.Value);
 
-            if (existing != null) { imageUri = existing.ImageUri.ToString(); }
+            if (existing != null) { imageUri = existing.ImageUri; }
         }
 
         if (Form.NewImageExtension != null)
         {
             string base64Data = PreviewImageSource!.Split(',')[1];
             byte[] bytes = Convert.FromBase64String(base64Data);
-            
-            if (EditingId.HasValue && EditingId.Value != Guid.Empty && imageUri.Contains("127.0.0.1:9000"))
-            {
-                await imageService.DeleteImageAsync(new Uri(imageUri));
-            }
 
-            imageUri = await imageService.UploadImageAsync(
-                "gallery",
-                $"{Guid.NewGuid()}{Form.NewImageExtension}",
-                bytes);
+            if (EditingId.HasValue && EditingId.Value != Guid.Empty && PreviewImageSource.StartsWith("data:"))
+            {
+                imageUri = await imageService.UpdateImageAsync(imageUri, bytes);
+            }
+            else { imageUri = await imageService.UploadImageAsync("gallery", Form.NewImageExtension, bytes); }
         }
 
         var saveDto = new GalleryImageSaveDto(imageUri, Form.Caption, Form.AssociatedProgrammeId);
@@ -129,12 +126,14 @@ public class GalleryBoard(
 
         IsModalOpen = false;
         await LoadData();
+        Client.ExecuteJs("Swal.fire('Success', 'Gallery image saved successfully', 'success');");
     }
 
     public async Task Delete(Guid id)
     {
         await galleryService.DeleteImageAsync(id);
         await LoadData();
+        Client.ExecuteJs("Swal.fire('Deleted!', 'The record has been deleted.', 'success');");
     }
 
     public class Validator : AbstractValidator<GalleryBoard>

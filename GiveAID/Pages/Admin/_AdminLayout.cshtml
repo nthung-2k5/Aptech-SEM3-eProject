@@ -21,7 +21,7 @@
                 </div>
                 <h1 class="text-[#1C1A17]">Give-AID Control Panel</h1>
             </div>
-            <a href="/" class="text-sm text-[#6B6459] hover:text-[#1A5C6B] flex items-center gap-1 no-underline">
+            <a asp-page="/Index" class="text-sm text-[#6B6459] hover:text-[#1A5C6B] flex items-center gap-1 no-underline">
                 <i class="ph ph-caret-left"></i> Back to Site
             </a>
         </section>
@@ -55,10 +55,6 @@
             <a asp-page="/Admin/Programme/Index"
                data-active="@IsActive("/Admin/Programme")">
                 <i class="ph ph-flag"></i>Programmes
-            </a>
-            <a asp-page="/Admin/DonationCause/Index"
-               data-active="@IsActive("/Admin/DonationCause")">
-                <i class="ph ph-tag"></i>Causes
             </a>
             <a asp-page="/Admin/UserQuery/Index"
                data-active="@IsActive("/Admin/UserQuery")">

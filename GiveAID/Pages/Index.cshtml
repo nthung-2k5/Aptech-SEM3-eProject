@@ -38,7 +38,7 @@
                     {
                         var cause = Model.Causes[i];
                         var theme = themes[i % themes.Length];
-                        <a href="/Programmes" onclick="localStorage.setItem('activeCause', '@cause.Id')"
+                        <a asp-page="/Programmes/Index" onclick="localStorage.setItem('activeCause', '@cause.Id')"
                            class="btn border-none @theme rounded-full px-8 h-12 font-bold transition-all duration-300 snap-align-start shrink-0 no-underline shadow-sm hover:shadow-md hover:-translate-y-0.5">
                             @cause.Name
                         </a>
@@ -98,9 +98,16 @@
             <p class="text-white/80 text-lg mb-8">Register today to donate, invite friends, and stay connected with
                 every programme we run.</p>
             <div class="flex flex-wrap justify-center gap-4">
-                <a asp-page="/Register"
-                   class="px-8 py-4 bg-white text-[#C97C2E] font-bold rounded hover:bg-[#F6F1E9] transition-colors no-underline">
-                    Create an Account
+                @if (User.Identity?.IsAuthenticated != true)
+                {
+                    <a asp-page="/Register/Index"
+                       class="px-8 py-4 bg-white text-[#C97C2E] font-bold rounded hover:bg-[#F6F1E9] transition-colors no-underline">
+                        Create an Account
+                    </a>
+                }
+                <a asp-page="/Programmes/Index"
+                   class="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded hover:bg-white/10 transition-colors no-underline">
+                    Donate Directly
                 </a>
                 <a asp-page="/Programmes/Index"
                    class="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded hover:bg-white/10 transition-colors no-underline">
