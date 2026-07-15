@@ -32,6 +32,7 @@ public class DonateForm(
     public string CVV { get; set; } = string.Empty;
 
     public string TargetDescription { get; set; } = "General Donation";
+    public decimal? MaxAllowedAmount { get; set; }
 
     // Populated when donating to an NGO so the user can pick a cause inline
     public DonationCauseDto[] Causes { get; set; } = [];
@@ -58,6 +59,14 @@ public class DonateForm(
         if (property.Name == nameof(CauseId))
         {
             await LoadTargetDescriptionAsync();
+        }
+
+        if (property.Name == nameof(Amount))
+        {
+            if (MaxAllowedAmount.HasValue && Amount > MaxAllowedAmount.Value)
+            {
+                Amount = MaxAllowedAmount.Value;
+            }
         }
     }
 
@@ -105,6 +114,14 @@ public class DonateForm(
         {
             var prog = await programmeService.GetProgrammeByIdAsync(ProgrammeId.Value);
             TargetDescription = prog != null ? $"Programme: {prog.Name}" : "Unknown Programme";
+
+            if (prog != null && prog.TargetAmount.HasValue)
+            {
+                MaxAllowedAmount = prog.TargetAmount.Value - prog.RaisedAmount;
+                if (MaxAllowedAmount < 0) MaxAllowedAmount = 0;
+
+                if (Amount > MaxAllowedAmount.Value) Amount = MaxAllowedAmount.Value;
+            }
         }
         else if (NgoId.HasValue && NgoId.Value != Guid.Empty)
         {
@@ -129,7 +146,9 @@ public class DonateForm(
         public Validator()
         {
             RuleFor(x => x.Amount)
-                .GreaterThanOrEqualTo(1).WithMessage("Amount must be at least 1");
+                .GreaterThanOrEqualTo(1).WithMessage("Amount must be at least 1")
+                .Must((form, amount) => !form.MaxAllowedAmount.HasValue || amount <= form.MaxAllowedAmount.Value)
+                .WithMessage(form => $"Amount cannot exceed {form.MaxAllowedAmount:C}");
 
             RuleFor(x => x.CardNumber)
                 .NotEmpty().WithMessage("Card number is required")
