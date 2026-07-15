@@ -1,38 +1,28 @@
-@model AdminDonationCauseList
+@model GiveAID.Pages.Admin.DonationCause.AdminDonationCauseList
 
 <div class="bg-white rounded-xl border border-[#E3DDD3] overflow-hidden">
     <div class="p-6 border-b border-[#E3DDD3]">
-        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
-            <div class="flex flex-wrap items-center gap-2">
-              <h3 class="text-[#1C1A17]">Donation Causes</h3>
-              <span class="badge badge-lg bg-[#1A5C6B]/10 text-[#1A5C6B] border-0 font-semibold"><i class="ph ph-tag mr-1"></i> @Model.TotalCount total</span>
-              <span class="badge badge-lg bg-[#C97C2E]/10 text-[#C97C2E] border-0 font-semibold"><i class="ph ph-funnel mr-1"></i> @Model.Causes.Length showing</span>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <h3 class="text-[#1C1A17] font-semibold text-lg">Donation Causes</h3>
+                <span class="badge badge-ghost text-sm font-medium">@Model.Causes.Length Causes</span>
             </div>
-            <a asp-page="/Admin/DonationCause/Editor" class="btn btn-primary btn-sm">
-                <i class="ph ph-plus"></i> Add Cause
-            </a>
-        </div>
-
-        <div class="flex flex-wrap gap-3 items-end">
-            <div class="flex-1 min-w-[200px]">
-                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Search by Name</label>
-                <label class="input input-bordered input-sm flex items-center gap-2 w-full">
-                    <i class="ph ph-magnifying-glass text-[#6B6459]"></i>
-                    <input type="text" asp-for="SearchTerm" bind:keydown.debounce.300ms
-                           on:input="@(() => Model.Search())"
-                           placeholder="Cause name…" />
-                </label>
-            </div>
+            @if (!Model.IsCreating)
+            {
+                <button on:click="@(() => Model.StartCreate())" class="btn btn-primary btn-sm">
+                    <i class="ph ph-plus"></i> Add Cause
+                </button>
+            }
         </div>
     </div>
 
     <div class="overflow-x-auto">
         <table class="table w-full">
             <thead>
-            <tr>
-                <th>Name</th>
-                <th class="w-24">Actions</th>
-            </tr>
+                <tr>
+                    <th>Name</th>
+                    <th class="w-32">Actions</th>
+                </tr>
             </thead>
             <tbody>
                 @if (Model.IsCreating)
@@ -94,7 +84,7 @@
                 }
             </tbody>
         </table>
-        @if (Model.Causes.Length == 0)
+        @if (Model.Causes.Length == 0 && !Model.IsCreating)
         {
             <div class="p-8 text-center text-[#6B6459] text-sm">
                 No donation causes found. Click "Add Cause" to create one.

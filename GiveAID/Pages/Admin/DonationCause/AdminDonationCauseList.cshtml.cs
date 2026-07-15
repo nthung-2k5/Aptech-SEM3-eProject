@@ -29,14 +29,24 @@ public class AdminDonationCauseList(IDonationCauseService donationCauseService) 
     private async Task LoadDataAsync()
     {
         var allCauses = await donationCauseService.GetAllDonationCausesAsync();
-        
+
         if (!string.IsNullOrWhiteSpace(SearchTerm))
         {
             Causes = allCauses.Where(c => c.Name.Contains(SearchTerm, StringComparison.OrdinalIgnoreCase)).ToArray();
         }
         else
         {
-            await causeService.CreateDonationCauseAsync(new DonationCauseSaveDto(NewCauseName.Trim()));
+
+            Causes = allCauses;
+        }
+
+        TotalCount = Causes.Length;
+    }
+    public async Task SaveNew()
+    {
+        try
+        {
+            await donationCauseService.CreateDonationCauseAsync(new DonationCauseSaveDto(NewCauseName.Trim()));
             IsCreating = false;
             NewCauseName = string.Empty;
             ModelState.Clear();
@@ -76,7 +86,7 @@ public class AdminDonationCauseList(IDonationCauseService donationCauseService) 
 
         try
         {
-            await causeService.UpdateDonationCauseAsync(EditingId.Value, new DonationCauseSaveDto(EditingName.Trim()));
+            await donationCauseService.UpdateDonationCauseAsync(EditingId.Value, new DonationCauseSaveDto(ne.Trim()));
             EditingId = null;
             EditingName = string.Empty;
             ModelState.Clear();
@@ -97,5 +107,6 @@ public class AdminDonationCauseList(IDonationCauseService donationCauseService) 
         await causeService.DeleteDonationCauseAsync(id);
         await LoadDataAsync();
         Client.ExecuteJs("Swal.fire('Deleted!', 'The record has been deleted.', 'success');");
-    }
+>>>>>>> quan
+        }
 }
