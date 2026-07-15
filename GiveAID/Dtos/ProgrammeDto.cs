@@ -1,4 +1,5 @@
 using GiveAID.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GiveAID.Dtos;
 
@@ -51,7 +52,11 @@ public static class ProgrammeMapper
     );
     
     public static IQueryable<ProgrammeDto> ProjectToDto(this IQueryable<WelfareProgramme> programmes) =>
-        programmes.Select(p => new ProgrammeDto(
+        programmes
+                .Include(p => p.Cause)
+                .Include(p => p.Ngo)
+                .Include(p => p.Donations)
+                .Select(p => new ProgrammeDto(
             p.ProgrammeId,
             p.Name,
             p.Cause.Name,

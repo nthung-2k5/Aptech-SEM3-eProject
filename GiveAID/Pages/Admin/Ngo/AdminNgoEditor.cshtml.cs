@@ -72,7 +72,7 @@ public class AdminNgoEditor(
             if (Id.HasValue && Id.Value != Guid.Empty) { await ngoService.UpdateNgoAsync(Id.Value, saveDto); }
             else { await ngoService.CreateNgoAsync(saveDto); }
 
-            Redirect(Url.Page("/Admin/Ngo/Index"));
+            Client.ExecuteJs($"Swal.fire('Success', 'NGO saved successfully', 'success').then(() => window.location.href = '{Url.Page("/Admin/Ngo/Index")}');");
         }
         catch (DuplicateException ex)
         {

@@ -58,6 +58,7 @@ public class AdminDonationList(
     {
         await donationService.VoidDonationAsync(id);
         await LoadDataAsync();
+        Client.ExecuteJs("Swal.fire('Voided!', 'The donation has been voided.', 'success');");
     }
 
     public bool OpenModal { get; set; }

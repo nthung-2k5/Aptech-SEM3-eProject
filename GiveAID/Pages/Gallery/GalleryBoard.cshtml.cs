@@ -126,12 +126,14 @@ public class GalleryBoard(
 
         IsModalOpen = false;
         await LoadData();
+        Client.ExecuteJs("Swal.fire('Success', 'Gallery image saved successfully', 'success');");
     }
 
     public async Task Delete(Guid id)
     {
         await galleryService.DeleteImageAsync(id);
         await LoadData();
+        Client.ExecuteJs("Swal.fire('Deleted!', 'The record has been deleted.', 'success');");
     }
 
     public class Validator : AbstractValidator<GalleryBoard>

@@ -69,13 +69,14 @@
                         {
                             <td class="font-medium">@cause.Name</td>
                             <td>
-                                <div class="flex gap-1">
+                                <div class="flex gap-1" x-data="{ confirmDelete() { Swal.fire({ title: 'Are you sure?', text: 'This action cannot be undone.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete it!' }).then((result) => { if (result.isConfirmed) { $refs.deleteBtn.click(); } }) } }">
                                     <button on:click="@(() => Model.StartEdit(cause.Id, cause.Name))" class="btn btn-ghost btn-xs" title="Edit">
                                         <i class="ph ph-pencil-simple"></i>
                                     </button>
-                                    <button on:click="@(() => Model.Delete(cause.Id))" class="btn btn-ghost btn-xs text-error" title="Delete">
+                                    <button @@click.prevent="confirmDelete()" class="btn btn-ghost btn-xs text-error" title="Delete">
                                         <i class="ph ph-trash"></i>
                                     </button>
+                                    <button x-ref="deleteBtn" on:click="@(() => Model.Delete(cause.Id))" style="display:none;"></button>
                                 </div>
                             </td>
                         }

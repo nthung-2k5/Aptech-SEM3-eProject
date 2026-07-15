@@ -56,6 +56,7 @@ public class AdminDonationCauseList(IDonationCauseService causeService) : HydroC
             NewCauseName = string.Empty;
             ModelState.Clear();
             await LoadDataAsync();
+            Client.ExecuteJs("Swal.fire('Success', 'Donation cause added successfully', 'success');");
         }
         catch (DuplicateException ex)
         {
@@ -95,6 +96,7 @@ public class AdminDonationCauseList(IDonationCauseService causeService) : HydroC
             EditingName = string.Empty;
             ModelState.Clear();
             await LoadDataAsync();
+            Client.ExecuteJs("Swal.fire('Success', 'Donation cause updated successfully', 'success');");
         }
         catch (DuplicateException ex)
         {
@@ -109,5 +111,6 @@ public class AdminDonationCauseList(IDonationCauseService causeService) : HydroC
     {
         await causeService.DeleteDonationCauseAsync(id);
         await LoadDataAsync();
+        Client.ExecuteJs("Swal.fire('Deleted!', 'The record has been deleted.', 'success');");
     }
 }

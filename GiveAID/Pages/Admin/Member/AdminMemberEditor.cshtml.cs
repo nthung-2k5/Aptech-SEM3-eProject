@@ -76,7 +76,7 @@ public class AdminMemberEditor(
                 await memberService.CreateMemberAsync(createDto);
             }
 
-            Redirect(Url.Page("/Admin/Member/Index"));
+            Client.ExecuteJs($"Swal.fire('Success', 'Member saved successfully', 'success').then(() => window.location.href = '{Url.Page("/Admin/Member/Index")}');");
         }
         catch (DuplicateException ex)
         {

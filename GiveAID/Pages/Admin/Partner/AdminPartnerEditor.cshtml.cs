@@ -86,7 +86,7 @@ public class AdminPartnerEditor(
             if (Id.HasValue && Id.Value != Guid.Empty) { await partnerService.UpdatePartnerAsync(Id.Value, saveDto); }
             else { await partnerService.CreatePartnerAsync(saveDto); }
 
-            Redirect(Url.Page("/Admin/Partner/Index"));
+            Client.ExecuteJs($"Swal.fire('Success', 'Partner saved successfully', 'success').then(() => window.location.href = '{Url.Page("/Admin/Partner/Index")}');");
         }
         catch (DuplicateException ex)
         {

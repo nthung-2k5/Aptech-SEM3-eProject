@@ -29,7 +29,7 @@ public class AdminProgrammeEditor(
         public string ImageUrl { get; set; } = "";
 
         public string? Location { get; set; }
-        public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        public DateOnly StartDate { get; set; } = DateOnly.FromDateTime(DateTime.Now).AddDays(1);
         public DateOnly? EndDate { get; set; }
         public decimal? MaxDonation { get; set; }
         public string? NewImageExtension { get; set; }
@@ -118,7 +118,7 @@ public class AdminProgrammeEditor(
             }
             else { await programmeService.CreateProgrammeAsync(saveDto); }
 
-            Redirect(Url.Page("/Admin/Programme/Index"));
+            Client.ExecuteJs($"Swal.fire('Success', 'Programme saved successfully', 'success').then(() => window.location.href = '{Url.Page("/Admin/Programme/Index")}');");
         }
         catch (MissingForeignEntityException ex)
         {
@@ -155,8 +155,8 @@ public class AdminProgrammeEditor(
                 .NotEmpty().WithMessage("Description is required");
 
             RuleFor(x => x.PreviewImageSource)
-                .NotNull().WithMessage("Image file is required")
-                .OverridePropertyName(nameof(Form.ImageUrl));
+                .NotEmpty().WithMessage("Image file is required")
+                .OverridePropertyName(nameof(ImageFile));
 
             RuleFor(x => x.Form.Location)
                 .MaximumLength(255).WithMessage("Location cannot exceed 255 characters");

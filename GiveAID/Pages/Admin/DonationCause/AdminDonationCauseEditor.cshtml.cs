@@ -54,7 +54,7 @@ public class AdminDonationCauseEditor(
             return;
         }
 
-        Redirect(Url.Page("/Admin/DonationCause/Index"));
+        Client.ExecuteJs($"Swal.fire('Success', 'Donation cause saved successfully', 'success').then(() => window.location.href = '{Url.Page("/Admin/DonationCause/Index")}');");
     }
 
     public class Validator : AbstractValidator<AdminDonationCauseEditor>

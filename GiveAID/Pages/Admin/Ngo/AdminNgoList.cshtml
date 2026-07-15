@@ -35,15 +35,16 @@
                         <h4 class="font-['Playfair_Display',serif] font-bold text-[#1C1A17]">@n.Name</h4>
                         <p class="text-sm text-[#C97C2E] line-clamp-2">@n.Description</p>
                     </div>
-                    <div class="flex gap-1 shrink-0">
+                    <div class="flex gap-1" x-data="{ confirmDelete() { Swal.fire({ title: 'Are you sure?', text: 'This action cannot be undone.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete it!' }).then((result) => { if (result.isConfirmed) { $refs.deleteBtn.click(); } }) } }">
                         <a asp-page="/Admin/Ngo/Editor" asp-route-id="@n.Id" asp-route-mode="view" class="btn btn-ghost btn-xs text-[#1A5C6B]" title="View details">
                             <i class="ph ph-eye text-lg"></i>
                         </a>
                         <a asp-page="/Admin/Ngo/Editor" asp-route-id="@n.Id" class="btn btn-ghost btn-xs text-[#C97C2E]" title="Edit">
                             <i class="ph ph-pencil-simple text-lg"></i>
                         </a>
-                        <button on:click="@(() => Model.Delete(n.Id))" class="btn btn-ghost btn-xs text-error"
+                        <button @@click.prevent="confirmDelete()" class="btn btn-ghost btn-xs text-error"
                                 title="Delete"><i class="ph ph-trash text-lg"></i></button>
+                        <button x-ref="deleteBtn" on:click="@(() => Model.Delete(n.Id))" style="display:none;"></button>
                     </div>
                 </div>
             </div>
