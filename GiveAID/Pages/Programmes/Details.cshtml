@@ -36,11 +36,12 @@
     <div class="pb-12">
         <!-- Hero Section -->
         <div class="h-[40vh] min-h-[300px] max-h-[500px] relative">
-            <img src="@p.ImageUrl" alt="@p.Name" class="w-full h-full object-cover"/>
+            <img src="@p.ImageUrl" alt="@p.Name" class="w-full h-full object-cover" />
             <div class="absolute inset-0 bg-black/50"></div>
-            
+
             <div class="absolute top-6 left-6 md:left-12 z-10">
-                <a href="/Programmes" class="btn btn-sm bg-white/20 hover:bg-white/40 border-none text-white backdrop-blur-md rounded-full shadow-lg pr-4">
+                <a href="/Programmes"
+                   class="btn btn-sm bg-white/20 hover:bg-white/40 border-none text-white backdrop-blur-md rounded-full shadow-lg pr-4">
                     <i class="ph ph-arrow-left"></i> Back to Programmes
                 </a>
             </div>
@@ -59,7 +60,7 @@
                         <div class="flex items-center gap-2">
                             <i class="ph ph-calendar-blank text-xl"></i>
                             <span class="text-lg">
-                                @p.StartDate.ToString("MMM dd, yyyy") @(p.EndDate.HasValue ? $"- {p.EndDate.Value.ToString("MMM dd, yyyy")}" : "(Ongoing)")
+                                @p.StartDate.ToString("MMM dd, yyyy") @(p.EndDate.HasValue ? $"-                           {p.EndDate.Value.ToString("MMM dd, yyyy")}" : "(Ongoing)")
                             </span>
                         </div>
                         @if (timeText != null)
@@ -105,11 +106,10 @@
                         <div class="mb-8">
                             <div class="flex justify-between items-end mb-2">
                                 <span
-                                    class="text-3xl font-bold text-[#1A5C6B] font-['Playfair_Display',serif]">@p.RaisedAmount.ToUsCurrencyString()</span>
+                                class="text-3xl font-bold text-[#1A5C6B] font-['Playfair_Display',serif]">@p.RaisedAmount.ToUsCurrencyString()</span>
                                 @if (p.TargetAmount.HasValue)
                                 {
-                                    <span
-                                        class="text-gray-500 mb-1">raised of @p.TargetAmount.Value.ToUsCurrencyString()</span>
+                                    <span class="text-gray-500 mb-1">raised of @p.TargetAmount.Value.ToUsCurrencyString()</span>
                                 }
                             </div>
 
@@ -139,7 +139,8 @@
 
                         @if (User.IsInRole(nameof(GiveAID.Models.UserRole.Admin)))
                         {
-                            <a href="/Admin/Programme/Editor/@p.Id" class="btn bg-[#1A5C6B] hover:bg-[#154D5A] text-white btn-block btn-xl border-none">
+                            <a href="/Admin/Programme/Editor/@p.Id"
+                               class="btn bg-[#1A5C6B] hover:bg-[#154D5A] text-white btn-block btn-xl border-none">
                                 <i class="ph ph-pencil-simple text-xl"></i> Edit Programme
                             </a>
                         }
@@ -159,11 +160,12 @@
                             }
                             else
                             {
-                                <a asp-page="/Donate/Index" asp-route-programmeId="@p.Id" class="btn btn-secondary btn-block btn-xl">
+                                <a asp-page="/Donate/Index" asp-route-programmeId="@p.Id"
+                                   class="btn btn-secondary btn-block btn-xl">
                                     Donate Now
                                 </a>
                             }
-                            
+
                             <button class="btn btn-outline btn-block mt-4" onclick="inviteModal.showModal()">
                                 <i class="ph ph-envelope-simple text-xl"></i>
                                 Invite Friends
@@ -186,27 +188,41 @@
                 <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
             </form>
             <h3 class="font-bold text-2xl mb-6 font-['Playfair_Display',serif]">Invite a Friend</h3>
-            
+
             <form method="post" asp-page-handler="Invite">
-                <div class="form-control w-full mb-4">
-                    <label class="label"><span class="label-text font-bold">Friend's Email</span></label>
-                    <input type="email" asp-for="InviteForm.FriendEmail" class="input input-bordered w-full" placeholder="friend@example.com" required />
-                    <span asp-validation-for="InviteForm.FriendEmail" class="text-error text-sm mt-1"></span>
+
+                <div id="email-container">
+                    <div class="form-control w-full mb-2">
+                        <label class="label"><span class="label-text font-bold">Friend's Email</span></label>
+                        <input type="email" name="InviteForm.FriendEmails" class="input input-bordered w-full"
+                               placeholder="friend@example.com" required />
+                    </div>
                 </div>
-                
+
+                <div class="mb-4">
+                    <button type="button" onclick="addEmailField()" class="btn btn-sm btn-outline btn-primary text-xs">
+                        + Add another email
+                    </button>
+                </div>
+
                 <div class="form-control w-full mb-4">
                     <label class="label"><span class="label-text font-bold">Subject</span></label>
                     <input type="text" asp-for="InviteForm.Subject" class="input input-bordered w-full" required />
-                    <span asp-validation-for="InviteForm.Subject" class="text-error text-sm mt-1"></span>
                 </div>
-                
+
                 <div class="form-control w-full mb-6">
                     <label class="label"><span class="label-text font-bold">Message</span></label>
                     <textarea asp-for="InviteForm.Body" class="textarea textarea-bordered h-48 w-full" required></textarea>
-                    <span asp-validation-for="InviteForm.Body" class="text-error text-sm mt-1"></span>
                 </div>
-                
-                <button type="submit" class="btn btn-secondary w-full">Send Invitation</button>
+
+                @* <button type="submit" class="btn btn-secondary w-full">
+                    <span id="btn-text">Send Invitation</span>
+                    <span id="loading-spinner" class="loading loading-spinner hidden"></span>
+                </button> *@
+
+                <button type="submit" class="btn btn-secondary w-full">
+                    Send Invitation
+                </button>
             </form>
         </div>
         <form method="dialog" class="modal-backdrop">
@@ -214,10 +230,90 @@
         </form>
     </dialog>
 
+    <script>
+        function addEmailField() {
+            // Lấy vùng chứa email
+            const container = document.getElementById('email-container');
+
+            // Tạo một div mới chứa ô input
+            const newField = document.createElement('div');
+            newField.className = 'form-control w-full mb-2 mt-2';
+            // giới hạn giới hạn số lượng email gửi đi (ví dụ: tối đa 3 email mỗi lần)
+            const currentEmailCount = container.querySelectorAll('input[name="InviteForm.FriendEmails"]').length;
+            const maxEmailsAllowed = 3;
+
+            if (currentEmailCount >= maxEmailsAllowed) {
+                // 1. Tạo một thẻ div chứa Toast cảnh báo
+                const toastDiv = document.createElement('div');
+                toastDiv.className = 'toast toast-top toast-end z-50 mt-16';
+
+                // 2. Nhét HTML DaisyUI vào trong thẻ div đó (Dùng alert-warning màu vàng cho hợp lý)
+                toastDiv.innerHTML = `
+                    <div class="alert alert-warning text-white shadow-lg">
+                        <span>You can only add up to ${maxEmailsAllowed} emails!</span>
+                    </div>
+                `;
+
+                // 3. Hiển thị lên màn hình
+                document.body.appendChild(toastDiv);
+
+                // 4. Tự động xóa nó đi sau 3 giây
+                setTimeout(() => {
+                    toastDiv.remove();
+                }, 3000);
+
+                // Dừng luôn, không cho thêm ô input mới nữa
+                return;
+            }
+
+            // Đặt nội dung là 1 ô input mới (không cần label để gọn hơn)
+            newField.innerHTML = `
+                                   <div class="flex items-center gap-2">
+                                                                            <input type="email" name="InviteForm.FriendEmails" class="input input-bordered w-full" placeholder="another.friend@example.com" required />  
+                                                                            <button type="button" onclick="removeEmailField(this)" class="btn btn-sm btn-outline btn-danger text-xs mt-2">
+                                                                                Remove
+                                                                            </button>
+                                                          </div>
+                                                                         `;
+
+            // Thêm vào vùng chứa
+            container.appendChild(newField);
+        }
+        function removeEmailField(button) {F
+            const field = button.parentElement;
+            field.remove();
+        }
+    </script>
+
+  
+    @if (TempData["SuccessMessage"] != null || TempData["ErrorMessage"] != null)
+    {
+        <div id="notification-toast" class="toast toast-top toast-end z-50 mt-16">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success text-white shadow-lg">
+                    <span>@TempData["SuccessMessage"]</span>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-error text-white shadow-lg">
+                    <span>@TempData["ErrorMessage"]</span>
+                </div>
+            }
+        </div>
+        <script>
+            // Tự động ẩn thông báo sau 4 giây
+            setTimeout(() => {
+                var t = document.getElementById('notification-toast');
+                if (t) t.remove();
+            }, 4000);
+        </script>
+    }
     @if (!ModelState.IsValid)
     {
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('inviteModal').showModal();
             });
         </script>

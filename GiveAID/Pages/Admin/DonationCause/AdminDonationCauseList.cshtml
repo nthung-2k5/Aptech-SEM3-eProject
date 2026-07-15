@@ -35,7 +35,7 @@
             </tr>
             </thead>
             <tbody>
-            @foreach (var c in Model.Causes)
+            @foreach (Dtos.DonationCauseDto c in Model.Causes)
             {
                 <tr>
                     <td class="font-semibold">@c.Name</td>
