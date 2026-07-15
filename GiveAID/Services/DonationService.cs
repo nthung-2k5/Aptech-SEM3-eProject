@@ -66,7 +66,10 @@ public class DonationService(AppDbContext dbContext, INotificationService notifi
     public async Task<UserDonationDto[]> GetDonationsByUserAsync(Guid userId, CancellationToken ct = default)
     {
         return await dbContext.ValidDonations.Include(d => d.Ngo).Include(d => d.Cause).Include(d => d.Programme)
-                .Where(d => d.UserId == userId).ProjectToUserDto().ToArrayAsync(ct);
+                .Where(d => d.UserId == userId)
+                .OrderByDescending(d => d.CreatedAt)
+                .ProjectToUserDto()
+                .ToArrayAsync(ct);
     }
 
     public async Task<DonationDto?> CreateDonationAsync(DonationSaveDto donation, CancellationToken ct = default)
