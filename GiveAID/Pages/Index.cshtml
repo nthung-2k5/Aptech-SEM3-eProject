@@ -6,7 +6,7 @@
 
 <div class="min-h-screen">
     <!-- Hero -->
-    <hydro name="HeroSlider" />
+    <hero-slider/>
 
     <!-- Causes section -->
     <section class="bg-[#F6F1E9] py-20">
@@ -25,33 +25,35 @@
             @{
                 var themes = new[] 
                 {
-                    "bg-[#E8F3F5] text-[#1A5C6B] hover:bg-[#1A5C6B] hover:text-white", // Teal
-                    "bg-[#FDF3E7] text-[#C97C2E] hover:bg-[#C97C2E] hover:text-white", // Amber
-                    "bg-[#F2EDF7] text-[#6B4D91] hover:bg-[#6B4D91] hover:text-white", // Purple
-                    "bg-[#FCEAE9] text-[#B84245] hover:bg-[#B84245] hover:text-white", // Rose
-                    "bg-[#EBF5EE] text-[#2E7D4C] hover:bg-[#2E7D4C] hover:text-white"  // Green
+                    new { bg = "bg-[#E8F3F5]", text = "text-[#1A5C6B]", border = "border-[#1A5C6B]/20" },
+                    new { bg = "bg-[#FDF3E7]", text = "text-[#C97C2E]", border = "border-[#C97C2E]/20" },
+                    new { bg = "bg-[#F2EDF7]", text = "text-[#6B4D91]", border = "border-[#6B4D91]/20" },
+                    new { bg = "bg-[#FCEAE9]", text = "text-[#B84245]", border = "border-[#B84245]/20" },
+                    new { bg = "bg-[#EBF5EE]", text = "text-[#2E7D4C]", border = "border-[#2E7D4C]/20" },
+                    new { bg = "bg-[#F0F4F8]", text = "text-[#2B6CB0]", border = "border-[#2B6CB0]/20" },
+                    new { bg = "bg-[#FFF0F5]", text = "text-[#D53F8C]", border = "border-[#D53F8C]/20" },
+                    new { bg = "bg-[#E6FFFA]", text = "text-[#319795]", border = "border-[#319795]/20" }
                 };
             }
-            <div class="relative w-full">
-                <div class="flex flex-row overflow-x-auto gap-4 pb-4 scrollbar-none snap-x [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                    @for (int i = 0; i < Model.Causes.Length; i++)
-                    {
-                        var cause = Model.Causes[i];
-                        var theme = themes[i % themes.Length];
-                        <a asp-page="/Programmes/Index" onclick="localStorage.setItem('activeCause', '@cause.Id')"
-                           class="btn border-none @theme rounded-full px-8 h-12 font-bold transition-all duration-300 snap-align-start shrink-0 no-underline shadow-sm hover:shadow-md hover:-translate-y-0.5">
-                            @cause.Name
-                        </a>
-                    }
-                </div>
-                <!-- Fading Mask for Scroll Indication -->
-                <div class="absolute right-0 top-0 bottom-4 w-24 bg-gradient-to-l from-[#F6F1E9] to-transparent pointer-events-none"></div>
-            </div>
             
-            <!-- Desktop Scroll Hint -->
-            <div class="hidden md:flex justify-end items-center gap-1.5 mt-2 text-xs text-[#6B6459] opacity-70">
-                <i class="ph ph-mouse-scroll"></i>
-                <span>Use <kbd class="kbd kbd-xs bg-[#E3DDD3] border-none text-[#6B6459]">Shift</kbd> + Scroll to navigate</span>
+            <div class="flex flex-wrap gap-3 md:gap-4">
+                @for (int i = 0; i < Model.Causes.Length; i++)
+                {
+                    var cause = Model.Causes[i];
+                    var theme = themes[i % themes.Length];
+                    
+                    <a asp-page="/Programmes/Index" asp-route-causeId="@cause.Id"
+                       class="group inline-flex items-center px-5 py-3 md:px-6 md:py-3.5 rounded-full @theme.bg border @theme.border transition-all duration-300 hover:-translate-y-1 hover:shadow-md no-underline relative overflow-hidden">
+                        
+                        <!-- decorative background element -->
+                        <div class="absolute right-0 top-0 w-12 h-12 rounded-full @theme.text opacity-[0.03] group-hover:scale-[4] transition-transform duration-700 ease-out origin-top-right"></div>
+
+                        <div class="relative z-10 font-bold text-sm md:text-base @theme.text leading-none whitespace-nowrap flex items-center gap-2">
+                            @cause.Name
+                            <i class="ph-bold ph-arrow-up-right opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 w-0 group-hover:w-4 -mr-2 group-hover:mr-0 overflow-hidden text-sm"></i>
+                        </div>
+                    </a>
+                }
             </div>
         </div>
     </section>
@@ -66,7 +68,7 @@
                 <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=700&h=500&fit=crop&auto=format"
                      alt="Volunteers working" class="rounded-xl w-full object-cover h-80 opacity-90"/>
                 <div class="absolute -bottom-6 -right-6 bg-[#C97C2E] text-white p-5 rounded-xl shadow-xl">
-                    <div class="font-['Playfair_Display',serif] text-3xl font-bold">1+</div>
+                    <div class="font-['Playfair_Display',serif] text-3xl font-bold">@((DateTime.Now.Year - 2026) * 12 + DateTime.Now.Month - 6)+</div>
                     <div class="text-xs uppercase tracking-wide opacity-90">Month of Service</div>
                 </div>
             </div>

@@ -28,7 +28,7 @@ public class ProgrammeDetailsModel(IBackgroundTaskQueue backgroundTaskQueue, IPr
         InviteForm = new InviteFriendModel
         {
             // Khởi tạo danh sách email rỗng
-            FriendEmails = new List<string>(),
+            FriendEmails = [],
             Subject = $"Join me in supporting {Programme.Name}!",
             Body = $"Hi,\n\nI just found this amazing programme \"{Programme.Name}\" by {Programme.NgoName}. They are raising funds to help people and I think you might be interested in supporting this cause too.\n\nYou can learn more and donate here: {url}\n\nLet's make a difference together!\n\nBest,"
         };
@@ -51,36 +51,45 @@ public class ProgrammeDetailsModel(IBackgroundTaskQueue backgroundTaskQueue, IPr
         if (Programme == null) { return NotFound(); }
 
         // 3. Xử lý nội dung email
-        var url = Url.Page("/Programmes/Details", pageHandler: null, values: new { id }, protocol: Request.Scheme);
-        var formattedBody = InviteForm.Body.Replace("\n", "<br/>");
+        string? url = Url.Page("/Programmes/Details", pageHandler: null, values: new { id }, protocol: Request.Scheme);
+        string formattedBody = InviteForm.Body.Replace("\n", "<br/>");
 
-        var htmlBody = $@"
-<!DOCTYPE html>
-<html>
-<head><meta charset='UTF-8'></head>
-<body style='margin:0;padding:0;background:#f4f7fb;font-family:Segoe UI,Arial,sans-serif;'>
-<table width='100%' cellpadding='0' cellspacing='0' style='background:#1A5C6B;padding:30px 0;'>
-<tr><td align='center'>
-<table width='600' cellpadding='0' cellspacing='0' style='background:#ffffff;border-radius:12px;overflow:hidden;'>
-<tr><td style='background:#0d6efd;padding:30px;text-align:center;color:white;'>
-<h1>🤝 You're Invited!</h1>
-</td></tr>
-<tr><td style='padding:30px;'>
-<p>{formattedBody}</p>
-<hr/>
-<p><strong>Programme:</strong> {Programme.Name}</p>
-<p><strong>Organization:</strong> {Programme.NgoName}</p>
-<p style='text-align:center;margin-top:30px'>
-<a href='{url}' style='background:#0d6efd;padding:12px 24px;color:white;text-decoration:none;border-radius:6px'>
-❤️ Learn More & Donate
-</a>
-</p>
-</td></tr>
-</table>
-</td></tr>
-</table>
-</body>
-</html>";
+        string htmlBody = $"""
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta charset='UTF-8'>
+              </head>
+              <body style='margin:0;padding:0;background:#f4f7fb;font-family:Segoe UI,Arial,sans-serif;'>
+                <table width='100%' cellpadding='0' cellspacing='0' style='background:#1A5C6B;padding:30px 0;'>
+                  <tr>
+                    <td align='center'>
+                      <table width='600' cellpadding='0' cellspacing='0' style='background:#ffffff;border-radius:12px;overflow:hidden;'>
+                        <tr>
+                          <td style='background:#0d6efd;padding:30px;text-align:center;color:white;'>
+                            <h1>🤝 You're Invited!</h1>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style='padding:30px;'>
+                            <p>{formattedBody}</p>
+                            <hr/>
+                            <p><strong>Programme:</strong> {Programme.Name}</p>
+                            <p><strong>Organization:</strong> {Programme.NgoName}</p>
+                            <p style='text-align:center;margin-top:30px'>
+                              <a href='{url}' style='background:#0d6efd;padding:12px 24px;color:white;text-decoration:none;border-radius:6px'>
+                              ❤️ Learn More & Donate
+                              </a>
+                            </p>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </body>
+            </html>
+            """;
 
         // 4. Lọc danh sách email từ giao diện (bỏ các ô trống, cắt khoảng trắng dư và bỏ email trùng)
         var inputEmails = InviteForm.FriendEmails
@@ -106,7 +115,7 @@ public class ProgrammeDetailsModel(IBackgroundTaskQueue backgroundTaskQueue, IPr
         var content = htmlBody;
 
         // 2. Ném việc vào Background Queue
-        await backgroundTaskQueue.QueueBackgroundWorkItemAsync(async (serviceProvider, token) =>
+        await backgroundTaskQueue.QueueBackgroundWorkItemAsync(async (serviceProvider, ct) =>
         {
             // CẢNH BÁO: Không dùng TempData, ModelState, hay Request ở trong này!
             var backgroundEmailService = serviceProvider.GetRequiredService<IEmailService>();
@@ -117,7 +126,7 @@ public class ProgrammeDetailsModel(IBackgroundTaskQueue backgroundTaskQueue, IPr
                 try
                 {
                     // Sử dụng các biến cục bộ (subject, content) đã copy ở trên
-                    await backgroundEmailService.SendEmailAsync(email, subject, content);
+                    await backgroundEmailService.SendEmailAsync(email, subject, content, ct);
                 }
                 catch (Exception ex)
                 {
