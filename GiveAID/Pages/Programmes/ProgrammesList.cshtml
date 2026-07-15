@@ -151,7 +151,6 @@
                 </a>
                 }
             </div>
-        }
 
         <!-- Pagination -->
         @if (Model.TotalPages > 1)
@@ -190,19 +189,4 @@
             </div>
         }
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const activeCause = localStorage.getItem('activeCause');
-            
-            if (activeCause) {
-                const causeSelect = document.getElementById('CauseId');
-                if (causeSelect) {
-                    causeSelect.value = activeCause;
-                    causeSelect.dispatchEvent(new Event('change', { bubbles: true }));
-                }
-                localStorage.removeItem('activeCause');
-            }
-        });
-    </script>
 </div>
