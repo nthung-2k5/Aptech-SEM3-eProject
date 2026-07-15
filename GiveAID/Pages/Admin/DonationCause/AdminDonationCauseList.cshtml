@@ -34,11 +34,11 @@
                         </td>
                         <td>
                             <div class="flex gap-1">
-                                <button on:click="@(() => Model.SaveNew())" class="btn btn-success btn-xs" title="Save">
-                                    <i class="ph ph-check text-white"></i>
+                                <button on:click="@(() => Model.SaveNew())" class="btn btn-success btn-sm" title="Save">
+                                    <i class="ph ph-check text-white text-lg"></i>
                                 </button>
-                                <button on:click="@(() => Model.CancelCreate())" class="btn btn-ghost btn-xs text-error" title="Cancel">
-                                    <i class="ph ph-x"></i>
+                                <button on:click="@(() => Model.CancelCreate())" class="btn btn-ghost btn-sm text-error" title="Cancel">
+                                    <i class="ph ph-x text-lg"></i>
                                 </button>
                             </div>
                         </td>
@@ -56,11 +56,11 @@
                             </td>
                             <td>
                                 <div class="flex gap-1">
-                                    <button on:click="@(() => Model.SaveEdit())" class="btn btn-success btn-xs" title="Save">
-                                        <i class="ph ph-check text-white"></i>
+                                    <button on:click="@(() => Model.SaveEdit())" class="btn btn-success btn-sm" title="Save">
+                                        <i class="ph ph-check text-white text-lg"></i>
                                     </button>
-                                    <button on:click="@(() => Model.CancelEdit())" class="btn btn-ghost btn-xs text-error" title="Cancel">
-                                        <i class="ph ph-x"></i>
+                                    <button on:click="@(() => Model.CancelEdit())" class="btn btn-ghost btn-sm text-error" title="Cancel">
+                                        <i class="ph ph-x text-lg"></i>
                                     </button>
                                 </div>
                             </td>
@@ -70,11 +70,11 @@
                             <td class="font-medium">@cause.Name</td>
                             <td>
                                 <div class="flex gap-1" x-data="{ confirmDelete() { Swal.fire({ title: 'Are you sure?', text: 'This action cannot be undone.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete it!' }).then((result) => { if (result.isConfirmed) { $refs.deleteBtn.click(); } }) } }">
-                                    <button on:click="@(() => Model.StartEdit(cause.Id, cause.Name))" class="btn btn-ghost btn-xs" title="Edit">
-                                        <i class="ph ph-pencil-simple"></i>
+                                    <button on:click="@(() => Model.StartEdit(cause.Id, cause.Name))" class="btn btn-ghost btn-sm" title="Edit">
+                                        <i class="ph ph-pencil-simple text-lg"></i>
                                     </button>
-                                    <button @@click.prevent="confirmDelete()" class="btn btn-ghost btn-xs text-error" title="Delete">
-                                        <i class="ph ph-trash"></i>
+                                    <button @@click.prevent="confirmDelete()" class="btn btn-ghost btn-sm text-error" title="Delete">
+                                        <i class="ph ph-trash text-lg"></i>
                                     </button>
                                     <button x-ref="deleteBtn" on:click="@(() => Model.Delete(cause.Id))" style="display:none;"></button>
                                 </div>

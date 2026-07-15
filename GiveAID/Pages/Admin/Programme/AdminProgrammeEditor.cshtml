@@ -12,13 +12,13 @@
             @* Core details *@
             <div class="grid md:grid-cols-2 gap-4">
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Programme Name <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Programme Name</label>
                     <input type="text" asp-for="Form.Name" bind placeholder="e.g. Clean Water Initiative" class="input w-full"/>
                     <span asp-validation-for="Form.Name"></span>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1">NGO <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">NGO</label>
                     <select asp-for="Form.NgoId" bind class="select w-full">
                         <option value="" disabled selected>— Select NGO —</option>
                         @foreach (var n in Model.AvailableNgos)
@@ -30,7 +30,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Cause <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Cause</label>
                     <select asp-for="Form.CauseId" bind class="select w-full">
                         <option value="" disabled selected>— Select Cause —</option>
                         @foreach (var c in Model.AvailableCauses)
@@ -43,12 +43,12 @@
 
                 <div class="md:col-span-2">
                     <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Location</label>
-                    <input type="text" asp-for="Form.Location" bind placeholder="City, Country or region" class="input w-full"/>
+                    <input type="text" asp-for="Form.Location" bind placeholder="City, Country or Region" class="input w-full"/>
                     <span asp-validation-for="Form.Location"></span>
                 </div>
 
                 <div class="md:col-span-2">
-                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Description <span class="text-red-500">*</span></label>
+                    <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Description</label>
                     <textarea asp-for="Form.Description" bind rows="4" placeholder="Describe the programme's goals and impact..." class="textarea w-full"></textarea>
                     <span asp-validation-for="Form.Description"></span>
                 </div>
@@ -59,8 +59,10 @@
                 <div class="text-xs font-bold uppercase tracking-widest text-[#6B6459] mb-3">Schedule & Funding</div>
                 <div class="grid md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Start Date <span class="text-red-500">*</span></label>
-                        <input type="date" asp-for="Form.StartDate" bind required class="input w-full"/>
+                        <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Start Date</label>
+                        <input type="date" asp-for="Form.StartDate" bind required class="input w-full"
+                               @* readonly="@(Model.Id.HasValue && Model.Id.Value != Guid.Empty)" *@
+                               />
                         <span asp-validation-for="Form.StartDate"></span>
                     </div>
                     <div>
@@ -70,7 +72,7 @@
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Donation Target ($) <span class="text-xs text-[#6B6459] font-normal">(optional)</span></label>
-                        <input type="number" asp-for="Form.MaxDonation" bind min="0" step="0.01" placeholder="e.g. 50000" class="input w-full"/>
+                        <input type="number" asp-for="Form.MaxDonation" bind step="0.01" placeholder="e.g. 50000" class="input w-full"/>
                         <span asp-validation-for="Form.MaxDonation"></span>
                     </div>
                 </div>
@@ -79,7 +81,7 @@
 
         <div class="space-y-4">
             <div>
-                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Image <span class="text-red-500">*</span></label>
+                <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Image</label>
                 <input type="file" asp-for="ImageFile" bind accept="image/*" class="file-input w-full"/>
                 <span asp-validation-for="ImageFile"></span>
             </div>

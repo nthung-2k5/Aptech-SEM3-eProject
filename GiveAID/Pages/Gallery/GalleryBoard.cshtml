@@ -69,9 +69,8 @@
                         <!-- Left Side: Inputs -->
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Caption</label>
-                                <input type="text" asp-for="Form.Caption" bind required
-                                       class="input w-full"/>
+                                <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Caption</label>
+                                <input type="text" asp-for="Form.Caption" bind class="input w-full"/>
                                 <span asp-validation-for="Form.Caption"></span>
                             </div>
                             <div>
@@ -92,7 +91,7 @@
                         <!-- Right Side: Image Upload and Preview -->
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-semibold text-[#1C1A17] mb-1">Image File</label>
+                                <label class="block text-sm font-semibold text-[#1C1A17] mb-1 required">Image File</label>
                                 <input type="file" asp-for="ImageFile" bind accept="image/*"
                                        class="file-input w-full"/>
                                 <span asp-validation-for="PreviewImageSource"></span>

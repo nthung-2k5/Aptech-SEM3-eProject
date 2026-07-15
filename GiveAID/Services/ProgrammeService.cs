@@ -17,7 +17,7 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
 
         if (!string.IsNullOrWhiteSpace(query.SearchTerm))
         {
-            q = q.Where(p => p.Name.Contains(query.SearchTerm) || p.Description.Contains(query.SearchTerm));
+            q = q.Where(p => p.Name.Contains(query.SearchTerm));
         }
 
         if (query.NgoId != null) { q = q.Where(p => p.Ngo.NgoId == query.NgoId); }

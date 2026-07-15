@@ -15,12 +15,12 @@
 
         <div class="flex flex-wrap gap-3 items-end">
             <div class="flex-1 min-w-[200px]">
-                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Search by Name or Description</label>
-                <label class="input input-bordered input-sm flex items-center gap-2 w-full">
+                <label class="label label-text text-sm font-semibold text-[#6B6459] mb-1">Search by Name or Description</label>
+                <label class="input input-bordered flex items-center gap-2 w-full">
                     <i class="ph ph-magnifying-glass text-[#6B6459]"></i>
                     <input type="text" asp-for="SearchTerm" bind:keydown.debounce.300ms
                            on:input="@(() => Model.Search())"
-                           placeholder="Name or description…" />
+                           placeholder="Name…" />
                 </label>
             </div>
         </div>

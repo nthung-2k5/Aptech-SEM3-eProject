@@ -2,10 +2,12 @@ using FluentValidation;
 using Hydro;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using GiveAID.Dtos;
+using GiveAID.Services.Abstractions;
 
 namespace GiveAID.Pages.Components;
 
-public class ContactForm(IValidator<ContactForm> validator, IHttpContextAccessor httpContextAccessor) : HydroComponent
+public class ContactForm(IValidator<ContactForm> validator, IUserQueryService userQueryService, IHttpContextAccessor httpContextAccessor) : HydroComponent
 {
     public string FullName { get; set; }
     public string Email { get; set; }
@@ -30,14 +32,21 @@ public class ContactForm(IValidator<ContactForm> validator, IHttpContextAccessor
         }
     }
 
-    public void Submit()
+    public async Task Submit()
     {
         if (!IsMember) { return; }
         if (!this.Validate(validator)) { return; }
-        IsSuccess = true;
+        var user = httpContextAccessor.HttpContext?.User;
+        var id = Guid.Parse(user!.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        IsSuccess = await userQueryService.CreateQueryAsync(new UserQueryCreateDto(id, Subject, Message));
     }
 
-    public void Reset() { IsSuccess = false; }
+    public void Reset()
+    {
+        IsSuccess = false;
+        Subject = string.Empty;
+        Message = string.Empty;
+    }
 
     public class Validator : AbstractValidator<ContactForm>
     {

@@ -18,7 +18,7 @@ public class AdminMemberEditor(
         public string FullName { get; set; } = "";
         public string Email { get; set; } = "";
         public string? Password { get; set; } = null;
-        public string Address { get; set; } = "";
+        public string? Address { get; set; } = "";
         public string PhoneNumber { get; set; } = "";
         public string Occupation { get; set; } = "";
         public DateOnly DateOfBirth { get; set; } = new(1990, 1, 1);
@@ -56,7 +56,7 @@ public class AdminMemberEditor(
                     Form.Email,
                     Form.Password,
                     Form.DateOfBirth,
-                    Form.Address,
+                    Form.Address ?? string.Empty,
                     Form.PhoneNumber,
                     Form.Occupation);
 
@@ -69,7 +69,7 @@ public class AdminMemberEditor(
                     Form.Email,
                     Form.Password!,
                     Form.DateOfBirth,
-                    Form.Address,
+                    Form.Address ?? string.Empty,
                     Form.PhoneNumber,
                     Form.Occupation);
 
@@ -116,6 +116,7 @@ public class AdminMemberEditor(
                 .MaximumLength(255).WithMessage("Address cannot exceed 255 characters");
 
             RuleFor(x => x.Form.Occupation)
+                .NotEmpty().WithMessage("Occupation is required")
                 .MaximumLength(50).WithMessage("Occupation cannot exceed 50 characters");
 
             RuleFor(x => x.Form.Password)

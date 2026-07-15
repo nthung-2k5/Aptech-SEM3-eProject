@@ -16,17 +16,17 @@
         
         <div class="flex flex-wrap gap-3 items-end">
             <div class="flex-1 min-w-[180px]">
-                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Search</label>
-                <label class="input input-bordered input-sm flex items-center gap-2 w-full">
+                <label class="label label-text text-sm font-semibold text-[#6B6459] mb-1">Search</label>
+                <label class="input input-bordered flex items-center gap-2 w-full">
                     <i class="ph ph-magnifying-glass text-[#6B6459]"></i>
                     <input type="text" asp-for="SearchTerm" bind:keydown.debounce.300ms
                            on:input="@(() => Model.Search())"
-                           placeholder="Name or description…" />
+                           placeholder="Name…" />
                 </label>
             </div>
             <div>
-                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">NGO</label>
-                <select asp-for="NgoId" bind on:change="@(() => Model.Search())" class="select select-bordered select-sm">
+                <label class="label label-text text-sm font-semibold text-[#6B6459] mb-1">NGO</label>
+                <select asp-for="NgoId" bind on:change="@(() => Model.Search())" class="select select-bordered">
                     <option value="">All NGOs</option>
                     @foreach (var ngo in Model.AvailableNgos)
                     {
@@ -35,8 +35,8 @@
                 </select>
             </div>
             <div>
-                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Cause</label>
-                <select asp-for="CauseId" bind on:change="@(() => Model.Search())" class="select select-bordered select-sm">
+                <label class="label label-text text-sm font-semibold text-[#6B6459] mb-1">Cause</label>
+                <select asp-for="CauseId" bind on:change="@(() => Model.Search())" class="select select-bordered">
                     <option value="">All Causes</option>
                     @foreach (var cause in Model.AvailableCauses)
                     {
@@ -45,8 +45,8 @@
                 </select>
             </div>
             <div>
-                <label class="label label-text text-xs font-semibold text-[#6B6459] mb-1">Status</label>
-                <select asp-for="StatusFilter" bind on:change="@(() => Model.Search())" class="select select-bordered select-sm">
+                <label class="label label-text font-semibold text-[#6B6459] mb-1">Status</label>
+                <select asp-for="StatusFilter" bind on:change="@(() => Model.Search())" class="select select-bordered">
                     <option value="">All Statuses</option>
                     <option value="Active">Active</option>
                     <option value="Upcoming">Upcoming</option>

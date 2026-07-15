@@ -108,7 +108,7 @@ public class AdminPartnerEditor(
 
             RuleFor(x => x.PreviewImageSource)
                 .NotNull().WithMessage("Logo file is required")
-                .OverridePropertyName(nameof(Form.LogoUrl));
+                .OverridePropertyName(nameof(ImageFile));
 
             RuleFor(x => x.Form.WebsiteLink)
                 .NotEmpty().WithMessage("Website link is required")
