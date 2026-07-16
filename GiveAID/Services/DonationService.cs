@@ -63,13 +63,53 @@ public class DonationService(AppDbContext dbContext, INotificationService notifi
         return await donations.ProjectToDto().ToArrayAsync(ct);
     }
 
-    public async Task<UserDonationDto[]> GetDonationsByUserAsync(Guid userId, CancellationToken ct = default)
+    public async Task<PagedResult<UserDonationDto>> GetDonationsByUserPagedAsync(Guid userId, UserDonationQueryParameters query, CancellationToken ct = default)
     {
-        return await dbContext.ValidDonations.Include(d => d.Ngo).Include(d => d.Cause).Include(d => d.Programme)
-                .Where(d => d.UserId == userId)
-                .OrderByDescending(d => d.CreatedAt)
+        var q = dbContext.ValidDonations.Include(d => d.Ngo).Include(d => d.Cause).Include(d => d.Programme)
+                .Where(d => d.UserId == userId);
+
+        if (query.TimePeriod == "30days")
+        {
+            var from = DateTime.UtcNow.AddDays(-30);
+            q = q.Where(d => d.CreatedAt >= from);
+        }
+        else if (query.TimePeriod == "6months")
+        {
+            var from = DateTime.UtcNow.AddMonths(-6);
+            q = q.Where(d => d.CreatedAt >= from);
+        }
+        else if (query.TimePeriod == "year")
+        {
+            var from = new DateTime(DateTime.UtcNow.Year, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            q = q.Where(d => d.CreatedAt >= from);
+        }
+
+        if (query.MinAmount.HasValue)
+        {
+            q = q.Where(d => d.Amount >= query.MinAmount.Value);
+        }
+
+        if (query.MaxAmount.HasValue)
+        {
+            q = q.Where(d => d.Amount <= query.MaxAmount.Value);
+        }
+
+        if (query.TargetNgo && !query.TargetProgramme)
+        {
+            q = q.Where(d => d.NgoId != null);
+        }
+        else if (query.TargetProgramme && !query.TargetNgo)
+        {
+            q = q.Where(d => d.ProgrammeId != null);
+        }
+
+        var totalCount = await q.CountAsync(ct);
+        var items = await q.OrderByDescending(d => d.CreatedAt)
+                .Skip((query.PageNumber - 1) * query.PageSize).Take(query.PageSize)
                 .ProjectToUserDto()
                 .ToArrayAsync(ct);
+
+        return new PagedResult<UserDonationDto>(items, totalCount, query.PageNumber, query.PageSize);
     }
 
     public async Task<DonationDto?> CreateDonationAsync(DonationSaveDto donation, CancellationToken ct = default)
