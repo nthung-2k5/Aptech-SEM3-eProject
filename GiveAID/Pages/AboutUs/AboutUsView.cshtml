@@ -1,0 +1,59 @@
+@model AboutUsView
+@{
+    bool isAdmin = User.Identity?.IsAuthenticated == true && User.IsInRole(nameof(GiveAID.Models.UserRole.Admin));
+}
+<div class="max-w-7xl mx-auto px-6 py-12">
+    <div class="flex flex-col md:flex-row gap-8">
+        <!-- Sidebar -->
+        <aside class="md:w-56 flex-shrink-0">
+            @if (isAdmin)
+            {
+                <a asp-page="/AboutUs/Editor" id="add-subpage" class="btn btn-primary btn-block mb-3">
+                    <i class="ph ph-plus"></i> Add Subpage
+                </a>
+            }
+            <div>
+                @foreach (var p in Model.Subpages)
+                {
+                    bool isActive = Model.CurrentPage?.Slug == p.Slug;
+                    <section data-active="@isActive" class="group">
+                        <a asp-page="/AboutUs/Index" asp-route-slug="@p.Slug">
+                            @p.Title
+                        </a>
+                        @if (isAdmin)
+                        {
+                            <div>
+                                <div class="tooltip" data-tip="Edit">
+                                    <a asp-page="/AboutUs/Editor" asp-route-slug="@p.Slug"
+                                       class="text-blue-500 hover:text-blue-700 group-data-[active=True]:hover:text-blue-400"
+                                       title="Edit">
+                                        <i class="ph ph-pencil"></i>
+                                    </a>
+                                </div>
+                                <div class="tooltip" data-tip="Delete" x-data="{ confirmDelete() { Swal.fire({ title: 'Are you sure?', text: 'Are you sure you want to delete this subpage?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', cancelButtonColor: '#3085d6', confirmButtonText: 'Yes, delete it!' }).then((result) => { if (result.isConfirmed) { $refs.deleteBtn.click(); } }) } }">
+                                    <button type="button" @@click.prevent="confirmDelete()"
+                                            class="text-red-500 hover:text-red-700 group-data-[active=True]:hover:text-red-400"
+                                            title="Delete">
+                                        <i class="ph ph-trash"></i>
+                                    </button>
+                                    <button x-ref="deleteBtn" on:click="@(() => Model.Delete(p.Slug))" style="display:none;"></button>
+                                </div>
+                            </div>
+                        }
+                    </section>
+                }
+            </div>
+        </aside>
+        <!-- Content -->
+        <div class="flex-1 bg-white rounded-xl border border-[#E3DDD3] p-8">
+
+            @if (Model.CurrentPage != null)
+            {
+                <div class="prose max-w-none text-[#6B6459]">
+                    @Html.Raw(Model.CurrentPage.HtmlContent)
+                </div>
+            }
+            else { <p class="text-gray-500">No content available.</p> }
+        </div>
+    </div>
+</div>

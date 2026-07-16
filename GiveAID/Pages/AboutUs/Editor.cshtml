@@ -11,7 +11,9 @@
                 @(Model.IsEditMode ? "Update Subpage" : "Create Subpage")
             </h1>
 
-            <form method="post">
+            <form method="post"
+                  x-data="{ submitForm(e) { if (typeof tinymce !== 'undefined') tinymce.triggerSave(); if ($el.checkValidity()) { e.preventDefault(); Swal.fire({ title: 'Success!', text: 'Subpage saved successfully.', icon: 'success', showConfirmButton: false, timer: 1500 }).then(() => { $el.submit(); }); } } }"
+                  x-on:submit="submitForm">
                 <input type="hidden" name="originalSlug" value="@Model.CurrentPage?.Slug"/>
                 <div class="space-y-4">
                     <div>

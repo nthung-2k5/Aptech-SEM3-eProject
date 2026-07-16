@@ -28,10 +28,10 @@ public class EditorModel(IAboutUsSubpageService aboutUsService) : PageModel
         return Page();
     }
 
-    public async Task<IActionResult> OnPostAsync(string? originalSlug, string slug, string title, string content,
+    public async Task<IActionResult> OnPostAsync(string? originalSlug, string slug, string title, string? content,
                                                  CancellationToken ct)
     {
-        var page = new AboutUsSubpageDto(slug, title, content);
+        var page = new AboutUsSubpageDto(slug, title, content ?? string.Empty);
 
         try
         {

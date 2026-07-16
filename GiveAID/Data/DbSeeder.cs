@@ -609,10 +609,23 @@ public static class DbSeeder
                     UserId         = admin?.UserId,
                     HtmlContent    =
                         "<section class=\"mission-section\">" +
+                        "<div class=\"mission-header mb-4\">" +
                         "<h2>What Drives Us</h2>" +
-                        "<p>At GiveAID, our mission is to connect compassionate donors with life-changing welfare programmes run by the world's most trusted humanitarian organisations — including UNICEF, the Red Cross, WWF, MSF, and Save the Children. We believe every dollar donated with purpose has the power to change a life.</p>" +
-                        "<h2>Our Commitment</h2>" +
-                        "<p>We operate with radical transparency. 97% of every donation reaches the designated programme. All financials are independently audited and published in our annual report. Donors receive real-time impact updates directly from field teams.</p>" +
+                        "<p class=\"lead text-muted\">Empowering communities worldwide through transparent, high-impact giving.</p>" +
+                        "</div>" +
+                        "<div class=\"mission-content mb-4\">" +
+                        "<p>At GiveAID, our mission is to seamlessly connect compassionate donors with life-changing welfare programmes led by the world's most trusted humanitarian organisations — including UNICEF, the Red Cross, WWF, MSF, and Save the Children. We firmly believe that every donation, when made with clear purpose and genuine accountability, carries the profound power to transform lives and uplift entire communities from the ground up.</p>" +
+                        "<p>We are not simply a donation platform. We are a bridge — carefully engineered to ensure that the compassion of a donor in one part of the world translates into tangible, lasting change in another. From clean water access to childhood education, from emergency disaster relief to mental health support for displaced families, the <a href=\"/programmes\" class=\"text-primary\">programmes we support</a> span the full spectrum of humanitarian need. Every cause on our platform has been rigorously vetted, and every partner organisation has demonstrated a proven track record of real-world impact.</p>" +
+                        "</div>" +
+                        "<div class=\"commitment-section mb-4\">" +
+                        "<h2>Our Unwavering Commitment</h2>" +
+                        "<p>We operate on a foundation of radical transparency. Our technology stack was built from day one with donor confidence in mind — every transaction is traceable, every programme update is verified, and every financial report is published openly for the public to scrutinise. We believe the charitable sector deserves the same level of rigour and accountability as any regulated financial institution, and we hold ourselves to exactly that standard.</p>" +
+                        "<p>Our commitment extends beyond just moving money efficiently. We invest heavily in understanding the communities our <a href=\"/organisations\" class=\"text-primary\">partner organisations</a> serve, so that the programmes we highlight are not only well-funded but genuinely well-matched to the needs of the people they aim to help. We regularly publish in-depth <a href=\"/impact-reports\" class=\"text-primary\">impact reports</a> that go beyond surface-level metrics, offering donors a meaningful window into how their generosity is being put to work.</p>" +
+                        "</div>" +
+                        "<div class=\"values-section\">" +
+                        "<h2>The Values We Live By</h2>" +
+                        "<p>Three core values define everything we do at GiveAID: <strong>Transparency</strong>, <strong>Integrity</strong>, and <strong>Impact</strong>. Transparency means we never hide fees, never obscure how funds are allocated, and never make promises we cannot keep. Integrity means we hold our partner organisations to the highest ethical standards and walk away from partnerships that do not align with our principles. Impact means we relentlessly measure outcomes — not just outputs — and continuously refine our approach to ensure that generosity truly reaches those who need it most.</p>" +
+                        "</div>" +
                         "</section>",
                     CreatedAt = DateTimeOffset.UtcNow.AddDays(-180)
                 },
@@ -623,10 +636,23 @@ public static class DbSeeder
                     UserId         = admin?.UserId,
                     HtmlContent    =
                         "<section class=\"story-section\">" +
+                        "<div class=\"story-header mb-4\">" +
                         "<h2>How It All Started</h2>" +
-                        "<p>GiveAID was founded in 2018 by a group of international development professionals and technologists who witnessed first-hand the friction between well-meaning donors and the NGOs that desperately needed their support. The idea was simple: build trust through technology.</p>" +
+                        "<p class=\"lead text-muted\">A vision born from the desire to bridge the gap between generosity and impact.</p>" +
+                        "</div>" +
+                        "<div class=\"story-content mb-4\">" +
+                        "<p>GiveAID was founded in 2018 by a dedicated collective of international development professionals, financial experts, and technologists who shared a single, burning frustration. Having spent years working on the ground — in refugee camps, in flood-ravaged villages, in communities rebuilding after conflict — they had witnessed first-hand the systemic friction that stood between well-meaning donors and the NGOs that desperately needed their support. Administrative overhead was sky-high. Accountability was inconsistent. Donors had no meaningful way to know whether their contributions were truly making a difference.</p>" +
+                        "<p>The founding team made a bold decision: rather than simply join existing platforms, they would rebuild the charitable giving experience from the ground up. The idea was elegantly simple yet quietly revolutionary — <strong>use technology to make trust the default, not an afterthought.</strong> Early conversations with partner organisations like <a href=\"/organisations\" class=\"text-primary\">those listed on our platform</a> confirmed that the appetite for a more transparent, efficient solution was enormous on both sides of the giving equation.</p>" +
+                        "</div>" +
+                        "<div class=\"milestones-section mb-4\">" +
                         "<h2>Where We Are Today</h2>" +
-                        "<p>Today, GiveAID partners with 5 globally recognised NGOs operating in 190+ countries. We have facilitated over $12 million in donations, funded 48 welfare programmes, and directly impacted 2.3 million beneficiaries. We are just getting started.</p>" +
+                        "<p>From a small grassroots initiative operating out of a shared office in Ho Chi Minh City, GiveAID has grown into a globally recognised platform for purposeful giving. Our <a href=\"/organisations\" class=\"text-primary\">partner organisations</a> now operate across every inhabited continent, responding to crises as they emerge and building sustainable community infrastructure where it is needed most. The diversity of <a href=\"/programmes\" class=\"text-primary\">programmes we support</a> has expanded dramatically — from emergency relief and clean water initiatives to long-term education scholarships and mental health outreach for marginalised communities.</p>" +
+                        "<p>Yet for all the growth, the founding ethos has never changed. Every decision we make — from the partners we onboard to the features we build — is filtered through one question: does this make giving more trustworthy, more accessible, and more impactful for the communities who depend on it? We believe the answer must always be yes, and we work tirelessly to ensure it is.</p>" +
+                        "</div>" +
+                        "<div class=\"future-section\">" +
+                        "<h2>What Comes Next</h2>" +
+                        "<p>We are at an exciting inflection point. The philanthropic landscape is changing — donors are more informed, more discerning, and more eager than ever to give with purpose. GiveAID is uniquely positioned to lead that shift. In the coming years, we plan to expand our network of partner organisations, deepen our investment in real-time programme reporting, and launch new tools that make charitable giving as intuitive and rewarding as any other meaningful act in a person's life. <a href=\"/contact\" class=\"text-primary\">Follow our journey</a> — the best chapters are still being written.</p>" +
+                        "</div>" +
                         "</section>",
                     CreatedAt = DateTimeOffset.UtcNow.AddDays(-180)
                 },
@@ -637,10 +663,24 @@ public static class DbSeeder
                     UserId         = admin?.UserId,
                     HtmlContent    =
                         "<section class=\"team-section\">" +
+                        "<div class=\"team-header mb-4\">" +
                         "<h2>The People Behind GiveAID</h2>" +
-                        "<p>Our lean, diverse team spans Vietnam, Switzerland, and the United States. We bring together expertise in humanitarian finance, full-stack engineering, UX design, and international development. Every team member has personally volunteered in at least one of our partner NGO programmes.</p>" +
+                        "<p class=\"lead text-muted\">A global team united by a single, powerful purpose.</p>" +
+                        "</div>" +
+                        "<div class=\"team-content mb-4\">" +
+                        "<p>GiveAID is powered by a lean, fiercely dedicated team spread across Vietnam, Switzerland, the United Kingdom, and the United States. We are not a faceless corporation. We are a group of people who genuinely care — about the communities we serve, about the donors who trust us, and about doing this work with the integrity it deserves. Our team brings together expertise in humanitarian finance, full-stack software engineering, user experience design, data science, and international grassroots development, all working in concert toward a shared vision.</p>" +
+                        "<p>What sets our team apart is lived experience. Every person who works at GiveAID has, at some point, rolled up their sleeves and worked directly with one of our <a href=\"/organisations\" class=\"text-primary\">partner organisations</a> on the ground. That firsthand understanding of what aid work actually looks like — the logistical challenges, the human stories, the moments of profound hope — keeps us grounded and laser-focused on what truly matters.</p>" +
+                        "</div>" +
+                        "<div class=\"culture-section mb-4\">" +
+                        "<h2>How We Work</h2>" +
+                        "<p>We operate with a flat structure and a culture of radical openness. Ideas are welcomed from every corner of the organisation, and our weekly all-hands meetings are open to volunteers and long-term partners alike. We believe the best thinking happens when diverse perspectives are genuinely heard — not just tolerated. Our <a href=\"/impact-reports\" class=\"text-primary\">publicly available reports</a> reflect this ethos: we share not only our successes but our setbacks, because honest reflection is the only path to genuine improvement.</p>" +
+                        "<p>Collaboration with our <a href=\"/organisations\" class=\"text-primary\">NGO partners</a> is central to how we develop new features and refine existing ones. We do not build in isolation and then hand things over — we co-design, test, and iterate alongside the organisations and communities we serve, ensuring that what we build is actually useful in the real world.</p>" +
+                        "</div>" +
+                        "<div class=\"join-section\">" +
                         "<h2>Join the Movement</h2>" +
-                        "<p>We are always seeking passionate volunteers, corporate partners, and impact investors. If you share our belief in a more generous world, <a href=\"/contact\">reach out to us</a> — we would love to hear from you.</p>" +
+                        "<p>Real change is never the work of one person or one organisation — it is always a collective endeavour. We are always looking for passionate people who want to contribute in meaningful ways. Whether you are a developer who wants to build technology for good, a communications professional who can help tell these important stories, or simply someone who believes deeply in a more generous world, there is a place for you here.</p>" +
+                        "<p>We also welcome <a href=\"/contact\" class=\"text-primary\">corporate partnerships</a> with organisations that want to embed social impact into their culture in a meaningful, accountable way — not just as a box-ticking exercise. If your organisation shares our values, let us build something worthwhile together. <a href=\"/contact\" class=\"text-primary fw-bold\">Reach out to us today</a> and let's start the conversation.</p>" +
+                        "</div>" +
                         "</section>",
                     CreatedAt = DateTimeOffset.UtcNow.AddDays(-180)
                 },
