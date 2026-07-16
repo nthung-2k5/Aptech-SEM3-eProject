@@ -59,7 +59,7 @@ public class RegisterForm(
         {
             ModelState.AddModelError(nameof(Email), "An account with this email already exists.");
         }
-        catch (DuplicateException ex) when (ex.FieldName == nameof(Phone))
+        catch (DuplicateException ex) when (ex.FieldName == nameof(MemberCreateDto.PhoneNumber))
         {
             ModelState.AddModelError(nameof(Phone), "An account with this phone number already exists.");
         }

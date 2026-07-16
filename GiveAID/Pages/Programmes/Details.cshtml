@@ -162,9 +162,18 @@
                             }
                             else
                             {
-                                <a asp-page="/Donate/Index" asp-route-programmeId="@p.Id" class="btn btn-secondary btn-block btn-xl">
-                                    Donate Now
-                                </a>
+                                @if (User.Identity?.IsAuthenticated == true)
+                                {
+                                    <a asp-page="/Donate/Index" asp-route-programmeId="@p.Id" class="btn btn-secondary btn-block btn-xl">
+                                        Donate Now
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button onclick="Swal.fire({ title: 'Registration Required', text: 'You must be registered to donate. Do you want to register now?', icon: 'warning', showCancelButton: true, confirmButtonText: 'Yes', cancelButtonText: 'No' }).then((result) => { if (result.isConfirmed) { window.location.href = '@Url.Page("/Register/Index")'; } })" class="btn btn-secondary btn-block btn-xl">
+                                        Donate Now
+                                    </button>
+                                }
                             }
                             
                             <button class="btn btn-outline btn-block mt-4" onclick="inviteModal.showModal()">

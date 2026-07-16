@@ -66,6 +66,7 @@ public class DonateForm(
             if (MaxAllowedAmount.HasValue && Amount > MaxAllowedAmount.Value)
             {
                 Amount = MaxAllowedAmount.Value;
+                Client.ExecuteJs($"Swal.fire('Amount Adjusted', 'The donation amount has been adjusted to ${MaxAllowedAmount.Value:N2} to not exceed the required target.', 'info');");
             }
         }
     }

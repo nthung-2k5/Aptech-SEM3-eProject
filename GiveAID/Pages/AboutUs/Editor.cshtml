@@ -58,6 +58,25 @@
             content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
             promotion: false,
             license_key: 'gpl',
+            file_picker_types: 'image',
+            // Custom file picker to convert local image to Base64
+            file_picker_callback: (cb, value, meta) => {
+                const input = document.createElement('input');
+                input.setAttribute('type', 'file');
+                input.setAttribute('accept', 'image/*');
+                input.addEventListener('change', (e) => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.addEventListener('load', () => {
+                        const id = 'blobid' + (new Date()).getTime();
+                        const base64 = reader.result.split(',')[1];
+                        // Create base64 image without backend upload
+                        cb('data:' + file.type + ';base64,' + base64, { title: file.name });
+                    });
+                    reader.readAsDataURL(file);
+                });
+                input.click();
+            }
         });
     </script>
 }
