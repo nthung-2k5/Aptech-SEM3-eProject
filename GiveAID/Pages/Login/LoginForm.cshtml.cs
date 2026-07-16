@@ -3,6 +3,7 @@ using GiveAID.Models;
 using GiveAID.Services;
 using GiveAID.Services.Abstractions;
 using Hydro;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GiveAID.Pages.Login;
 
@@ -35,7 +36,8 @@ public class LoginForm(
 
             HttpContext.Response.Cookies.Append("jwt_token", result.Token, cookieOptions);
 
-            Redirect(result.Role == UserRole.Admin ? "/Admin" : "/");
+            var redirectUrl = result.Role == UserRole.Admin ? Url.Page("/Admin/Index") : Url.Page("/Index");
+            Client.ExecuteJs($"Swal.fire('Success', 'Login successful!', 'success').then(() => window.location.href = '{redirectUrl ?? (result.Role == UserRole.Admin ? "/Admin" : "/")}');");
         }
         catch (LoginException ex)
         {

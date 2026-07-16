@@ -53,7 +53,7 @@ public class RegisterForm(
 
             HttpContext.Response.Cookies.Append("jwt_token", result.Token, cookieOptions);
             
-            Redirect(Url.Page("/Index"));
+            Client.ExecuteJs($"Swal.fire('Success', 'Registration successful!', 'success').then(() => window.location.href = '{Url.Page("/Index")}');");
         }
         catch (DuplicateException ex) when (ex.FieldName == nameof(Email))
         {
