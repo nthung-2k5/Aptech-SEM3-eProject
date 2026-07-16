@@ -1,5 +1,3 @@
-using Microsoft.AspNetCore.Http;
-
 namespace GiveAID.Services.Abstractions;
 
 public interface IImageService

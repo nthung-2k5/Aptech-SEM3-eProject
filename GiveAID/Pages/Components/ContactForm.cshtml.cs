@@ -1,6 +1,5 @@
 using FluentValidation;
 using Hydro;
-using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using GiveAID.Dtos;
 using GiveAID.Services.Abstractions;

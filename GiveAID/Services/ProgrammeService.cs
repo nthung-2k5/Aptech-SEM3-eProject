@@ -137,7 +137,7 @@ public class ProgrammeService(AppDbContext context, IUserInterestService userInt
 
         await userInterestService.NotifyInterestedUsersAsync(programme, ct);
 
-        return await context.AvailableWelfareProgrammes.AsNoTracking().ProjectToDto().FirstAsync(ct);
+        return await context.WelfareProgrammes.AsNoTracking().ProjectToDto().FirstAsync(ct);
     }
 
     public async Task UpdateProgrammeAsync(Guid id, ProgrammeSaveDto dto, CancellationToken ct = default)
