@@ -36,7 +36,15 @@ public class AuthService(AppDbContext dbContext, IPasswordService passwordServic
         throw new LoginException("Invalid credentials.");
     }
 
-    private string GenerateJwtToken(User user)
+    public async Task<string?> RefreshTokenAsync(Guid userId, DateTime? expires = null, CancellationToken ct = default)
+    {
+        var user = await dbContext.Users.AsNoTracking().FirstOrDefaultAsync(u => u.UserId == userId, ct);
+        if (user == null || user.IsDeleted) return null;
+        
+        return GenerateJwtToken(user, expires);
+    }
+
+    private string GenerateJwtToken(User user, DateTime? expires = null)
     {
         var jwtSettings = configuration.GetSection("JwtSettings");
         string secretKey = jwtSettings["Secret"] ?? "super_secret_default_key_replace_me_in_production_over_32_chars";
@@ -56,7 +64,7 @@ public class AuthService(AppDbContext dbContext, IPasswordService passwordServic
             jwtSettings["Issuer"] ?? "GiveAID",
             jwtSettings["Audience"] ?? "GiveAID",
             claims,
-            expires: DateTime.UtcNow.AddHours(24),
+            expires: expires ?? DateTime.UtcNow.AddHours(24),
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

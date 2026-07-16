@@ -29,15 +29,14 @@
                     <label class="block text-sm font-medium text-gray-700">Email Address (Read-only)</label>
                     <input asp-for="Input.Email" bind
                            class="mt-1 input w-full"
-                           disabled/>
+                           readonly/>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Phone Number (Read-only)</label>
                     <input asp-for="Input.PhoneNumber" bind
                            class="mt-1 input w-full"
-                           disabled/>
-                    <span asp-validation-for="Input.PhoneNumber" class="text-red-500 text-xs" ></span>
+                           readonly/>
                 </div>
 
                 <div>

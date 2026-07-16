@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using FluentValidation;
 using GiveAID.Data;
+using GiveAID.Services.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace GiveAID.Pages.Member;
 
 [Authorize(Roles = "Member")]
-public class ProfileModel(AppDbContext context, IValidator<ProfileModel.InputModel> validator) : PageModel
+public class ProfileModel(AppDbContext context, IValidator<ProfileModel.InputModel> validator, IAuthService authService) : PageModel
 {
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -69,12 +70,36 @@ public class ProfileModel(AppDbContext context, IValidator<ProfileModel.InputMod
         if (user == null) { return RedirectToPage("/Login/Index"); }
 
         user.FullName = Input.FullName;
-        user.PhoneNumber = Input.PhoneNumber;
         user.DateOfBirth = Input.DateOfBirth;
         user.Address = Input.Address;
         user.Occupation = Input.Occupation;
 
         await context.SaveChangesAsync();
+
+        var tokenString = HttpContext.Request.Cookies["jwt_token"];
+        DateTime? expires = null;
+        if (!string.IsNullOrEmpty(tokenString))
+        {
+            var handler = new System.IdentityModel.Tokens.Jwt.JwtSecurityTokenHandler();
+            if (handler.CanReadToken(tokenString))
+            {
+                var jwtToken = handler.ReadJwtToken(tokenString);
+                expires = jwtToken.ValidTo;
+            }
+        }
+
+        var newToken = await authService.RefreshTokenAsync(userId, expires);
+        if (!string.IsNullOrEmpty(newToken))
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = expires.HasValue ? new DateTimeOffset(expires.Value) : DateTimeOffset.UtcNow.AddHours(24)
+            };
+            HttpContext.Response.Cookies.Append("jwt_token", newToken, cookieOptions);
+        }
 
         TempData["SuccessMessage"] = "Your profile has been updated successfully.";
 

@@ -4,11 +4,15 @@ using GiveAID.Exceptions;
 using GiveAID.Services.Abstractions;
 using Hydro;
 using Microsoft.AspNetCore.Mvc;
+// using System.Security.Claims;
+// using System.IdentityModel.Tokens.Jwt;
 
 namespace GiveAID.Pages.Admin.Member;
 
 public class AdminMemberEditor(
     IMemberService memberService,
+    // IAuthService authService,
+    // IHttpContextAccessor httpContextAccessor,
     IValidator<AdminMemberEditor> validator) : HydroComponent
 {
     public Guid? Id { get; set; }
@@ -75,6 +79,39 @@ public class AdminMemberEditor(
 
                 await memberService.CreateMemberAsync(createDto);
             }
+
+            // var httpContext = httpContextAccessor.HttpContext;
+            // if (httpContext != null && Id.HasValue && Id.Value != Guid.Empty)
+            // {
+            //     var currentUserIdStr = httpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //     if (currentUserIdStr == Id.Value.ToString())
+            //     {
+            //         var tokenString = httpContext.Request.Cookies["jwt_token"];
+            //         DateTime? expires = null;
+            //         if (!string.IsNullOrEmpty(tokenString))
+            //         {
+            //             var handler = new JwtSecurityTokenHandler();
+            //             if (handler.CanReadToken(tokenString))
+            //             {
+            //                 var jwtToken = handler.ReadJwtToken(tokenString);
+            //                 expires = jwtToken.ValidTo;
+            //             }
+            //         }
+            //
+            //         var newToken = await authService.RefreshTokenAsync(Id.Value, expires);
+            //         if (!string.IsNullOrEmpty(newToken))
+            //         {
+            //             var cookieOptions = new CookieOptions
+            //             {
+            //                 HttpOnly = true,
+            //                 Secure = true,
+            //                 SameSite = SameSiteMode.Strict,
+            //                 Expires = expires.HasValue ? new DateTimeOffset(expires.Value) : DateTimeOffset.UtcNow.AddHours(24)
+            //             };
+            //             httpContext.Response.Cookies.Append("jwt_token", newToken, cookieOptions);
+            //         }
+            //     }
+            // }
 
             Client.ExecuteJs($"Swal.fire('Success', 'Member saved successfully', 'success').then(() => window.location.href = '{Url.Page("/Admin/Member/Index")}');");
         }
