@@ -147,7 +147,7 @@ public class DonateForm(
         public Validator()
         {
             RuleFor(x => x.Amount)
-                .GreaterThanOrEqualTo(1).WithMessage("Amount must be at least 1")
+                .GreaterThan(0).WithMessage("Amount must be greater than zero")
                 .Must((form, amount) => !form.MaxAllowedAmount.HasValue || amount <= form.MaxAllowedAmount.Value)
                 .WithMessage(form => $"Amount cannot exceed {form.MaxAllowedAmount:C}");
 
